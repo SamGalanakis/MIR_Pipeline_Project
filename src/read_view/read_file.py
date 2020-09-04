@@ -9,6 +9,7 @@ import numpy as np
 def read_file(path):
     if path.split(".")[-1]=="off":
         pass
+    
     with open(path) as f:
         line_list=f.readlines()
         line_list = [x for x in line_list if x[0]!= "#"]

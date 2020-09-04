@@ -53,7 +53,6 @@ glfw.set_window_size_callback(window, window_resize)
 glfw.make_context_current(window)
 
 
-
 path = r"data\benchmark\db\0\m0\m0.off"
 
 
@@ -92,6 +91,24 @@ glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 glEnable(GL_DEPTH_TEST)
 
 rotation_loc = glGetUniformLocation(shader, "rotation")
+
+
+
+
+
+
+def input_manager(window,key,scancode,action,mods):
+    if key == glfw.KEY_LEFT and action == glfw.PRESS:
+        print("55")
+
+glfw.set_key_callback(window,input_manager)
+
+
+
+
+
+
+
 
 # the main application loop
 while not glfw.window_should_close(window):
