@@ -34,9 +34,9 @@ def read_file(path):
    
       
         vertices = line_list[:n_vertices]
-        vertices = np.array( [list(map(lambda y: float(y),x.split(" "))) for x in vertices],dtype= np.float32).flatten()
+        vertices = np.array( [list(map(lambda y: float(y),x.split())) for x in vertices],dtype= np.float32).flatten()
         triangle_elements = line_list[n_vertices:]
-        triangle_elements = np.array([list(map(lambda y: int(y),x.split(" ")))[1:] for x in triangle_elements],dtype=np.uint32).flatten()
+        triangle_elements = np.array([list(map(lambda y: int(y),x.split()))[1:] for x in triangle_elements],dtype=np.uint32).flatten()
 
         print("readfile")
 

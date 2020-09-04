@@ -73,32 +73,18 @@ vertices = np.array(vertices, dtype=np.float32)
 indices = np.array(indices, dtype=np.uint32)
 
 path = r"C:\Users\samme\Google_Drive\Code_library\MIR_Pipeline_Project\data\benchmark\db\0\m0\m0.off"
-# vertices, indices, info = read_file(path)
+# path = r"C:\Users\samme\Google_Drive\Code_library\MIR_Pipeline_Project\data\benchmark\db\1\m104\m104.off"
+# path = r"C:\Users\samme\Google_Drive\Code_library\MIR_Pipeline_Project\data\cube.off"
 
 
-def read_off(file):
-    if 'OFF' != file.readline().strip():
-        raise('Not a valid OFF header')
-    n_verts, n_faces, n_dontknow = tuple([int(s) for s in file.readline().strip().split(' ')])
-    verts = [[float(s) for s in file.readline().strip().split(' ')] for i_vert in range(n_verts)]
-    faces = [[int(s) for s in file.readline().strip().split(' ')][1:] for i_face in range(n_faces)]
-    vertices = []
-    indexes=[]
-    for x in verts:
-        vertices += x
-    for x in faces:
-        indexes += x
-    verts = np.array(vertices,dtype=np.float32)
-    faces = np.array(indexes,dtype = np.uint32)
-    return verts, faces
+vertices, indices, info = read_file(path)
 
 
 
 
-file = open(path)
-vertices,indexes= read_off(file)
 
-file.close()
+
+
 
 
 shader = compileProgram(compileShader(vertex_src, GL_VERTEX_SHADER), compileShader(fragment_src, GL_FRAGMENT_SHADER))
@@ -114,13 +100,15 @@ glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
 glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
 
 glEnableVertexAttribArray(0)
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(0))
 
 glEnableVertexAttribArray(1)
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(12))
 
 glUseProgram(shader)
 glClearColor(0, 0.1, 0.1, 1)
+
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 glEnable(GL_DEPTH_TEST)
 
 rotation_loc = glGetUniformLocation(shader, "rotation")
@@ -132,10 +120,12 @@ while not glfw.window_should_close(window):
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
     rot_x = pyrr.Matrix44.from_x_rotation(0.5 * glfw.get_time())
+    
     rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time())
 
     # glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, rot_x * rot_y)
     # glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, rot_x @ rot_y)
+
     glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, pyrr.matrix44.multiply(rot_x, rot_y))
 
     glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
