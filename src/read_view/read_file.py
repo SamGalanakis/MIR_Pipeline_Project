@@ -11,13 +11,14 @@ def read_file(path):
         pass
     with open(path) as f:
         line_list=f.readlines()
+        line_list = [x for x in line_list if x[0]!= "#"]
         if "OFF" in  line_list[0]:
             line_list=line_list[1:]
             print("off file")
         
         line_list= [ x.rstrip() for x in line_list]
 
-        info= line_list[0].split(" ")
+        info= line_list[0].split()
         info = [int(x) for x in info]
         line_list = line_list[1:]
         if len(info) == 4:
@@ -38,7 +39,7 @@ def read_file(path):
         triangle_elements = line_list[n_vertices:]
         triangle_elements = np.array([list(map(lambda y: int(y),x.split()))[1:] for x in triangle_elements],dtype=np.uint32).flatten()
 
-        print("readfile")
+   
 
         return vertices, triangle_elements, info
     

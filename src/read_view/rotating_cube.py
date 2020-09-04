@@ -52,29 +52,9 @@ glfw.set_window_size_callback(window, window_resize)
 # make the context current
 glfw.make_context_current(window)
 
-vertices = [-0.5, -0.5, 0.5, 1.0, 0.0, 0.0,
-             0.5, -0.5, 0.5, 0.0, 1.0, 0.0,
-             0.5,  0.5, 0.5, 0.0, 0.0, 1.0,
-            -0.5,  0.5, 0.5, 1.0, 1.0, 1.0,
 
-            -0.5, -0.5, -0.5, 1.0, 0.0, 0.0,
-             0.5, -0.5, -0.5, 0.0, 1.0, 0.0,
-             0.5,  0.5, -0.5, 0.0, 0.0, 1.0,
-            -0.5,  0.5, -0.5, 1.0, 1.0, 1.0]
 
-indices = [0, 1, 2, 2, 3, 0,
-           4, 5, 6, 6, 7, 4,
-           4, 5, 1, 1, 0, 4,
-           6, 7, 3, 3, 2, 6,
-           5, 6, 2, 2, 1, 5,
-           7, 4, 0, 0, 3, 7]
-
-vertices = np.array(vertices, dtype=np.float32)
-indices = np.array(indices, dtype=np.uint32)
-
-path = r"C:\Users\samme\Google_Drive\Code_library\MIR_Pipeline_Project\data\benchmark\db\0\m0\m0.off"
-# path = r"C:\Users\samme\Google_Drive\Code_library\MIR_Pipeline_Project\data\benchmark\db\1\m104\m104.off"
-# path = r"C:\Users\samme\Google_Drive\Code_library\MIR_Pipeline_Project\data\cube.off"
+path = r"data\benchmark\db\0\m0\m0.off"
 
 
 vertices, indices, info = read_file(path)
@@ -123,8 +103,7 @@ while not glfw.window_should_close(window):
     
     rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time())
 
-    # glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, rot_x * rot_y)
-    # glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, rot_x @ rot_y)
+   
 
     glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, pyrr.matrix44.multiply(rot_x, rot_y))
 
