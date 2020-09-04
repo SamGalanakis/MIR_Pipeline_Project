@@ -20,15 +20,15 @@ def ply_to_off(path):
 
 
 
-path = "/home/mvalente/docs/msc_ai/year2/term1/informr/MIR_Pipeline_Project/data/m0.ply"
 
-ply_to_off(path)
 
 
 def read_file(path):
     if path.split(".")[-1]=="off":
         pass
-    
+    elif path.split(".")[-1]=="ply":
+        ply_to_off(path)
+
     with open(path) as f:
         line_list=f.readlines()
         line_list = [x for x in line_list if x[0]!= "#"]

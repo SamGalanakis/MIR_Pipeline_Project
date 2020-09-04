@@ -130,6 +130,6 @@ dmypy.json
 
 #extras
 
-data/
+data/benchmark/
 .vscode/
 extras/
