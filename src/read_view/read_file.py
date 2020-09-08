@@ -30,29 +30,30 @@ def read_file(path):
     if path.split(".")[-1]=="off":
         pass
     elif path.split(".")[-1]=="ply":
-        ply_to_off(path)
+        line_list=ply_to_off(path)
 
-    with open(path) as f:
-        line_list=f.readlines()
+    if not line_list:    
+        with open(path) as f:
+            line_list=f.readlines()
         line_list = [x for x in line_list if x[0]!= "#"]
-        if "OFF" in  line_list[0]:
-            line_list=line_list[1:]
-            print("off file")
-        
-        line_list= [ x.rstrip() for x in line_list]
+    if "OFF" in  line_list[0]:
+        line_list=line_list[1:]
+        print("off file")
+    
+    line_list= [ x.rstrip() for x in line_list]
 
-        info= line_list[0].split()
-        info = [int(x) for x in info]
-        line_list = line_list[1:]
-        if len(info) == 4:
-            n_vertices = info[0]
-            n_faces= info[1]
-            n_edges= info[2]
-            n_cells = info[3]
-        else:
-            n_vertices = info[0]
-            n_faces= info[1]
-            n_cells = info[2]
+    info= line_list[0].split()
+    info = [int(x) for x in info]
+    line_list = line_list[1:]
+    if len(info) == 4:
+        n_vertices = info[0]
+        n_faces= info[1]
+        n_edges= info[2]
+        n_cells = info[3]
+    else:
+        n_vertices = info[0]
+        n_faces= info[1]
+        n_cells = info[2]
         
 
    
