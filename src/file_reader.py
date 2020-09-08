@@ -2,13 +2,13 @@ import numpy as np
 
 
 class FileReader:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self):
+        pass
 
-    def convert_ply_to_off(self):
+    def convert_ply_to_off(self, path):
         off_file = ["OFF\n"]
 
-        with open(self.path) as f:
+        with open(path) as f:
             ply = f.readlines()
 
         ply = [x for x in ply if not x.startswith("comment")]
@@ -24,13 +24,13 @@ class FileReader:
 
         return off_file
 
-    def read(self):
+    def read(self, path):
 
-        if self.path.split(".")[-1] == "ply":
-            lines = self.convert_ply_to_off()
+        if path.split(".")[-1] == "ply":
+            lines = self.convert_ply_to_off(path)
 
         if not lines:
-            with open(self.path) as f:
+            with open(path) as f:
                 lines = f.readlines()
             lines = [x for x in lines if x[0] != "#"]
         if "OFF" in lines[0]:
@@ -46,11 +46,14 @@ class FileReader:
             n_vertices = info[0]
             n_faces = info[1]
             n_edges = info[2]
-            n_cells = info[3]
+            n_attributes = info[3]
         else:
             n_vertices = info[0]
             n_faces = info[1]
-            n_cells = info[2]
+            n_attributes = info[2]
+
+        if n_attributes > 0:
+            raise Exception("Extra properties")
 
         vertices = lines[:n_vertices]
         vertices = np.array([list(map(lambda y: float(y), x.split()))
