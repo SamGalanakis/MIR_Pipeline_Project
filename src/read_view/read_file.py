@@ -7,14 +7,17 @@ def ply_to_off(path):
     off_file = ["OFF\n"]
     with open(path) as f:
         ply = f.readlines()
-    vertex = ply[3].split()[2]
-    indeces = ply[7].split()[2]
+    
+    ply = [x for x in ply if not x.startswith("comment")]
+
+    vertex = ply[2].split()[2]
+    indeces = ply[6].split()[2]
     off_file.append(f"{vertex} {indeces} 0\n")
 
-    ply = ply[10:]
+    ply = ply[9:]
 
-    off_file.append(ply[:int(vertex)])
-    off_file.append(ply[int(vertex):])
+    off_file.extend(ply[:int(vertex)])
+    off_file.extend(ply[int(vertex):])
 
     return off_file            
 
@@ -69,4 +72,6 @@ def read_file(path):
 if __name__ == "__main__":
     path = r"data\benchmark\db\0\m0\m0.off"
     path =r"data\test_ply.ply"
+    linux_path =r"../../data/test_ply.ply"
+
     read_file(path)
