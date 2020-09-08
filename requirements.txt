@@ -1,15 +1,10 @@
 certifi==2020.6.20
 glfw==1.12.0
-mkl-fft==1.1.0
-mkl-random==1.1.1
-mkl-service==2.3.0
 multipledispatch==0.6.0
-numpy @ file:///C:/Users/samme/Google_Drive/Code_library/MIR_Pipeline_Project/extras/numpy-1.19.1%2Bmkl-cp38-cp38-win_amd64.whl
+numpy==1.19.1
 Pillow==7.2.0
-pyglfw==0.2.2
 PyOpenGL==3.1.5
 PyOpenGL-accelerate==3.1.5
 pyrr==0.10.3
-scipy @ file:///C:/Users/samme/Google_Drive/Code_library/MIR_Pipeline_Project/extras/scipy-1.5.2-cp38-cp38-win_amd64.whl
+scipy==1.5.2
 six==1.15.0
-wincertstore==0.2

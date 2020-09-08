@@ -67,7 +67,7 @@ glfw.set_window_size_callback(window, window_resize)
 glfw.make_context_current(window)
 
 path = r"data\benchmark\db\0\m0\m0.off"
-path =r"data\test_ply.ply"
+path =r"../../data/test_ply.ply"
 
 vertices, indices, info = read_file(path)
 
