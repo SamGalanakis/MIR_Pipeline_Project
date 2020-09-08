@@ -1,0 +1,65 @@
+import numpy as np
+
+
+class FileReader:
+    def __init__(self):
+        pass
+
+    def convert_ply_to_off(self, path):
+        off_file = ["OFF\n"]
+
+        with open(path) as f:
+            ply = f.readlines()
+
+        ply = [x for x in ply if not x.startswith("comment")]
+
+        vertex = ply[2].split()[2]
+        indeces = ply[6].split()[2]
+        off_file.append(f"{vertex} {indeces} 0\n")
+
+        ply = ply[9:]
+
+        off_file.extend(ply[:int(vertex)])
+        off_file.extend(ply[int(vertex):])
+
+        return off_file
+
+    def read(self, path):
+
+        if path.split(".")[-1] == "ply":
+            lines = self.convert_ply_to_off(path)
+
+        if not lines:
+            with open(path) as f:
+                lines = f.readlines()
+            lines = [x for x in lines if x[0] != "#"]
+        if "OFF" in lines[0]:
+            lines = lines[1:]
+            print("off file")
+
+        lines = [x.rstrip() for x in lines]
+
+        info = [int(x) for x in lines[0].split()]
+        lines = lines[1:]
+
+        if len(info) == 4:
+            n_vertices = info[0]
+            n_faces = info[1]
+            n_edges = info[2]
+            n_attributes = info[3]
+        else:
+            n_vertices = info[0]
+            n_faces = info[1]
+            n_attributes = info[2]
+
+        if n_attributes > 0:
+            raise Exception("Extra properties")
+
+        vertices = lines[:n_vertices]
+        vertices = np.array([list(map(lambda y: float(y), x.split()))
+                                for x in vertices], dtype=np.float32).flatten()
+        triangle_elements = lines[n_vertices:]
+        triangle_elements = np.array([list(map(lambda y: int(y), x.split()))[
+                                        1:] for x in triangle_elements], dtype=np.uint32).flatten()
+
+        return vertices, triangle_elements, info
