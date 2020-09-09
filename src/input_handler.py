@@ -46,4 +46,4 @@ class InputHandler:
         if key == glfw.KEY_SPACE and action == glfw.PRESS:
             self.mode += 1
             self.mode = self.mode % len(self.mode_list)
-            print("space>")
+           

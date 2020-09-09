@@ -12,7 +12,7 @@ from input_handler import InputHandler
 from cmath import pi
 
 
-class ModelViwer:
+class ModelViewer:
     def __init__(self):
 
         self.reader = FileReader()
@@ -140,12 +140,12 @@ class ModelViwer:
             pyrr.Vector3(-initial_offset))
 
 
-        print(f"Initial offset: {initial_offset}")
+    
 
 
         ## Input
 
-        move = 0
+        
         rotation = pyrr.matrix44.create_from_axis_rotation(np.array([0, 1, 0]), 0)
 
         glfw.set_key_callback(window, input_handler.keyboard_handler)

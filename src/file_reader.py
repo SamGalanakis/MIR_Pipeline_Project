@@ -8,7 +8,7 @@ class FileReader:
     def convert_ply_to_off(self, path):
         off_file = ["OFF\n"]
 
-        with open(path) as f:
+        with path.open() as f:
             ply = f.readlines()
 
         ply = [x for x in ply if not x.startswith("comment")]
@@ -26,11 +26,13 @@ class FileReader:
 
     def read(self, path):
 
-        if path.split(".")[-1] == "ply":
+        if path.suffix == ".ply":
             lines = self.convert_ply_to_off(path)
+        elif path.suffix != ".off":
+            raise Exception("Invalid file type, can only process .off and .ply")
 
         if not lines:
-            with open(path) as f:
+            with path.open() as f:
                 lines = f.readlines()
             lines = [x for x in lines if x[0] != "#"]
         if "OFF" in lines[0]:
