@@ -1,14 +1,12 @@
 import platform
 from model_viewer import ModelViewer
 import os
+from pathlib import Path
 
 
 def main():
-    if platform.system() == "Linux":
-        os.system('export MESA_GL_VERSION_OVERRIDE=3.3')
-        path = r"../data/test.ply"
-    else:
-        path = r"data\\test.ply"
+ 
+    path = Path(r"data\\test.ply")
 
     viewer = ModelViewer()
     viewer.process(path)
