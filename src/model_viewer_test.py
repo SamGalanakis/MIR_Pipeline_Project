@@ -41,22 +41,6 @@ class ModelViewer:
         }
         """
 
-    def bounding_box(self,vertices,indices):
-        as_points = vertices.reshape(-1, 3)
-
-
-
-        max_x, max_y, max_z = as_points.max(axis=0)
-        min_x, min_y, min_z = as_points.min(axis=0)
-
-        bounding_rect_vertices = np.array([[min_x,min_y,min_z],[max_x,min_y,min_z],[max_x,min_y,max_z],[min_x,min_y,max_z],
-                            [min_x,max_y,min_z],[max_x,max_y,min_z],[max_x,max_y,max_z],[min_x,max_y,max_z]]).flatten()
-        
-        bounding_rect_indices = (np.array([0,1,2,2,3,0,  4,5,6,6,7,4, 0,1,4,4,5,1,  2,3,6,6,7,3, 0,3,4,4,7,3, 1,2,5,5,6,2 ],dtype=np.uint32) + max(indices)+1).flatten()
-
-        return bounding_rect_vertices, bounding_rect_indices
-
-
     def window_resize(self, window, width, height):
         glViewport(0, 0, width, height)
         projection = pyrr.matrix44.create_perspective_projection_matrix(
@@ -64,6 +48,22 @@ class ModelViewer:
         window_height = height
         window_width = width
         glUniformMatrix4fv(self.proj_loc, 1, GL_FALSE, projection)
+
+    def bounding_box(self,vertices):
+        as_points = vertices.reshape(-1, 3)
+
+   
+
+        max_x, max_y, max_z = as_points.max(axis=0)
+        min_x, min_y, min_z = as_points.min(axis=0)
+
+        bounding_rect_vertices = np.array([[min_x,min_y,min_z],[max_x,min_y,min_z],[max_x,min_y,max_z],[min_x,min_y,max_z],
+                            [min_x,max_y,min_z],[max_x,max_y,min_z],[max_x,max_y,max_z],[min_x,max_y,max_z]]).flatten()
+        
+        bounding_rect_indices = (np.array([0,1,2,2,3,0,  4,5,6,6,7,4, 0,1,4,4,5,1,  2,3,6,6,7,3, 0,3,4,4,7,3, 1,2,5,5,6,2 ],dtype=np.uint32)).flatten()
+
+        return bounding_rect_vertices, bounding_rect_indices
+
 
     def process(self, path=False, vertices=False, indices=False, info= False):
 
@@ -74,20 +74,11 @@ class ModelViewer:
         else:
             assert(type(vertices) ==np.ndarray and type(indices) ==np.ndarray, "Define path or both vertices and indices")
         
-        pre_box = len(indices)
-        
-        bounding_rect_vertices, bounding_rect_indices = self.bounding_box(vertices,indices)
-
-        vertices = np.append(vertices,bounding_rect_vertices)
-
         
 
-        indices = np.append(indices,bounding_rect_indices)
-        
-        # vertices = bounding_rect_vertices
-        # indices = bounding_rect_indices
+        bounding_rect_vertices, bounding_rect_indices = self.bounding_box(vertices)
 
-     
+
         # initializing glfw library
         if not glfw.init():
             raise Exception("glfw can not be initialized!")
@@ -130,28 +121,33 @@ class ModelViewer:
 
 
         # Vertex Buffer Object
-        VBO = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, VBO)
+        VBO = glGenBuffers(2)
+        glBindBuffer(GL_ARRAY_BUFFER, VBO[0])
         glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
+
+        #Vertex buffer object for bounding box
+        glBindBuffer(GL_ARRAY_BUFFER,VBO[1])
+        glBufferData(GL_ARRAY_BUFFER, bounding_rect_vertices.nbytes, bounding_rect_vertices, GL_STATIC_DRAW)
+
 
         # Element Buffer Object
         EBO = glGenBuffers(2)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0])
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
-        #EXTRA
 
-        # glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1])
-        # glBufferData(GL_ELEMENT_ARRAY_BUFFER, with_bounding_indices.nbytes, with_bounding_indices, GL_STATIC_DRAW)
+        #Element buffer object for bounding box
 
-        # glBindVertexArray(EBO[1])
-
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1])
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, bounding_rect_indices.nbytes, bounding_rect_indices, GL_STATIC_DRAW)
 
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(0))
 
-
         glEnableVertexAttribArray(1)
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(12))
+
+#extra
+    
 
         glUseProgram(shader)
         glClearColor(0, 0.1, 0.1, 1)
@@ -230,14 +226,11 @@ class ModelViewer:
             glUniformMatrix4fv(model_loc, 1, GL_FALSE, model)
             glUniformMatrix4fv(proj_matrix, 1, GL_FALSE, projection)
 
-            if input_handler.mode == "default":
-                glDrawElements(GL_TRIANGLES, pre_box, GL_UNSIGNED_INT, None)
-                
-            elif input_handler.mode=="wireframe":
-                glDrawElements(GL_LINES, pre_box, GL_UNSIGNED_INT, None)
-            elif input_handler.mode == "bounding_box":
+            if input_handler.mode:
                 glDrawElements(GL_LINES, len(indices), GL_UNSIGNED_INT, None)
-                
+            else:
+                glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
+
 
             glfw.swap_buffers(window)
 

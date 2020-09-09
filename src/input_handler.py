@@ -10,8 +10,8 @@ import pyrr
 class InputHandler:
     
     def __init__(self, window):
-        self.mode_list = [0, 1]
-        self.mode = 0
+        self.mode_list = ["default", "wireframe", "bounding_box"]
+        self.mode = "default"
         self.window = window
         self.eye = np.array([0, 0, 3], dtype=np.float32)
         self.target = np.array([0, 0, 0])
@@ -44,6 +44,6 @@ class InputHandler:
     def keyboard_handler(self, window, key, scancode, action, mods):
 
         if key == glfw.KEY_SPACE and action == glfw.PRESS:
-            self.mode += 1
-            self.mode = self.mode % len(self.mode_list)
+            self.mode = self.mode_list[  (self.mode_list.index(self.mode)+ 1 ) % len(self.mode_list)]
+            
            
