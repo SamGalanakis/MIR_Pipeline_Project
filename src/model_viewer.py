@@ -84,8 +84,7 @@ class ModelViewer:
 
         indices = np.append(indices,bounding_rect_indices)
         
-        # vertices = bounding_rect_vertices
-        # indices = bounding_rect_indices
+       
 
      
         # initializing glfw library
@@ -135,15 +134,10 @@ class ModelViewer:
         glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
 
         # Element Buffer Object
-        EBO = glGenBuffers(2)
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0])
+        EBO = glGenBuffers(1)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
-        #EXTRA
-
-        # glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1])
-        # glBufferData(GL_ELEMENT_ARRAY_BUFFER, with_bounding_indices.nbytes, with_bounding_indices, GL_STATIC_DRAW)
-
-        # glBindVertexArray(EBO[1])
+    
 
 
         glEnableVertexAttribArray(0)
@@ -226,8 +220,8 @@ class ModelViewer:
 
             model = pyrr.matrix44.multiply(scale, translation)
             model = pyrr.matrix44.multiply(model, rotation)
-            glUniformMatrix4fv(view_loc, 1, GL_FALSE, view)
             glUniformMatrix4fv(model_loc, 1, GL_FALSE, model)
+            glUniformMatrix4fv(view_loc, 1, GL_FALSE, view)
             glUniformMatrix4fv(proj_matrix, 1, GL_FALSE, projection)
 
             if input_handler.mode == "default":
@@ -237,6 +231,10 @@ class ModelViewer:
                 glDrawElements(GL_LINES, pre_box, GL_UNSIGNED_INT, None)
             elif input_handler.mode == "bounding_box":
                 glDrawElements(GL_LINES, len(indices), GL_UNSIGNED_INT, None)
+            else:
+                raise Exception("Invalid Mode!")
+          
+
                 
 
             glfw.swap_buffers(window)
