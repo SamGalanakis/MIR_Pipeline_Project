@@ -47,9 +47,22 @@ class ModelViewer:
             45, width / height, 0.1, 100)
         window_height = height
         window_width = width
-        glUniformMatrix4fv(proj_loc, 1, GL_FALSE, projection)
+        glUniformMatrix4fv(self.proj_loc, 1, GL_FALSE, projection)
 
-    def process(self, path):
+    def process(self, path=False, vertices=False, indices=False, info= False):
+
+
+        if path:
+            vertices, indices, info = self.reader.read(path)
+            print(f"Reading {path}")
+        else:
+            assert(type(vertices) ==np.ndarray and type(indices) ==np.ndarray, "Define path or both vertices and indices")
+        
+        
+
+
+
+
         # initializing glfw library
         if not glfw.init():
             raise Exception("glfw can not be initialized!")
@@ -74,7 +87,7 @@ class ModelViewer:
         glfw.make_context_current(window)
 
         
-        vertices, indices, info = self.reader.read(path)
+        
 
         as_points = vertices.reshape(-1, 3)
 
@@ -116,7 +129,7 @@ class ModelViewer:
         ## Shader matrices
         model_loc = glGetUniformLocation(shader, "model")
 
-        proj_loc = glGetUniformLocation(shader, "projection")
+        self.proj_loc = glGetUniformLocation(shader, "projection")
 
         view_loc = glGetUniformLocation(shader, "view")
 

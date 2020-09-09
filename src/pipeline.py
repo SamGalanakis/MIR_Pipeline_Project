@@ -1,5 +1,5 @@
 import platform
-from model_viewer import ModelViwer
+from model_viewer import ModelViewer
 import os
 
 
@@ -10,7 +10,7 @@ def main():
     else:
         path = r"data\\test.ply"
 
-    viewer = ModelViwer()
+    viewer = ModelViewer()
     viewer.process(path)
 
 
