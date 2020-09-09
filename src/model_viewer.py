@@ -52,7 +52,7 @@ class ModelViewer:
         bounding_rect_vertices = np.array([[min_x,min_y,min_z],[max_x,min_y,min_z],[max_x,min_y,max_z],[min_x,min_y,max_z],
                             [min_x,max_y,min_z],[max_x,max_y,min_z],[max_x,max_y,max_z],[min_x,max_y,max_z]]).flatten()
         
-        bounding_rect_indices = (np.array([0,1,2,2,3,0,  4,5,6,6,7,4, 0,1,4,4,5,1,  2,3,6,6,7,3, 0,3,4,4,7,3, 1,2,5,5,6,2 ],dtype=np.uint32) + max(indices)+1).flatten()
+        bounding_rect_indices = (np.array([0,1,2,2,3,0,  4,5,6,6,7,4, 0,1,4,4,5,1,  2,3,6,6,7,3, 0,3,4,4,7,3, 1,2,5,5,6,2 ],dtype=np.uint32) + indices.max()+1).flatten()
 
         return bounding_rect_vertices, bounding_rect_indices
 
@@ -69,12 +69,13 @@ class ModelViewer:
 
 
         if path:
-            vertices, indices, info = self.reader.read(path)
+            vertices, element_dict, info = self.reader.read(path)
+            indices = element_dict["triangles"] 
             print(f"Reading {path}")
         else:
             assert(type(vertices) ==np.ndarray and type(indices) ==np.ndarray, "Define path or both vertices and indices")
         
-        pre_box = len(indices)
+        pre_box = indices.size
         
         bounding_rect_vertices, bounding_rect_indices = self.bounding_box(vertices,indices)
 

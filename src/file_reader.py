@@ -37,7 +37,7 @@ class FileReader:
             lines = [x for x in lines if x[0] != "#"]
         if "OFF" in lines[0]:
             lines = lines[1:]
-            print("off file")
+            
 
         lines = [x.rstrip() for x in lines]
 
@@ -60,8 +60,13 @@ class FileReader:
         vertices = lines[:n_vertices]
         vertices = np.array([list(map(lambda y: float(y), x.split()))
                                 for x in vertices], dtype=np.float32).flatten()
-        triangle_elements = lines[n_vertices:]
-        triangle_elements = np.array([list(map(lambda y: int(y), x.split()))[
-                                        1:] for x in triangle_elements], dtype=np.uint32).flatten()
+        elements = lines[n_vertices:]
+        elements = [list(map(lambda y: int(y), x.split())) for x in elements]
 
-        return vertices, triangle_elements, info
+        triangles = np.array([x[1:] for x in elements if x[0]==3],dtype = np.uint32)
+        quads = np.array([x[1:] for x in elements if x[0]==4],dtype = np.uint32)
+        assert(triangles.size +quads.size == len(elements), "Non quad/triangle elements!")
+        element_dict = {"triangles":triangles, "quads":quads}
+
+        print(f" File type: {path.suffix} Triangles: {triangles.size}, Quads: {quads.size}.")
+        return vertices, element_dict, info
