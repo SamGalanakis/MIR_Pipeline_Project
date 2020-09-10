@@ -1,15 +1,14 @@
 import platform
 import sys
 import os
+from pathlib import Path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from file_reader import FileReader
 
 def test():
 
-    if platform.system() == "Linux":
-        path = r"../../data/test.ply"
-    else:
-        path = r"data\\test.ply"
+   
+    path = Path(r"data\\test.ply")
 
     reader = FileReader()
     print(reader.read(path))
