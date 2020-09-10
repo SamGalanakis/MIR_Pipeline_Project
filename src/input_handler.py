@@ -7,6 +7,7 @@ import numpy as np
 import pyrr
 
 
+
 class InputHandler:
     
     def __init__(self, window):
@@ -16,6 +17,7 @@ class InputHandler:
         self.eye = np.array([0, 0, 3], dtype=np.float32)
         self.target = np.array([0, 0, 0])
         self.up = np.array([0, 1, 0])
+        
 
         # for scroll zoom
         self.current_distance = 1

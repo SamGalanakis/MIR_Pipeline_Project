@@ -25,7 +25,7 @@ class FileReader:
         return off_file
 
     def read(self, path):
-
+        lines=False
         if path.suffix == ".ply":
             lines = self.convert_ply_to_off(path)
         elif path.suffix != ".off":
