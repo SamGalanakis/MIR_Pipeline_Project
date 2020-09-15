@@ -32,7 +32,7 @@ class Refinement:
         edges_non_unique = list(dict.fromkeys([item for t in edges_per_face for item in t]))
         edges = set() 
         temp = [edges.add((a, b)) for (a, b) in edges_non_unique  
-                if (a, b) and (b, a) not in res] 
+                if (a, b) and (b, a) not in edges] 
 
     def view_refined(self):
         #self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
