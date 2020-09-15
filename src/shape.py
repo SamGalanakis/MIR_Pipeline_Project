@@ -28,7 +28,7 @@ class Shape:
 
     def get_edges(self):
         self.edges = set() 
-        edges_non_unique = list(dict.fromkeys([item for t in [list(combinations(triangle,2)) for triangle in element_dict["triangles"]] for item in t]))
+        edges_non_unique = list(dict.fromkeys([item for t in [list(combinations(triangle,2)) for triangle in self.element_dict["triangles"]] for item in t]))
 
         for (a, b) in edges_non_unique:
             if (a, b) and (b ,a) not in self.edges:
