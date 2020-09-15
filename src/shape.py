@@ -16,7 +16,8 @@ class Shape:
         self.n_quads = element_dict["quads"].size
         self.n_vertices = vertices.size
         self.viewer = ModelViewer()
-
+        self.get_edges()
+        self.n_edges = len(self.edges)
         
 
         self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) #is this barycenter or just centroid??
