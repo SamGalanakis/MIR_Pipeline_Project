@@ -6,7 +6,7 @@ from utils import bounding_box
 from itertools import combinations 
 
 
-class Refinement:
+class SubDivision:
     def __init__(self,vertices,element_dict,info):
         self.vertices = vertices
         self.element_dict = element_dict
@@ -29,14 +29,11 @@ class Refinement:
         #compute edges
         #edges_per_face = [list(combinations(triangle,2)) for triangle in self.triangles]
         edges_non_unique = list(dict.fromkeys([item for t in [list(combinations(triangle,2)) for triangle in self.triangles] for item in t]))
-        edges_indice = set() 
+        edges = set() 
 
         for (a, b) in edges_non_unique:
-            if (a, b) and (b ,a) not in edges_raw:
-                edges_raw.add((a,b))
-
-        for edge in edges:
-             
+            if (a, b) and (b ,a) not in edges:
+                edges.add((a,b))
 
         print()
 

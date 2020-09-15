@@ -3,6 +3,8 @@ from model_viewer import ModelViewer
 from pathlib import Path
 from file_reader import FileReader
 from utils import bounding_box
+from itertools import combinations 
+
 
 
 class Shape:
@@ -14,6 +16,7 @@ class Shape:
         self.n_quads = element_dict["quads"].size
         self.n_vertices = vertices.size
         self.viewer = ModelViewer()
+
         
 
         self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) #is this barycenter or just centroid??
@@ -22,7 +25,14 @@ class Shape:
 
         self.process_shape()
 
+    def get_edges(self):
+        self.edges = set() 
+        edges_non_unique = list(dict.fromkeys([item for t in [list(combinations(triangle,2)) for triangle in self.triangles] for item in t]))
+        
 
+        for (a, b) in edges_non_unique:
+            if (a, b) and (b ,a) not in self.edges:
+                self.edges.add((a,b))
 
     def process_shape(self):
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
