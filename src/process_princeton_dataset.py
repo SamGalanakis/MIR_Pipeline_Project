@@ -29,8 +29,8 @@ bounding_box_list =[]
 barycenter_list = []
 data = {k:[] for k in columns}
 
-n_not_classified=0
-for file in tqdm(file_paths[0:10]):
+n_not_classified=0  
+for file in tqdm(file_paths):
     vertices, element_dict, info = reader.read(Path(file))
     shape = Shape(vertices,element_dict,info)
     id = file.split("\\")[-1].split(".")[-2].replace("m","")

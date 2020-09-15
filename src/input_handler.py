@@ -11,7 +11,7 @@ import pyrr
 class InputHandler:
     
     def __init__(self, window):
-        self.mode_list = ["default", "wireframe", "bounding_box"]
+        self.mode_list = ["default", "wireframe","point_cloud","bounding_box"]
         self.mode = "default"
         self.window = window
         self.eye = np.array([0, 0, 3], dtype=np.float32)

@@ -17,32 +17,39 @@ class ModelViewer:
 
         self.reader = FileReader()
         self.vertex_src = """
-        # version 330
+        # version 330 core
         layout(location = 0) in vec3 a_position;
-        layout(location = 1) in vec3 a_color;
+        layout(location = 1) in  vec3 normals;
         uniform mat4 model;
         uniform mat4 projection;
         uniform mat4 view;
-        out vec3 v_color;
+        
         void main()
         {
         gl_Position = projection * view * model * vec4(a_position, 1.0);
-        v_color = a_color;
+
+        
+        
         }
         """
 
         self.fragment_src = """
-        # version 330
-        in vec3 v_color;
-        out vec4 out_color;
+        # version 330 core
+        in vec4 v_color;
+        out vec4 FragColor;
+        uniform vec4 color;
         void main()
         {
-            out_color = vec4(v_color, 1.0);
+            
+            FragColor = color;
+            
+
         }
         """
 
  
 
+#out_color = vec4(v_color, 1.0);
 
     def window_resize(self, window, width, height):
         glViewport(0, 0, width, height)
@@ -70,10 +77,25 @@ class ModelViewer:
 
         
 
-        indices = np.append(indices,bounding_rect_indices)
         
+
+        indices = np.append(indices,bounding_rect_indices)
+
+        vertex_normals = pyrr.vector3.generate_vertex_normals(vertices.reshape((-1,3)), indices.reshape((-1,3)), normalize_result=True).flatten()
        
 
+        
+        surface_normals = []
+
+        for index in range(0,len(indices)-3,3):
+            vertices_accesible = vertices.reshape((-1,3))
+            v1 = vertices_accesible[indices[index+1],:] - vertices_accesible[indices[index],:]
+            v2 = vertices_accesible[indices[index+2],:] - vertices_accesible[indices[index+1],:]
+            v3 = vertices_accesible[indices[index],:] - vertices_accesible[indices[index+2],:]
+            surface_normal = pyrr.vector3.generate_normals(v1,v2,v3,normalize_result=True)
+            surface_normals.append(surface_normal)
+
+        surface_normals = np.array(surface_normals).flatten()
      
         # initializing glfw library
         if not glfw.init():
@@ -125,15 +147,20 @@ class ModelViewer:
         EBO = glGenBuffers(1)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
-    
+
+        #Normal Buffer Object
+
+        # NBO = glGenBuffers(1)
+        # glBindBuffer(GL_ARRAY_BUFFER, NBO)
+        # glBufferData(GL_ARRAY_BUFFER, vertex_normals.nbytes, vertex_normals, GL_STATIC_DRAW)
 
 
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(0))
 
 
-        glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(12))
+        # glEnableVertexAttribArray(1)
+        # glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(0))
 
         glUseProgram(shader)
         glClearColor(0, 0.1, 0.1, 1)
@@ -147,6 +174,8 @@ class ModelViewer:
         self.proj_loc = glGetUniformLocation(shader, "projection")
 
         view_loc = glGetUniformLocation(shader, "view")
+
+        color_loc = glGetUniformLocation(shader,"color")
 
         window_height = glfw.get_window_size(window)[1]
         window_width = glfw.get_window_size(window)[0]
@@ -182,6 +211,17 @@ class ModelViewer:
 
 
         previous_displacement = np.zeros(2)
+
+
+
+
+        
+  
+
+
+
+
+
         while not glfw.window_should_close(window):
             glfw.poll_events()
 
@@ -212,18 +252,36 @@ class ModelViewer:
             glUniformMatrix4fv(view_loc, 1, GL_FALSE, view)
             glUniformMatrix4fv(proj_matrix, 1, GL_FALSE, projection)
 
+            default_RGBA  = np.zeros(shape=(4,),dtype=np.float32) +1
+
+            color = pyrr.Vector4(default_RGBA)
+            glUniform4fv(color_loc,1,color)
+
+
+           
+    
+
             if input_handler.mode == "default":
                 glDrawElements(GL_TRIANGLES, pre_box, GL_UNSIGNED_INT, None)
+            elif input_handler.mode == "point_cloud":
+          
+                glDrawElements(GL_POINTS, pre_box, GL_UNSIGNED_INT, None)
                 
             elif input_handler.mode=="wireframe":
+                glDrawElements(GL_TRIANGLES, pre_box, GL_UNSIGNED_INT, None)
+                RGBA  = np.zeros(shape=(4,),dtype=np.float32) 
+                color = pyrr.Vector4(RGBA)
+                glUniform4fv(color_loc,1,RGBA)
                 glDrawElements(GL_LINES, pre_box, GL_UNSIGNED_INT, None)
             elif input_handler.mode == "bounding_box":
                 glDrawElements(GL_LINES, len(indices), GL_UNSIGNED_INT, None)
             else:
                 raise Exception("Invalid Mode!")
+
+   
           
 
-                
+            
 
             glfw.swap_buffers(window)
 
