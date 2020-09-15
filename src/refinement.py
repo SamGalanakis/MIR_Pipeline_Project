@@ -27,12 +27,18 @@ class Refinement:
         average_faces = [int(sum(triangle)/len(triangle)) for triangle in self.triangles]
        
         #compute edges
+        #edges_per_face = [list(combinations(triangle,2)) for triangle in self.triangles]
+        edges_non_unique = list(dict.fromkeys([item for t in [list(combinations(triangle,2)) for triangle in self.triangles] for item in t]))
+        edges_indice = set() 
 
-        edges_per_face = [list(combinations(triangle,2)) for triangle in self.triangles]
-        edges_non_unique = list(dict.fromkeys([item for t in edges_per_face for item in t]))
-        edges = set() 
-        temp = [edges.add((a, b)) for (a, b) in edges_non_unique  
-                if (a, b) and (b, a) not in edges] 
+        for (a, b) in edges_non_unique:
+            if (a, b) and (b ,a) not in edges_raw:
+                edges_raw.add((a,b))
+
+        for edge in edges:
+             
+
+        print()
 
     def view_refined(self):
         #self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
