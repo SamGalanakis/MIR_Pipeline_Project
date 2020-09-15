@@ -6,7 +6,7 @@ from pathlib import Path
 
 def main():
  
-    path = Path(r"data/test.ply")
+    path = Path(r"data/cube.off")
 
     viewer = ModelViewer()
     viewer.process(path)

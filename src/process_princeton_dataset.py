@@ -8,10 +8,10 @@ from shape import Shape
 from file_reader import FileReader
 
 
-classification_dict, hierarchy_dict, cla_info =  cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
+classification_dict, hierarchy_dict, cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
 reader = FileReader()
 file_paths = []
-for root, dirs, files in os.walk(Path(r"data\benchmark")):
+for root, dirs, files in os.walk(Path(r"data/benchmark")):
     for file in files:
         if file.endswith(".off"):
              
@@ -29,7 +29,7 @@ bounding_box_list =[]
 barycenter_list = []
 data = {k:[] for k in columns}
 
-n_not_classified=0  
+n_not_classified=0
 for file in tqdm(file_paths):
     vertices, element_dict, info = reader.read(Path(file))
     shape = Shape(vertices,element_dict,info)
