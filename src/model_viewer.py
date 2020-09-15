@@ -11,41 +11,12 @@ from file_reader import FileReader
 from input_handler import InputHandler
 from cmath import pi
 from utils import bounding_box
-
+import shader_loader
 class ModelViewer:
     def __init__(self):
 
         self.reader = FileReader()
-        self.vertex_src = """
-        # version 330 core
-        layout(location = 0) in vec3 a_position;
-        layout(location = 1) in  vec3 normals;
-        uniform mat4 model;
-        uniform mat4 projection;
-        uniform mat4 view;
-        
-        void main()
-        {
-        gl_Position = projection * view * model * vec4(a_position, 1.0);
-
-        
-        
-        }
-        """
-
-        self.fragment_src = """
-        # version 330 core
-        in vec4 v_color;
-        out vec4 FragColor;
-        uniform vec4 color;
-        void main()
-        {
-            
-            FragColor = color;
-            
-
-        }
-        """
+    
 
  
 
@@ -82,21 +53,29 @@ class ModelViewer:
         indices = np.append(indices,bounding_rect_indices)
 
         vertex_normals = pyrr.vector3.generate_vertex_normals(vertices.reshape((-1,3)), indices.reshape((-1,3)), normalize_result=True).flatten()
-       
 
         
-        surface_normals = []
+        
+        vertices_final = np.append(vertices,vertex_normals)
 
-        for index in range(0,len(indices)-3,3):
-            vertices_accesible = vertices.reshape((-1,3))
-            v1 = vertices_accesible[indices[index+1],:] - vertices_accesible[indices[index],:]
-            v2 = vertices_accesible[indices[index+2],:] - vertices_accesible[indices[index+1],:]
-            v3 = vertices_accesible[indices[index],:] - vertices_accesible[indices[index+2],:]
-            surface_normal = pyrr.vector3.generate_normals(v1,v2,v3,normalize_result=True)
-            surface_normals.append(surface_normal)
 
-        surface_normals = np.array(surface_normals).flatten()
-     
+
+        
+        # surface_normals = []
+        # vertices_accesible = vertices.reshape((-1,3))
+        # for index in range(0,len(indices)-3,3):
+            
+        #     v1 = vertices_accesible[indices[index+1],:] - vertices_accesible[indices[index],:]
+        #     v2 = vertices_accesible[indices[index+2],:] - vertices_accesible[indices[index+1],:]
+        #     v3 = vertices_accesible[indices[index],:] - vertices_accesible[indices[index+2],:]
+        #     surface_normal = pyrr.vector3.generate_normals(v1,v2,v3,normalize_result=True)
+        #     surface_normals.append(surface_normal)
+
+        # surface_normals = np.array(surface_normals)
+
+
+       
+
         # initializing glfw library
         if not glfw.init():
             raise Exception("glfw can not be initialized!")
@@ -121,6 +100,7 @@ class ModelViewer:
         glfw.make_context_current(window)
 
         
+
         
 
         as_points = vertices.reshape(-1, 3)
@@ -134,34 +114,45 @@ class ModelViewer:
             [min_x + (max_x-min_x)/2, min_y + (max_y-min_y)/2, min_z + (max_z-min_z)/2])
 
 
-        shader = compileProgram(compileShader(
-            self.vertex_src, GL_VERTEX_SHADER), compileShader(self.fragment_src, GL_FRAGMENT_SHADER))
 
 
+
+        shader = shader_loader.compile_shader("src/shaders/vert.vs", "src/shaders/frag.fs")
+
+
+
+
+        
         # Vertex Buffer Object
         VBO = glGenBuffers(1)
+        VA0 = glGenVertexArrays(1)
         glBindBuffer(GL_ARRAY_BUFFER, VBO)
-        glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, vertices_final.nbytes, vertices_final, GL_STATIC_DRAW)
+
+      
+
+
+        
+        #positions
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*4, ctypes.c_void_p(0))
+        glEnableVertexAttribArray(0)
+        #normals
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*4, ctypes.c_void_p(4*len(vertices)))
+        glEnableVertexAttribArray(1)
+    
+
+
+
+
 
         # Element Buffer Object
         EBO = glGenBuffers(1)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
 
-        #Normal Buffer Object
-
-        # NBO = glGenBuffers(1)
-        # glBindBuffer(GL_ARRAY_BUFFER, NBO)
-        # glBufferData(GL_ARRAY_BUFFER, vertex_normals.nbytes, vertex_normals, GL_STATIC_DRAW)
 
 
-        glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(0))
-
-
-        # glEnableVertexAttribArray(1)
-        # glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, ctypes.c_void_p(0))
-
+   
         glUseProgram(shader)
         glClearColor(0, 0.1, 0.1, 1)
 
@@ -176,6 +167,11 @@ class ModelViewer:
         view_loc = glGetUniformLocation(shader, "view")
 
         color_loc = glGetUniformLocation(shader,"color")
+
+        transform_loc = glGetUniformLocation(shader, "transform")
+
+
+        light_loc = glGetUniformLocation(shader, "light")
 
         window_height = glfw.get_window_size(window)[1]
         window_width = glfw.get_window_size(window)[0]
@@ -214,6 +210,9 @@ class ModelViewer:
 
 
 
+        rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time() )
+
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, rot_y)
 
         
   
@@ -246,16 +245,20 @@ class ModelViewer:
             view = pyrr.matrix44.create_look_at(pyrr.Vector3(input_handler.eye), pyrr.Vector3(
                 input_handler.target), pyrr.Vector3(input_handler.up))
 
+            rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time() )
+            glUniformMatrix4fv(light_loc, 1, GL_FALSE, rot_y)
+
             model = pyrr.matrix44.multiply(scale, translation)
             model = pyrr.matrix44.multiply(model, rotation)
+
             glUniformMatrix4fv(model_loc, 1, GL_FALSE, model)
             glUniformMatrix4fv(view_loc, 1, GL_FALSE, view)
             glUniformMatrix4fv(proj_matrix, 1, GL_FALSE, projection)
 
-            default_RGBA  = np.zeros(shape=(4,),dtype=np.float32) +1
+            default_RGB  = np.zeros(shape=(3,),dtype=np.float32) +1
 
-            color = pyrr.Vector4(default_RGBA)
-            glUniform4fv(color_loc,1,color)
+            color = pyrr.Vector3(default_RGB)
+            glUniform3fv(color_loc,1,color)
 
 
            
@@ -269,9 +272,9 @@ class ModelViewer:
                 
             elif input_handler.mode=="wireframe":
                 glDrawElements(GL_TRIANGLES, pre_box, GL_UNSIGNED_INT, None)
-                RGBA  = np.zeros(shape=(4,),dtype=np.float32) 
-                color = pyrr.Vector4(RGBA)
-                glUniform4fv(color_loc,1,RGBA)
+                RGB = np.zeros(shape=(3,),dtype=np.float32) 
+                color = pyrr.Vector3(RGB)
+                glUniform3fv(color_loc,1,RGB)
                 glDrawElements(GL_LINES, pre_box, GL_UNSIGNED_INT, None)
             elif input_handler.mode == "bounding_box":
                 glDrawElements(GL_LINES, len(indices), GL_UNSIGNED_INT, None)
@@ -287,3 +290,8 @@ class ModelViewer:
 
         # terminate glfw, free up allocated resources
         glfw.terminate()
+          
+
+            
+
+
