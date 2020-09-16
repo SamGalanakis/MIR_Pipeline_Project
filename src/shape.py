@@ -3,7 +3,8 @@ from model_viewer import ModelViewer
 from pathlib import Path
 from file_reader import FileReader
 from utils import bounding_box
-from itertools import combinations 
+from itertools import combinations
+import pyvista as pv
 
 
 
@@ -46,8 +47,9 @@ class Shape:
     def view(self):
         self.viewer.process(vertices = self.vertices , indices = self.element_dict["triangles"],info=self.info)
 
+    def subdive(self):
 
-
+        pv.PolyData(vertices.reshape(-1,3),)
 
 
 
