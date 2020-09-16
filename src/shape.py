@@ -1,11 +1,12 @@
 import numpy as np
+import pyvista
 from model_viewer import ModelViewer
 from pathlib import Path
 from file_reader import FileReader
 from utils import bounding_box
 from itertools import combinations
 import pyvista as pv
-
+import math
 
 
 class Shape:
@@ -13,12 +14,13 @@ class Shape:
         self.vertices=vertices
         self.element_dict = element_dict
         self.info = info
-        self.n_triangles = element_dict["triangles"].size
+        self.n_triangles = element_dict["triangles"].size/3
         self.n_quads = element_dict["quads"].size
         self.n_vertices = vertices.size
         self.viewer = ModelViewer()
         self.get_edges()
         self.n_edges = len(self.edges)
+        self.pyvista_mesh = False
         
 
         self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) #is this barycenter or just centroid??
@@ -47,9 +49,53 @@ class Shape:
     def view(self):
         self.viewer.process(vertices = self.vertices , indices = self.element_dict["triangles"],info=self.info)
 
-    def subdive(self):
-        mesh = pv.PolyData(self.vertices.reshape(-1,3),self.element_dict["triangles"])
-        mesh.subdivide(1,'loop', inplace=True)
+    def make_pyvista_mesh(self):
+        triangles = np.zeros((self.element_dict["triangles"].shape[0],4)) +3
+        triangles [:,1:4] = self.element_dict["triangles"]
+        triangles = np.array(triangles,dtype=np.int)
+        self.pyvista_mesh = pv.PolyData(self.vertices.reshape(-1,3),triangles)
+
+    
+    
+    
+
+
+    def subdivide(self,times=1,algo="loop",target=False,undercut=True):
+        if type(self.pyvista_mesh)== bool:
+            self.make_pyvista_mesh()
+        if undercut:
+            rounding = math.floor
+        else:
+            rounding = math.ceil
+        if target:
+            times = rounding(target/(self.pyvista_mesh.n_faces*4 ))
+            print(f"Subdividing {times} times")
+   
+        
+
+        self.pyvista_mesh.subdivide(times,algo, inplace=True)
+        
+        
+    def decimate(self,reduction=0.5,algo="pro",target=False):
+        
+        
+        if type(self.pyvista_mesh)== bool:
+            self.make_pyvista_mesh()
+
+        if target:
+            reduction = target/self.pyvista_mesh.n_faces
+        assert(reduction<1,"Nothing to reduce!")
+        if algo=="pro":
+            self.pyvista_mesh.decimate_pro(reduction,inplace=True)
+        else:
+            self.pyvista_mesh.decimate(reduction,inplace=True)
+
+        print(f"Decimating  {reduction}% ")
+            
+
+
+            
+
         
 
 if __name__ == "__main__":
@@ -57,7 +103,9 @@ if __name__ == "__main__":
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
-    shape.view_processed()
+    shape.decimate(0.9)
+    
+    
     print("done")
 
 
