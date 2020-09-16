@@ -48,10 +48,9 @@ class Shape:
         self.viewer.process(vertices = self.vertices , indices = self.element_dict["triangles"],info=self.info)
 
     def subdive(self):
-
-        pv.PolyData(vertices.reshape(-1,3),)
-
-
+        mesh = pv.PolyData(self.vertices.reshape(-1,3),self.element_dict["triangles"])
+        mesh.subdivide(1,'loop', inplace=True)
+        
 
 if __name__ == "__main__":
     path = Path(r"data\\test.ply")
