@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
+from scipy.spatial import ConvexHull
 from utils import bounding_box, cla_parser
 from tqdm import tqdm
 from shape import Shape
@@ -17,7 +18,8 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
              
              file_paths.append(os.path.join(root, file))
 
-columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter","classification","volume","surface_area","surface_area"]
+columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter",
+        "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume"]
 
 
 data = {k:[] for k in columns}
@@ -48,9 +50,18 @@ for file in tqdm(file_paths):
     data["classification"].append(classification)
     data["volume"].append(shape.pyvista_mesh.volume)
     data["surface_area"].append(sum(shape.pyvista_mesh.compute_cell_sizes(area = True, volume=False).cell_arrays["Area"]))
-    xmax, ymax, zmax = shape.bounding_rect_vertices.reshape(-1 ,3).max(axis=0)
-    if xmax != 1 or ymax != 1 or zmax != 1:
-        print("asd")
+
+    axis_size = shape.bounding_rect_vertices.reshape(-1 ,3).max(axis=0)
+    data["bounding_box_ratio"].append(np.max(axis_size)/np.min(axis_size))
+    
+    data["compactness"].append(np.power(data["surface_area"][-1],3) / np.sqrt(data["volume"][-1]))
+    data["bounding_box_volume"].append(np.prod(axis_size))
+    
+    hull = ConvexHull(shape.vertices.reshape(-1,3))
+
+
+
+
     print()
 n_classified_models = cla_info["n_models"]
 print(f"Missed/unclassified: {n_not_classified} of {len(file_paths)} of which {n_classified_models} are classified according to the cla.")
