@@ -1,5 +1,9 @@
 import numpy as np
 from pathlib import Path
+import pyrr
+import math
+from file_reader import FileReader
+
 
 def bounding_box(vertices,indices):
         as_points = vertices.reshape(-1, 3)
@@ -48,7 +52,39 @@ def cla_parser(path):
     return classification_dict, hierarchy_dict, info
 
 
+
+def align(vertices):
+    vertices = vertices.reshape((3,-1))
+    cov = np.cov(vertices)
+    eigenvalues, eigenvectors = np.linalg.eig(cov)
+
+    eig_indices = sorted(range(0,3),key = lambda x : eigenvalues[x])
+    
+
+    rotation_total_matrix = pyrr.matrix33.create_identity()
+    for counter , eig_index in enumerate(eig_indices):
+        eigenvector  = pyrr.Vector3(eigenvectors[:,eig_index])
+        axis = [0,0,0]
+        axis[counter]=1
+        axis = pyrr.Vector3(axis)
+        normal = pyrr.vector3.cross(axis,eigenvector)
+        theta = math.acos(pyrr.vector3.dot(axis,eigenvector))
+
+        rotation_matrix = pyrr.matrix33.create_from_axis_rotation(axis=normal,theta = -theta)
+        rotated = pyrr.matrix33.apply_to_vector(mat=rotation_matrix,vec=eigenvector)
+
+        rotation_total_matrix =  pyrr.matrix33.multiply(rotation_matrix, rotation_total_matrix)
+        
+
+
+
+    return    np.matmul(rotation_total_matrix.T,vertices)
+
 if __name__ == "__main__":
     
-    cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
+    #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
+    reader= FileReader()
+    path = path = Path(r"data/test.ply")
+    vertices, element_dict, info = reader.read(path)
+    align(vertices)
     
