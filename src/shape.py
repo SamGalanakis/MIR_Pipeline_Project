@@ -41,7 +41,9 @@ class Shape:
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
         processed_vertices = self.vertices.reshape(-1, 3) - self.barycenter
     
-        self.processed_vertices = (processed_vertices- processed_vertices.min(axis=0))/(processed_vertices.max(axis=0)- processed_vertices.min(axis=0)).flatten()
+        self.processed_vertices = (processed_vertices - processed_vertices.min(axis=0))/(processed_vertices.max(axis=0) - processed_vertices.min(axis=0))
+        standart_deviation = np.sqrt( (1 / len(processed_vertices)) * np.sum(processed_vertices, axis=0))
+        #self.processed_vertices = processed_vertices / standart_deviation
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
 
     def view_processed(self):

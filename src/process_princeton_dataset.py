@@ -17,30 +17,26 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
              
              file_paths.append(os.path.join(root, file))
 
-columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter","classification"]
+columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter","classification","volume","surface_area","surface_area"]
 
 
-
-id_list =[]
-n_vertices_list = []
-n_triangles_list =[]
-n_quads_list=[]
-bounding_box_list =[]
-barycenter_list = []
 data = {k:[] for k in columns}
 
 n_not_classified=0
 for file in tqdm(file_paths):
     vertices, element_dict, info = reader.read(Path(file))
     shape = Shape(vertices,element_dict,info)
-    id = file.split("\\")[-1].split(".")[-2].replace("m","")
+    
 
+    id = file.split("/")[-1].split(".")[-2].replace("m","")
     try:
         classification = classification_dict[id]
         print(classification)
     except:
         n_not_classified +=1
         continue
+
+    shape.make_pyvista_mesh()
     print(id)
     data["file_name"].append(file)
     data["id"].append(id)
@@ -50,7 +46,12 @@ for file in tqdm(file_paths):
     data["bounding_box"].append(str(shape.bounding_rect_vertices))
     data["barycenter"].append(str(shape.barycenter))
     data["classification"].append(classification)
-    
+    data["volume"].append(shape.pyvista_mesh.volume)
+    data["surface_area"].append(sum(shape.pyvista_mesh.compute_cell_sizes(area = True, volume=False).cell_arrays["Area"]))
+    xmax, ymax, zmax = shape.bounding_rect_vertices.reshape(-1 ,3).max(axis=0)
+    if xmax != 1 or ymax != 1 or zmax != 1:
+        print("asd")
+    print()
 n_classified_models = cla_info["n_models"]
 print(f"Missed/unclassified: {n_not_classified} of {len(file_paths)} of which {n_classified_models} are classified according to the cla.")
     
