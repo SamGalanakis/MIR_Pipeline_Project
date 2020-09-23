@@ -21,19 +21,13 @@ columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","b
 
 
 
-id_list =[]
-n_vertices_list = []
-n_triangles_list =[]
-n_quads_list=[]
-bounding_box_list =[]
-barycenter_list = []
 data = {k:[] for k in columns}
 
 n_not_classified=0
 for file in tqdm(file_paths):
     vertices, element_dict, info = reader.read(Path(file))
     shape = Shape(vertices,element_dict,info)
-    id = file.split("\\")[-1].split(".")[-2].replace("m","")
+    id = file.split("/")[-1].split(".")[-2].replace("m","")
 
     try:
         classification = classification_dict[id]

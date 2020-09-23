@@ -3,7 +3,7 @@ import pyvista
 from model_viewer import ModelViewer
 from pathlib import Path
 from file_reader import FileReader
-from utils import bounding_box
+from utils import bounding_box, align
 from itertools import combinations
 import pyvista as pv
 import math
@@ -39,11 +39,14 @@ class Shape:
 
     def process_shape(self):
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
-        processed_vertices = self.vertices.reshape(-1, 3) - self.barycenter
+        self.processed_vertices = self.vertices.reshape(-1, 3) - self.barycenter
     
-        self.processed_vertices = (processed_vertices- processed_vertices.min(axis=0))/(processed_vertices.max(axis=0)- processed_vertices.min(axis=0)).flatten()
-        self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+       # self.processed_vertices = (processed_vertices- processed_vertices.min(axis=0))/(processed_vertices.max(axis=0)- processed_vertices.min(axis=0)).flatten()
         
+
+        self.processed_vertices = align(self.processed_vertices).flatten()
+        self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+
 
     def view_processed(self):
         self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
@@ -104,7 +107,7 @@ if __name__ == "__main__":
     path = Path(r"data/test.ply")
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
-    path = problem_path
+    path = path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
