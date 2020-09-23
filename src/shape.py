@@ -39,11 +39,15 @@ class Shape:
 
     def process_shape(self):
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
-        processed_vertices = self.vertices.reshape(-1, 3) - self.barycenter
-    
-        self.processed_vertices = (processed_vertices - processed_vertices.min(axis=0))/(processed_vertices.max(axis=0) - processed_vertices.min(axis=0))
-        standart_deviation = np.sqrt( (1 / len(processed_vertices)) * np.sum(processed_vertices, axis=0))
-        #self.processed_vertices = processed_vertices / standart_deviation
+        processed_vertices = self.vertices.reshape(-1, 3)  - self.barycenter
+        
+        new_range = (0, 1)
+        max_range = max(new_range)
+        min_range = min(new_range)
+        scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
+
+        self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
+
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
         
 
@@ -111,7 +115,7 @@ if __name__ == "__main__":
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
     #shape.decimate(0.9)
-    
+    shape.view_processed()
     
     print("done")
 
