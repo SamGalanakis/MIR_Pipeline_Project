@@ -45,6 +45,7 @@ class Shape:
         standart_deviation = np.sqrt( (1 / len(processed_vertices)) * np.sum(processed_vertices, axis=0))
         #self.processed_vertices = processed_vertices / standart_deviation
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+        
 
     def view_processed(self):
         self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
