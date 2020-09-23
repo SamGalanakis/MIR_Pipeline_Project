@@ -17,7 +17,7 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
              
              file_paths.append(os.path.join(root, file))
 
-columns=["id","n_vertices","n_triangles","n_quads","bounding_box","barycenter","classification"]
+columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter","classification"]
 
 
 
@@ -42,6 +42,7 @@ for file in tqdm(file_paths):
         n_not_classified +=1
         continue
     print(id)
+    data["file_name"].append(file)
     data["id"].append(id)
     data["n_vertices"].append(shape.n_vertices)
     data["n_triangles"].append(shape.n_triangles)

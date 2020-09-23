@@ -61,7 +61,7 @@ class Shape:
 
 
     def subdivide(self,times=1,algo="loop",target=False,undercut=True):
-        if type(self.pyvista_mesh)== bool:
+        if type(self.pyvista_mesh) == bool:
             self.make_pyvista_mesh()
         if undercut:
             rounding = math.floor
@@ -77,16 +77,17 @@ class Shape:
         
         
     def decimate(self,reduction=0.5,algo="pro",target=False):
-        
+            
         
         if type(self.pyvista_mesh)== bool:
             self.make_pyvista_mesh()
 
         if target:
-            reduction = target/self.pyvista_mesh.n_faces
+            reduction = 1- target/self.pyvista_mesh.n_faces
         assert(reduction<1,"Nothing to reduce!")
         if algo=="pro":
             self.pyvista_mesh.decimate_pro(reduction,inplace=True)
+        
         else:
             self.pyvista_mesh.decimate(reduction,inplace=True)
 
@@ -99,11 +100,14 @@ class Shape:
         
 
 if __name__ == "__main__":
-    path = Path(r"data\\test.ply")
+    path = Path(r"data/test.ply")
+    max_path = Path('data/benchmark/db/17/m1755/m1755.off')
+    problem_path = "data/benchmark/db/2/m201/m201.off"
+    path = problem_path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
-    shape.decimate(0.9)
+    #shape.decimate(0.9)
     
     
     print("done")

@@ -1,5 +1,5 @@
 import numpy as np
-
+from pathlib import Path
 
 class FileReader:
     def __init__(self):
@@ -25,6 +25,8 @@ class FileReader:
         return off_file
 
     def read(self, path):
+        if type(path)==str:
+            path = Path(path)
         lines=False
         if path.suffix == ".ply":
             lines = self.convert_ply_to_off(path)
