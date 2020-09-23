@@ -43,6 +43,7 @@ class Shape:
     
         self.processed_vertices = (processed_vertices- processed_vertices.min(axis=0))/(processed_vertices.max(axis=0)- processed_vertices.min(axis=0)).flatten()
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+        
 
     def view_processed(self):
         self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
