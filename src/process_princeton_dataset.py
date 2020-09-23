@@ -20,21 +20,13 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
 columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter","classification","volume","surface_area","surface_area"]
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> refs/remotes/origin/master
 data = {k:[] for k in columns}
 
 n_not_classified=0
 for file in tqdm(file_paths):
     vertices, element_dict, info = reader.read(Path(file))
     shape = Shape(vertices,element_dict,info)
-<<<<<<< HEAD
     
-=======
-    id = file.split("/")[-1].split(".")[-2].replace("m","")
->>>>>>> refs/remotes/origin/master
 
     id = file.split("/")[-1].split(".")[-2].replace("m","")
     try:
