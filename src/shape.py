@@ -39,7 +39,6 @@ class Shape:
 
     def process_shape(self):
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
-<<<<<<< HEAD
         processed_vertices = self.vertices.reshape(-1, 3)  - self.barycenter
         
         new_range = (0, 1)
@@ -50,11 +49,6 @@ class Shape:
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
 
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
-=======
-        self.processed_vertices = self.vertices.reshape(-1, 3) - self.barycenter
-    
-       # self.processed_vertices = (processed_vertices- processed_vertices.min(axis=0))/(processed_vertices.max(axis=0)- processed_vertices.min(axis=0)).flatten()
->>>>>>> refs/remotes/origin/master
         
 
         self.processed_vertices = align(self.processed_vertices).flatten()
@@ -71,9 +65,6 @@ class Shape:
         triangles [:,1:4] = self.element_dict["triangles"]
         triangles = np.array(triangles,dtype=np.int)
         self.pyvista_mesh = pv.PolyData(self.vertices.reshape(-1,3),triangles)
-
-    
-    
     
 
 
