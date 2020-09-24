@@ -41,19 +41,20 @@ class Shape:
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
         processed_vertices = self.vertices.reshape(-1, 3)  - self.barycenter
         
-        new_range = (0, 1)
-        max_range = max(new_range)
-        min_range = min(new_range)
+       
+        max_range = 1
+        min_range = 0
+
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
 
-        self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+        
         
 
         self.processed_vertices = align(self.processed_vertices).flatten()
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
-
+    
 
     def view_processed(self):
         self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     path = Path(r"data/test.ply")
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
-    path = path
+    path = problem_path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)

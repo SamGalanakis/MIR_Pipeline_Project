@@ -54,31 +54,21 @@ def cla_parser(path):
 
 
 def align(vertices):
-    vertices = vertices.reshape((3,-1))
-    cov = np.cov(vertices)
+    vertices= vertices.reshape((-1,3))
+    cov = np.cov(vertices,rowvar=False)
     eigenvalues, eigenvectors = np.linalg.eig(cov)
 
-    eig_indices = sorted(range(0,3),key = lambda x : eigenvalues[x])
+    eig_indices = sorted(range(0,3),key = lambda x : eigenvalues[x],reverse=True)
     
+    eigenvecs_sorted = np.zeros(eigenvectors.shape)
+    for count,  x in enumerate(eig_indices):
+        eigenvecs_sorted[:,count] = eigenvectors[:,x]
 
-    rotation_total_matrix = pyrr.matrix33.create_identity()
-    for counter , eig_index in enumerate(eig_indices):
-        eigenvector  = pyrr.Vector3(eigenvectors[:,eig_index])
-        axis = [0,0,0]
-        axis[counter]=1
-        axis = pyrr.Vector3(axis)
-        normal = pyrr.vector3.cross(axis,eigenvector)
-        theta = math.acos(pyrr.vector3.dot(axis,eigenvector))
+ 
+    vertices = np.matmul(vertices,eigenvectors)
 
-        rotation_matrix = pyrr.matrix33.create_from_axis_rotation(axis=normal,theta = -theta)
-        rotated = pyrr.matrix33.apply_to_vector(mat=rotation_matrix,vec=eigenvector)
-
-        rotation_total_matrix =  pyrr.matrix33.multiply(rotation_matrix, rotation_total_matrix)
-        
-
-
-
-    return    np.matmul(rotation_total_matrix.T,vertices)
+    
+    return  np.array(vertices.flatten(),dtype=np.float32)
 
 if __name__ == "__main__":
     
