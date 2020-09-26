@@ -65,10 +65,8 @@ def align(vertices):
     eigenvecs_sorted = np.zeros(eigenvectors.shape)
     for count,  x in enumerate(eig_indices):
         eigenvecs_sorted[:,count] = eigenvectors[:,x]
-
  
     vertices = np.matmul(vertices,eigenvectors)
-
     
     return  np.array(vertices.flatten(),dtype=np.float32)
 
