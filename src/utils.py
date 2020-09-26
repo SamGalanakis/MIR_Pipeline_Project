@@ -77,6 +77,30 @@ def align(vertices):
 
     
     return  vertices.flatten(order="F").reshape((-1,3)).astype(np.float32) ,  eigenvectors
+
+
+
+def flip_test(vertices,triangle_indices):
+    
+    f = lambda x: vertices[x,:]
+    triangles = f(triangle_indices)
+
+    centroids = np.sum(triangles,axis=1)/3
+
+    second_moments = np.multiply( np.sign(centroids) , centroids**2).sum(axis=0)
+
+    transformation = np.zeros((3,3))
+ 
+    np.fill_diagonal(transformation,np.sign(second_moments) )
+
+
+    
+
+    return np.matmul(vertices,transformation)
+   
+
+    
+    
  
 
 
