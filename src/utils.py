@@ -68,7 +68,19 @@ def align(vertices):
  
     vertices = np.matmul(vertices,eigenvectors)
     
-    return  (np.array(vertices.flatten(),dtype=np.float32),eigenvectors)
+    return  (np.array(vertices.flatten(),dtype=np.float32), eigenvectors)
+
+def calculate_angle(a, b, c):
+    """
+        Calculates angle between three vertices
+    """
+    ba = a - b
+    bc = c - b
+
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(cosine_angle)
+
+    return np.degrees(angle)
 
 def calculate_diameter(vertices):
     hull = ConvexHull(vertices.reshape(-1,3))
