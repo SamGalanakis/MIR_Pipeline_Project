@@ -3,6 +3,8 @@ from pathlib import Path
 import pyrr
 import math
 from file_reader import FileReader
+from scipy.spatial import ConvexHull
+
 
 
 def bounding_box(vertices,indices):
@@ -70,6 +72,18 @@ def align(vertices):
     
     return  np.array(vertices.flatten(),dtype=np.float32)
 
+def calculate_diameter(vertices):
+    hull = ConvexHull(vertices)
+    diameter = 0
+    for idx, simplice in enumerate(hull.simplices):
+        if idx + 1 >= len(hull.simplices):
+            diameter += (np.linalg.norm(simplice - hull.simplices[0]))
+        else:
+            diameter += (np.linalg.norm(simplice - hull.simplices[idx+1]))
+
+    return diameter
+
+    
 if __name__ == "__main__":
     
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))

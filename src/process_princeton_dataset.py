@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from scipy.spatial import ConvexHull
-from utils import bounding_box, cla_parser
+from utils import bounding_box, cla_parser, calculate_diameter
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
@@ -19,7 +18,8 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
              file_paths.append(os.path.join(root, file))
 
 columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter",
-        "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume"]
+        "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
+        "diameter"]
 
 
 data = {k:[] for k in columns}
@@ -56,13 +56,10 @@ for file in tqdm(file_paths):
     
     data["compactness"].append(np.power(data["surface_area"][-1],3) / np.sqrt(data["volume"][-1]))
     data["bounding_box_volume"].append(np.prod(axis_size))
+    data["diameter"].append(calculate_diameter(shape.vertices.reshape(-1,3)))
     
-    hull = ConvexHull(shape.vertices.reshape(-1,3))
-
-
-
-
     print()
+    
 n_classified_models = cla_info["n_models"]
 print(f"Missed/unclassified: {n_not_classified} of {len(file_paths)} of which {n_classified_models} are classified according to the cla.")
     
