@@ -3,7 +3,7 @@ import pyvista
 from model_viewer import ModelViewer
 from pathlib import Path
 from file_reader import FileReader
-from utils import bounding_box, align
+from utils import bounding_box, align, flip_test
 from itertools import combinations
 import pyvista as pv
 import math
@@ -37,7 +37,7 @@ class Shape:
             if (a, b) and (b ,a) not in self.edges:
                 self.edges.add((a,b))
 
-    def process_shape(self):
+    def process_shape(self,flip=True):
         self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
         processed_vertices = self.vertices.reshape(-1, 3)  - self.barycenter
         
@@ -48,9 +48,8 @@ class Shape:
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
-        before = self.processed_vertices
         self.processed_vertices, self.eigenvectors = align(self.processed_vertices.flatten())
-     
+        #self.processed_vertices = flip_test(self.processed_vertices,self.element_dict["triangles"]).astype(np.float32)
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
     
 
@@ -118,10 +117,11 @@ class Shape:
         
 
 if __name__ == "__main__":
+    ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
     path = Path(r"data/test.ply")
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
-    path = problem_path
+    path = ant_path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
