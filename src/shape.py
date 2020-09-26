@@ -48,12 +48,16 @@ class Shape:
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
-
-        
-        
-
-        self.processed_vertices = align(self.processed_vertices).flatten()
+        before = self.processed_vertices
+        self.processed_vertices = align(self.processed_vertices.flatten())
+     
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+    
+
+    def voxelize(self,density):
+        if type(self.pyvista_mesh) == bool:
+            self.make_pyvista_mesh()
+        self.voxels = pyvista.voxelize(self.pyvista_mesh, density=self.pyvista_mesh.length/200)
     
 
     def view_processed(self):
@@ -66,6 +70,11 @@ class Shape:
         triangles [:,1:4] = self.element_dict["triangles"]
         triangles = np.array(triangles,dtype=np.int)
         self.pyvista_mesh = pv.PolyData(self.vertices.reshape(-1,3),triangles)
+    def make_pyvista_mesh_processed(self):
+        triangles = np.zeros((self.element_dict["triangles"].shape[0],4)) +3
+        triangles [:,1:4] = self.element_dict["triangles"]
+        triangles = np.array(triangles,dtype=np.int)
+        self.pyvista_mesh_processed = pv.PolyData(self.processed_vertices.reshape(-1,3),triangles)
     
 
 
@@ -117,7 +126,8 @@ if __name__ == "__main__":
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
     #shape.decimate(0.9)
-    shape.view_processed()
+    shape.make_pyvista_mesh_processed()
+    shape.pyvista_mesh_processed.plot()
     
     print("done")
 

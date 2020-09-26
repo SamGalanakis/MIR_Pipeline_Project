@@ -54,8 +54,13 @@ def cla_parser(path):
 
 
 def align(vertices):
-    vertices= vertices.reshape((-1,3))
-    cov = np.cov(vertices,rowvar=False)
+   
+    vertices = vertices.reshape((3,-1),order="F")
+    print(f"first points:{vertices[:,0]}")
+   
+    
+    
+    cov = np.cov(vertices)
     eigenvalues, eigenvectors = np.linalg.eig(cov)
 
     eig_indices = sorted(range(0,3),key = lambda x : eigenvalues[x],reverse=True)
@@ -64,11 +69,14 @@ def align(vertices):
     for count,  x in enumerate(eig_indices):
         eigenvecs_sorted[:,count] = eigenvectors[:,x]
 
- 
-    vertices = np.matmul(vertices,eigenvectors)
+    transformation = np.linalg.inv(eigenvecs_sorted)
 
+    vertices = np.matmul(transformation,vertices)
+    print(eigenvecs_sorted)
+    print(eigenvalues)
+    print(eig_indices)
     
-    return  np.array(vertices.flatten(),dtype=np.float32)
+    return  vertices.flatten(order="F").reshape((-1,3)).astype(np.float32)
 
 if __name__ == "__main__":
     
