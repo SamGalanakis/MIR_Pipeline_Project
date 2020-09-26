@@ -93,6 +93,17 @@ def calculate_diameter(vertices):
 
     return diameter
 
+def angle_three_vertices(vertices):
+    NotImplemented
+def barycenter_vertice(vertices):
+    NotImplemented
+def two_vertices(vertices):
+    NotImplemented
+def square_root_triangle(vertices):
+    NotImplemented
+def cube_root_tetrahedron(vertices):
+    NotImplemented
+
     
 if __name__ == "__main__":
     
