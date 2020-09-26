@@ -23,7 +23,7 @@ class Shape:
         self.pyvista_mesh = False
         
 
-        self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) #is this barycenter or just centroid??
+        self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) 
 
         self.normalized_barycentered_vertices = vertices.reshape(-1, 3).mean(axis=0) - self.barycenter
 
@@ -38,18 +38,20 @@ class Shape:
                 self.edges.add((a,b))
 
     def process_shape(self,flip=True):
-        self.barycenter =   self.vertices.reshape(-1, 3).mean(axis=0)
-        processed_vertices = self.vertices.reshape(-1, 3)  - self.barycenter
+       
         
        
         max_range = 1
         min_range = 0
-
+        processed_vertices = self.vertices.reshape(-1, 3) 
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
         self.processed_vertices, self.eigenvectors = align(self.processed_vertices.flatten())
-        #self.processed_vertices = flip_test(self.processed_vertices,self.element_dict["triangles"]).astype(np.float32)
+        self.processed_vertices = flip_test(self.processed_vertices,self.element_dict["triangles"]).astype(np.float32)
+
+        self.barycenter =   self.processed_vertices.reshape(-1, 3).mean(axis=0)
+        self.processed_vertices = self.processed_vertices.reshape(-1, 3)  - self.barycenter
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
     
 
@@ -126,6 +128,7 @@ if __name__ == "__main__":
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
     #shape.decimate(0.9)
+    shape.view_processed()
     shape.make_pyvista_mesh_processed()
     shape.pyvista_mesh_processed.plot()
     

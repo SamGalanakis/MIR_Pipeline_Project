@@ -61,17 +61,6 @@ class ModelViewer:
 
 
         
-        # surface_normals = []
-        # vertices_accesible = vertices.reshape((-1,3))
-        # for index in range(0,len(indices)-3,3):
-            
-        #     v1 = vertices_accesible[indices[index+1],:] - vertices_accesible[indices[index],:]
-        #     v2 = vertices_accesible[indices[index+2],:] - vertices_accesible[indices[index+1],:]
-        #     v3 = vertices_accesible[indices[index],:] - vertices_accesible[indices[index+2],:]
-        #     surface_normal = pyrr.vector3.generate_normals(v1,v2,v3,normalize_result=True)
-        #     surface_normals.append(surface_normal)
-
-        # surface_normals = np.array(surface_normals)
 
 
        
@@ -105,7 +94,7 @@ class ModelViewer:
 
         as_points = vertices.reshape(-1, 3)
 
-        mean_point = as_points.mean(axis=0)
+        barycenter = as_points.mean(axis=0)
 
         max_x, max_y, max_z = as_points.max(axis=0)
         min_x, min_y, min_z = as_points.min(axis=0)

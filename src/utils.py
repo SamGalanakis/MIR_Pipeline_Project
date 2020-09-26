@@ -164,7 +164,7 @@ def two_vertices(vertices):
     
     indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
 
-    angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(vertices[indices], 3)]
+    
     vertices_difference = [np.linalg.norm(a - b) for a, b in grouped(vertices, 2)]
     bins = np.linspace(0, 1, 10)
     binned = np.digitize(vertices_difference, bins)
