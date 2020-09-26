@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from scipy.spatial import ConvexHull
-from utils import bounding_box, cla_parser
+from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_vertices, barycenter_vertice, two_vertices, square_root_triangle, cube_root_tetrahedron
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
+
 
 
 classification_dict, hierarchy_dict, cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
@@ -19,7 +19,9 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
              file_paths.append(os.path.join(root, file))
 
 columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter",
-        "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume"]
+        "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
+        "diameter","eccentricity", "angle_three_vertices","barycenter_vertice", "two_vertices",
+        "square_root_triangle", "cube_root_tetrahedron" ]
 
 
 data = {k:[] for k in columns}
@@ -50,19 +52,26 @@ for file in tqdm(file_paths):
     data["classification"].append(classification)
     data["volume"].append(shape.pyvista_mesh.volume)
     data["surface_area"].append(sum(shape.pyvista_mesh.compute_cell_sizes(area = True, volume=False).cell_arrays["Area"]))
-
+    
     axis_size = shape.bounding_rect_vertices.reshape(-1 ,3).max(axis=0)
     data["bounding_box_ratio"].append(np.max(axis_size)/np.min(axis_size))
     
     data["compactness"].append(np.power(data["surface_area"][-1],3) / np.sqrt(data["volume"][-1]))
     data["bounding_box_volume"].append(np.prod(axis_size))
-    
-    hull = ConvexHull(shape.vertices.reshape(-1,3))
+    data["diameter"].append(calculate_diameter(shape.vertices))
+    data["eccentricity"].append(align(shape.vertices)[1])
+    #Histograms
+    data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
+    data["barycenter_vertice"].append(barycenter_vertice(shape.vertices))
+    data["two_vertices"].append(two_vertices(shape.vertices, shape.barycenter))
+    data["square_root_triangle"].append(square_root_triangle(shape.vertices))
+    data["cube_root_tetrahedron"].append(cube_root_tetrahedron(shape.vertices))
 
 
 
 
     print()
+    
 n_classified_models = cla_info["n_models"]
 print(f"Missed/unclassified: {n_not_classified} of {len(file_paths)} of which {n_classified_models} are classified according to the cla.")
     

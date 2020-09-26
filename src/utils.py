@@ -3,6 +3,8 @@ from pathlib import Path
 import pyrr
 import math
 from file_reader import FileReader
+from scipy.spatial import ConvexHull
+
 
 
 def bounding_box(vertices,indices):
@@ -72,12 +74,77 @@ def align(vertices):
     transformation = np.linalg.inv(eigenvecs_sorted)
 
     vertices = np.matmul(transformation,vertices)
-    print(eigenvecs_sorted)
-    print(eigenvalues)
-    print(eig_indices)
-    
-    return  vertices.flatten(order="F").reshape((-1,3)).astype(np.float32)
 
+    
+    return  vertices.flatten(order="F").reshape((-1,3)).astype(np.float32) ,  eigenvectors
+ 
+
+
+def calculate_angle(a, b, c):
+    """
+        Calculates angle between three vertices
+    """
+    ba = a - b
+    bc = c - b
+
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(cosine_angle)
+
+    return np.degrees(angle)
+
+def calculate_diameter(vertices):
+    hull = ConvexHull(vertices.reshape(-1,3))
+    diameter = 0
+    for idx, simplice in enumerate(hull.simplices):
+        if idx + 1 >= len(hull.simplices):
+            diameter += np.linalg.norm(simplice - hull.simplices[0])
+        else:
+            diameter += np.linalg.norm(simplice - hull.simplices[idx+1])
+
+    return diameter
+
+def angle_three_vertices(vertices):
+    vertices = vertices.reshape(-1,3)
+    number_of_vertices = np.ceil(len(vertices) * 0.8)
+    while number_of_vertices % 3 != 0:
+        number_of_vertices += 1
+
+
+def barycenter_vertice(vertices, barycenter):
+    vertices = vertices.reshape(-1,3)
+    np.random.choice(vertices,np.ceil(len(vertices) * 0.8))
+    barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices]
+
+def two_vertices(vertices):
+    vertices = vertices.reshape(-1,3)
+    number_of_vertices = np.ceil(len(vertices) * 0.8)
+    if number_of_vertices % 2 != 0:
+        number_of_vertices += 1
+    
+    vertices_difference = [np.linalg.norm(vertice_a - vertice_b) for vertice_a, vertice_b in grouped(np.random.choice(vertices,number_of_vertices), 2)]
+
+
+
+def square_root_triangle(vertices):
+    vertices = vertices.reshape(-1,3)
+      vertices = vertices.reshape(-1,3)
+    number_of_vertices = np.ceil(len(vertices) * 0.8)
+    while number_of_vertices % 3 != 0:
+        number_of_vertices += 1
+
+def cube_root_tetrahedron(vertices):
+    vertices = vertices.reshape(-1,3)
+    vertices = vertices.reshape(-1,3)
+    number_of_vertices = np.ceil(len(vertices) * 0.8)
+    while number_of_vertices % 4 != 0:
+        number_of_vertices += 1
+
+def grouped(iterable, n):
+    return zip(*[iter(iterable)]*n)
+
+for x, y in grouped(l, 2):
+   print "%d + %d = %d" % (x, y, x + y)
+    
 if __name__ == "__main__":
     
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
