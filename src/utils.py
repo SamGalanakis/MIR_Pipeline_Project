@@ -80,17 +80,7 @@ def align(vertices):
  
 
 
-def calculate_angle(a, b, c):
-    """
-        Calculates angle between three vertices
-    """
-    ba = a - b
-    bc = c - b
 
-    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-    angle = np.arccos(cosine_angle)
-
-    return np.degrees(angle)
 
 def calculate_diameter(vertices):
     hull = ConvexHull(vertices.reshape(-1,3))
@@ -103,16 +93,31 @@ def calculate_diameter(vertices):
 
     return diameter
 
+def calculate_angle(a, b, c):
+    """
+        Calculates angle between three vertices
+    """
+    ba = a - b
+    bc = c - b
+
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(cosine_angle)
+
+    return np.degrees(angle)
+
 def angle_three_vertices(vertices):
     vertices = vertices.reshape(-1,3)
     number_of_vertices = np.ceil(len(vertices) * 0.8)
     while number_of_vertices % 3 != 0:
         number_of_vertices += 1
 
+    angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(np.random.choice(vertices,number_of_vertices), 3)]
+
 
 def barycenter_vertice(vertices, barycenter):
     vertices = vertices.reshape(-1,3)
     np.random.choice(vertices,np.ceil(len(vertices) * 0.8))
+
     barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices]
 
 def two_vertices(vertices):
@@ -125,25 +130,23 @@ def two_vertices(vertices):
 
 
 
-def square_root_triangle(vertices):
+def square_area_triangle(vertices):
     vertices = vertices.reshape(-1,3)
-      vertices = vertices.reshape(-1,3)
     number_of_vertices = np.ceil(len(vertices) * 0.8)
     while number_of_vertices % 3 != 0:
         number_of_vertices += 1
 
-def cube_root_tetrahedron(vertices):
-    vertices = vertices.reshape(-1,3)
+def cube_volume_tetrahedron(vertices):
     vertices = vertices.reshape(-1,3)
     number_of_vertices = np.ceil(len(vertices) * 0.8)
     while number_of_vertices % 4 != 0:
         number_of_vertices += 1
 
+    volumes = [ np.cbrt(np.linalg.norm(np.dot(a-d, np.cross(b-d,c-d))) / 6) for a, b ,c, d in grouped(np.random.choice(vertices,number_of_vertices), 4)]
+
 def grouped(iterable, n):
     return zip(*[iter(iterable)]*n)
 
-for x, y in grouped(l, 2):
-   print "%d + %d = %d" % (x, y, x + y)
     
 if __name__ == "__main__":
     
