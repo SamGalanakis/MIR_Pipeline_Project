@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_vertices, barycenter_vertice, two_vertices, square_area_triangle, cube_volume_tetrahedron
+from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_vertices, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
@@ -21,7 +21,7 @@ for root, dirs, files in os.walk(Path(r"data/benchmark")):
 columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter",
         "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
         "diameter","eccentricity", "angle_three_vertices","barycenter_vertice", "two_vertices",
-        "square_root_triangle", "cube_volume_tetrahedron" ]
+        "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
 data = {k:[] for k in columns}
@@ -59,11 +59,14 @@ for file in tqdm(file_paths):
     data["compactness"].append(np.power(data["surface_area"][-1],3) / np.sqrt(data["volume"][-1]))
     data["bounding_box_volume"].append(np.prod(axis_size))
     data["diameter"].append(calculate_diameter(shape.vertices))
-    data["eccentricity"].append(align(shape.vertices)[1])
+    
+    #TODO
+    data["eccentricity"].append(shape.eigenvectors)
     #Histograms
+    a = angle_three_vertices(shape.vertices)
     data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
-    data["barycenter_vertice"].append(barycenter_vertice(shape.vertices))
-    data["two_vertices"].append(two_vertices(shape.vertices, shape.barycenter))
+    data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter))
+    data["two_vertices"].append(two_vertices(shape.vertices))
     data["square_area_triangle"].append(square_area_triangle(shape.vertices))
     data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices))
 

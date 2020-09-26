@@ -111,14 +111,26 @@ def angle_three_vertices(vertices):
     while number_of_vertices % 3 != 0:
         number_of_vertices += 1
 
-    angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(np.random.choice(vertices,number_of_vertices), 3)]
+    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
+
+    angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(vertices[indices], 3)]
+    bins = np.linspace(0, 1, 10)
+    binned = np.digitize(angles_three_vertices, bins)
+    _ , counts = np.unique(binned, return_counts=True)
+
+    return counts
 
 
 def barycenter_vertice(vertices, barycenter):
     vertices = vertices.reshape(-1,3)
-    np.random.choice(vertices,np.ceil(len(vertices) * 0.8))
+    indices = np.random.choice(vertices.shape[0], int(len(vertices) * 0.8), replace=False)
 
-    barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices]
+    barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices[indices]]
+    bins = np.linspace(0, 1, 10)
+    binned = np.digitize(barycenter_vertices, bins)
+    _ , counts = np.unique(binned, return_counts=True)
+
+    return counts
 
 def two_vertices(vertices):
     vertices = vertices.reshape(-1,3)
@@ -126,9 +138,15 @@ def two_vertices(vertices):
     if number_of_vertices % 2 != 0:
         number_of_vertices += 1
     
-    vertices_difference = [np.linalg.norm(vertice_a - vertice_b) for vertice_a, vertice_b in grouped(np.random.choice(vertices,number_of_vertices), 2)]
+    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
 
+    angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(vertices[indices], 3)]
+    vertices_difference = [np.linalg.norm(a - b) for a, b in grouped(vertices, 2)]
+    bins = np.linspace(0, 1, 10)
+    binned = np.digitize(vertices_difference, bins)
+    _, counts = np.unique(binned, return_counts=True)
 
+    return counts
 
 def square_area_triangle(vertices):
     vertices = vertices.reshape(-1,3)
@@ -136,13 +154,30 @@ def square_area_triangle(vertices):
     while number_of_vertices % 3 != 0:
         number_of_vertices += 1
 
+    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
+
+    areas = [1/2 * np.linalg.norm((a[0]-c[0])*(b[1]-a[1]) - (a[0] - b[0])*(c[1]-a[1])) for a,b ,c in grouped(vertices[indices], 3)]
+    bins = np.linspace(0, 1, 10)
+    binned = np.digitize(areas, bins)
+    _ , counts = np.unique(binned, return_counts=True)
+
+    return counts
+
 def cube_volume_tetrahedron(vertices):
     vertices = vertices.reshape(-1,3)
     number_of_vertices = np.ceil(len(vertices) * 0.8)
     while number_of_vertices % 4 != 0:
         number_of_vertices += 1
 
-    volumes = [ np.cbrt(np.linalg.norm(np.dot(a-d, np.cross(b-d,c-d))) / 6) for a, b ,c, d in grouped(np.random.choice(vertices,number_of_vertices), 4)]
+    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
+
+    volumes = [np.cbrt(np.linalg.norm(np.dot(a-d, np.cross(b-d,c-d))) / 6) for a, b ,c, d in grouped(vertices[indices], 4)]
+    bins = np.linspace(0, 1, 10)
+    binned = np.digitize(volumes, bins)
+    _ , counts = np.unique(binned, return_counts=True)
+
+    return counts
+
 
 def grouped(iterable, n):
     return zip(*[iter(iterable)]*n)
@@ -155,4 +190,5 @@ if __name__ == "__main__":
     path = path = Path(r"data/test.ply")
     vertices, element_dict, info = reader.read(path)
     align(vertices)
-    
+
+
