@@ -52,7 +52,7 @@ class Shape:
         
         
 
-        self.processed_vertices = align(self.processed_vertices).flatten()
+        self.processed_vertices = align(self.processed_vertices)[0].flatten()
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
     
 

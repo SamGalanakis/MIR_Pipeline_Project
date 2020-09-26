@@ -68,10 +68,10 @@ def align(vertices):
  
     vertices = np.matmul(vertices,eigenvectors)
     
-    return  np.array(vertices.flatten(),dtype=np.float32)
+    return  (np.array(vertices.flatten(),dtype=np.float32),eigenvectors)
 
 def calculate_diameter(vertices):
-    hull = ConvexHull(vertices)
+    hull = ConvexHull(vertices.reshape(-1,3))
     diameter = 0
     for idx, simplice in enumerate(hull.simplices):
         if idx + 1 >= len(hull.simplices):
