@@ -62,8 +62,8 @@ for file in tqdm(file_paths):
     data["eccentricity"].append(align(shape.vertices)[1])
     #Histograms
     data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
-    data["barycenter_vertice"].append(angle_barycenter_vertice(shape.vertices))
-    data["two_vertices"].append(h_to_vertices(shape.vertices))
+    data["barycenter_vertice"].append(barycenter_vertice(shape.vertices))
+    data["two_vertices"].append(two_vertices(shape.vertices, shape.barycenter))
     data["square_root_triangle"].append(square_root_triangle(shape.vertices))
     data["cube_root_tetrahedron"].append(cube_root_tetrahedron(shape.vertices))
 
