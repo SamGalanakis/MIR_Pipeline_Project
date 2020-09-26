@@ -49,7 +49,7 @@ class Shape:
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
         before = self.processed_vertices
-        self.processed_vertices = align(self.processed_vertices.flatten())
+        self.processed_vertices, self.eigenvectors = align(self.processed_vertices.flatten())
      
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
     
