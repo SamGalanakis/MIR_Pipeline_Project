@@ -78,8 +78,9 @@ class Database:
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
             
             
+        path = ("processed_data/"+database_name+".csv")
         df = pd.DataFrame.from_dict(data)
-        df.to_csv(Path(r"processed_data/+database_name+.csv"))
+        df.to_csv(Path(path))
         print("done")
 
 
