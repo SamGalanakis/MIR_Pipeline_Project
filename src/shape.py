@@ -23,6 +23,8 @@ class Shape:
         self.pyvista_mesh = False
         self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) 
         self.normalized_barycentered_vertices = vertices.reshape(-1, 3).mean(axis=0) - self.barycenter
+        self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.vertices.reshape(-1, 3) ,self.element_dict["triangles"])
+
 
     def get_edges(self):
         self.edges = set() 

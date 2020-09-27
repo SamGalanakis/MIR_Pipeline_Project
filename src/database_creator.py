@@ -63,9 +63,9 @@ class Database:
             data["compactness"].append(np.power(data["surface_area"][-1],3) / np.sqrt(data["volume"][-1]))
             data["bounding_box_volume"].append(np.prod(axis_size))
             data["diameter"].append(calculate_diameter(shape.vertices))
-            data["eccentricity"].append(np.max(shape.eigenvalues)/np.min(shape.eigenvalues))
+            if process:
+                data["eccentricity"].append(np.max(shape.eigenvalues)/np.min(shape.eigenvalues))
             #Histograms
-            a = angle_three_vertices(shape.vertices)
             data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
             data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter))
             data["two_vertices"].append(two_vertices(shape.vertices))
