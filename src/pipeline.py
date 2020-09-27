@@ -9,11 +9,11 @@ def main():
  
     path = Path(r"data/test.ply")
 
-    viewer = ModelViewer()
-    viewer.process(path)
+    #viewer = ModelViewer()
+    #viewer.process(path)
 
     database = Database()
-    database.create_database("pre_processed_data")
+    database.create_database("processed_data", True)
 
 
 
