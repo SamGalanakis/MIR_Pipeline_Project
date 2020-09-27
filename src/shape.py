@@ -47,7 +47,7 @@ class Shape:
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
-        self.processed_vertices, self.eigenvectors, self.egeinvalues = align(self.processed_vertices.flatten())
+        self.processed_vertices, self.eigenvectors, self.eigenvalues = align(self.processed_vertices.flatten())
         self.processed_vertices = flip_test(self.processed_vertices,self.element_dict["triangles"]).astype(np.float32)
 
         self.barycenter =   self.processed_vertices.reshape(-1, 3).mean(axis=0)
