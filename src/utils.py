@@ -76,7 +76,7 @@ def align(vertices):
     vertices = np.matmul(transformation,vertices)
 
     
-    return  vertices.flatten(order="F").reshape((-1,3)).astype(np.float32) ,  eigenvectors
+    return  vertices.flatten(order="F").reshape((-1,3)).astype(np.float32) ,  eigenvectors, eigenvalues
 
 
 
