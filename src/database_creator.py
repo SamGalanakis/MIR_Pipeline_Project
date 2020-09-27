@@ -14,7 +14,7 @@ class Database:
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, database_name, process = False,):
+    def create_database(self, database_name, process = False):
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
