@@ -48,10 +48,7 @@ class Shape:
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
     
 
-    def voxelize(self,density):
-        if type(self.pyvista_mesh) == bool:
-            self.make_pyvista_mesh()
-        self.voxels = pyvista.voxelize(self.pyvista_mesh, density=self.pyvista_mesh.length/200)
+  
     
 
     def view_processed(self):

@@ -19,6 +19,7 @@ def test_alignment(shape):
     assert (abs(eigenvectors.sum(axis=0) -1) <1e-5).sum()==3, "Eigenvectors are not aligned with standard basis!"
 
 def test_normalization(shape):
+    vertices = shape.processed_vertices
     pass
 
 
