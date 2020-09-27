@@ -14,7 +14,7 @@ class Database:
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, process = False):
+    def create_database(self, process = False, database_name):
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
@@ -80,7 +80,7 @@ class Database:
             
             
         df = pd.DataFrame.from_dict(data)
-        df.to_csv(Path(r"processed_data/data.csv"))
+        df.to_csv(Path(r"processed_data/+database_name+.csv"))
         print("done")
 
 

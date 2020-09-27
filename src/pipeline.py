@@ -13,6 +13,7 @@ def main():
     viewer.process(path)
 
     database = Database()
+    database.create_database(False, "pre_processed_data")
 
 
 
