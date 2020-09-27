@@ -21,13 +21,8 @@ class Shape:
         self.get_edges()
         self.n_edges = len(self.edges)
         self.pyvista_mesh = False
-        
-
         self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) 
-
         self.normalized_barycentered_vertices = vertices.reshape(-1, 3).mean(axis=0) - self.barycenter
-
-        self.process_shape()
 
     def get_edges(self):
         self.edges = set() 
@@ -37,10 +32,8 @@ class Shape:
             if (a, b) and (b ,a) not in self.edges:
                 self.edges.add((a,b))
 
+
     def process_shape(self,flip=True):
-       
-        
-       
         max_range = 1
         min_range = 0
         processed_vertices = self.vertices.reshape(-1, 3) 

@@ -1,5 +1,6 @@
 import platform
 from model_viewer import ModelViewer
+from database_creator import Database
 import os
 from pathlib import Path
 
@@ -10,6 +11,9 @@ def main():
 
     viewer = ModelViewer()
     viewer.process(path)
+
+    database = Database()
+
 
 
 if __name__ == '__main__':
