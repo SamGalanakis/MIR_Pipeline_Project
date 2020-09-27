@@ -56,10 +56,6 @@ def cla_parser(path):
 def align(vertices):
    
     vertices = vertices.reshape((3,-1),order="F")
-
-   
-    
-    
     cov = np.cov(vertices)
     eigenvalues, eigenvectors = np.linalg.eig(cov)
 
