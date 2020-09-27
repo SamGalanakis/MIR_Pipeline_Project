@@ -10,8 +10,6 @@ from scipy.spatial import ConvexHull
 def bounding_box(vertices,indices):
         as_points = vertices.reshape(-1, 3)
 
-
-
         max_x, max_y, max_z = as_points.max(axis=0)
         min_x, min_y, min_z = as_points.min(axis=0)
 
@@ -58,10 +56,6 @@ def cla_parser(path):
 def align(vertices):
    
     vertices = vertices.reshape((3,-1),order="F")
-
-   
-    
-    
     cov = np.cov(vertices)
     eigenvalues, eigenvectors = np.linalg.eig(cov)
 

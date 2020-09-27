@@ -14,7 +14,7 @@ class Database:
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, process = False, database_name):
+    def create_database(self, database_name, process = False):
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
@@ -65,7 +65,6 @@ class Database:
             data["diameter"].append(calculate_diameter(shape.vertices))
             data["eccentricity"].append(np.max(shape.eigenvalues)/np.min(shape.eigenvalues))
             #Histograms
-            a = angle_three_vertices(shape.vertices)
             data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
             data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter))
             data["two_vertices"].append(two_vertices(shape.vertices))
@@ -79,8 +78,9 @@ class Database:
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
             
             
+        path = ("processed_data/"+database_name+".csv")
         df = pd.DataFrame.from_dict(data)
-        df.to_csv(Path(r"processed_data/+database_name+.csv"))
+        df.to_csv(Path(path))
         print("done")
 
 
