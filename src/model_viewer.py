@@ -208,8 +208,8 @@ class ModelViewer:
 
 
 
-
-
+        glEnable(GL_LIGHTING)
+        glEnable(GL_COLOR_MATERIAL)
         while not glfw.window_should_close(window):
             glfw.poll_events()
 
@@ -234,9 +234,9 @@ class ModelViewer:
             view = pyrr.matrix44.create_look_at(pyrr.Vector3(input_handler.eye), pyrr.Vector3(
                 input_handler.target), pyrr.Vector3(input_handler.up))
 
-            rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time() )
-            glUniformMatrix4fv(light_loc, 1, GL_FALSE, rot_y)
-
+            light = pyrr.matrix44.create_identity()
+            glUniformMatrix4fv(light_loc, 1, GL_FALSE, light)
+       
             model = pyrr.matrix44.multiply(scale, translation)
             model = pyrr.matrix44.multiply(model, rotation)
 

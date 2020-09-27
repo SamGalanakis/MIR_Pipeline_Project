@@ -58,7 +58,7 @@ def cla_parser(path):
 def align(vertices):
    
     vertices = vertices.reshape((3,-1),order="F")
-    print(f"first points:{vertices[:,0]}")
+
    
     
     
