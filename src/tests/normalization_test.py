@@ -18,9 +18,10 @@ def test_alignment(shape):
     eigenvalues, eigenvectors = np.linalg.eig(cov)
     assert (abs(eigenvectors.sum(axis=0) -1) <1e-5).sum()==3, "Eigenvectors are not aligned with standard basis!"
 
-def test_normalization(shape):
-    vertices = shape.processed_vertices
-    pass
+def test_bounding(shape):
+    assert ((shape.bounding_rect_vertices.reshape((-1,3)).max(axis=0) - shape.processed_vertices.max(axis=0))==0).sum()==3, "Pos values above bounding box!"
+    assert ((abs(shape.bounding_rect_vertices.reshape((-1,3)).min(axis=0)) - abs(shape.processed_vertices.min(axis=0)))==0).sum()==3, "Neg values below bounding box!"
+   
 
 
 
@@ -39,8 +40,10 @@ if __name__ == '__main__':
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
-    shape.make_pyvista_mesh_processed()
-
+    shape.process_shape()
+    
+    
     test_barycenter(shape)
     test_alignment(shape)
+    test_bounding(shape)
     

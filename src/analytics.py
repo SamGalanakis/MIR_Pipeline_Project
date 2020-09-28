@@ -3,10 +3,10 @@ import pandas as pd
 from pathlib import Path
 from shape import Shape
 from model_viewer import ModelViewer
-data_path = Path("processed_data//data.csv")
+data_path = Path("processed_data//testingDatamaker.csv")
 
 
-df = pd.read_csv(data_path,index_col=0)
+df = pd.read_csv(data_path)
 
 
 plt.hist(df["n_triangles"],bins="auto")

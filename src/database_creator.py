@@ -38,13 +38,14 @@ class Database:
             if process:
                 shape.process_shape()
 
-            id = file.split("/")[-1].split(".")[-2].replace("m","")
-            try:
+            id = os.path.basename(file).split(".")[0].replace("m","")
+            if id in self.classification_dict.keys():
                 classification = self.classification_dict[id]
-                print(classification)
-            except:
+                
+            else:
                 n_not_classified +=1
-                continue
+                classification = None
+                
 
             shape.make_pyvista_mesh()
             print(id)
@@ -78,11 +79,16 @@ class Database:
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
             
             
-        path = ("processed_data/"+database_name+".csv")
-        df = pd.DataFrame.from_dict(data)
+        path = (f"processed_data/{database_name}.csv")
+        df = pd.DataFrame.from_dict(data,orient='columns')
+        df.columns =columns
         df.to_csv(Path(path))
         print("done")
 
+
+if __name__=="__main__":
+    database = Database()
+    database.create_database("testingDatamaker",process=True)
 
 
 

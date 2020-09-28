@@ -101,7 +101,12 @@ def flip_test(vertices,triangle_indices):
 
 
 def calculate_diameter(vertices):
-    hull = ConvexHull(vertices.reshape(-1,3))
+    try:
+        hull = ConvexHull(vertices.reshape(-1,3))
+        
+    except:
+        print("Could not calculate hull for diameter")
+        return None
     diameter = 0
     for idx, simplice in enumerate(hull.simplices):
         if idx + 1 >= len(hull.simplices):

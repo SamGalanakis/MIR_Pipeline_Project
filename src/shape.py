@@ -35,7 +35,8 @@ class Shape:
                 self.edges.add((a,b))
 
 
-    def process_shape(self,flip=True):
+    def process_shape(self):
+
         max_range = 1
         min_range = 0
         processed_vertices = self.vertices.reshape(-1, 3) 
@@ -115,12 +116,15 @@ if __name__ == "__main__":
     path = Path(r"data/test.ply")
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
-    path = ant_path
+    pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
+    path = pig_path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
     #shape.decimate(0.9)
+    shape.process_shape()
     shape.view_processed()
+    
     shape.make_pyvista_mesh_processed()
     shape.pyvista_mesh_processed.plot()
     
