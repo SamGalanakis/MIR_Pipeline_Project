@@ -9,7 +9,9 @@ data_path = Path("processed_data//testingDatamaker.csv")
 df = pd.read_csv(data_path)
 
 
-plt.hist(df["n_triangles"],bins="auto")
+plt.hist(df["n_triangles"],bins=25,range=(0,100000))
+plt.xlabel("Number of triangles")
+plt.ylabel("Occurences in dataset")
 plt.show()
 
 df_sorted = df.sort_values("n_triangles")

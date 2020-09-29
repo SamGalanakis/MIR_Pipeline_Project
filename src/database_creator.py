@@ -14,7 +14,7 @@ class Database:
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, database_name, process = False):
+    def create_database(self, database_name, process = False,n_faces_target=False):
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
@@ -88,7 +88,7 @@ class Database:
 
 if __name__=="__main__":
     database = Database()
-    database.create_database("testingDatamaker",process=True)
+    database.create_database("dataNotProcessed",process=False,n_faces_target=False)
 
 
 

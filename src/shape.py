@@ -59,6 +59,11 @@ class Shape:
     def view(self):
         self.viewer.process(vertices = self.vertices , indices = self.element_dict["triangles"],info=self.info)
 
+    def pyvista_mesh_to_base(self,pyvista_mesh):
+        indices = pyvista_mesh.faces.reshape((-1,4))[:,1:]
+        vertices = pyvista_mesh.points.flatten()
+        return vertices, indices
+
     def make_pyvista_mesh(self):
         triangles = np.zeros((self.element_dict["triangles"].shape[0],4)) +3
         triangles [:,1:4] = self.element_dict["triangles"]
