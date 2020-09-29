@@ -4,6 +4,8 @@ import pyrr
 import math
 from file_reader import FileReader
 from scipy.spatial import ConvexHull
+from scipy.stats import binned_statistic
+
 
 
 
@@ -126,7 +128,7 @@ def calculate_angle(a, b, c):
     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
     angle = np.arccos(cosine_angle)
 
-    return np.degrees(angle)
+    return angle
 
 def angle_three_vertices(vertices):
     vertices = vertices.reshape(-1,3)
@@ -137,9 +139,12 @@ def angle_three_vertices(vertices):
     indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
 
     angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(vertices[indices], 3)]
-    bins = np.linspace(0, 1, 10)
+    
+    bins = np.linspace(np.min(angles_three_vertices),np.max(angles_three_vertices), 10)
     binned = np.digitize(angles_three_vertices, bins)
-    _ , counts = np.unique(binned, return_counts=True)
+    counts = np.zeros(10)
+    for bin_ in binned:
+        counts[bin_ -1] += 1
 
     return counts
 
@@ -149,11 +154,17 @@ def barycenter_vertice(vertices, barycenter):
     indices = np.random.choice(vertices.shape[0], int(len(vertices) * 0.8), replace=False)
 
     barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices[indices]]
-    bins = np.linspace(0, 1, 10)
-    binned = np.digitize(barycenter_vertices, bins)
-    _ , counts = np.unique(binned, return_counts=True)
 
+    bins = np.linspace(np.min(barycenter_vertices),np.max(barycenter_vertices), 10)
+    binned = np.digitize(barycenter_vertices, bins)
+    counts = np.zeros(10)
+    for bin_ in binned:
+        counts[bin_ -1] += 1
+        
     return counts
+
+
+
 
 def two_vertices(vertices):
     vertices = vertices.reshape(-1,3)
@@ -165,10 +176,13 @@ def two_vertices(vertices):
 
     
     vertices_difference = [np.linalg.norm(a - b) for a, b in grouped(vertices, 2)]
-    bins = np.linspace(0, 1, 10)
-    binned = np.digitize(vertices_difference, bins)
-    _, counts = np.unique(binned, return_counts=True)
 
+    bins = np.linspace(np.min(vertices_difference),np.max(vertices_difference), 10)
+    binned = np.digitize(vertices_difference, bins)
+    counts = np.zeros(10)
+    for bin_ in binned:
+        counts[bin_ -1] += 1
+        
     return counts
 
 def square_area_triangle(vertices):
@@ -180,10 +194,13 @@ def square_area_triangle(vertices):
     indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
 
     areas = [1/2 * np.linalg.norm((a[0]-c[0])*(b[1]-a[1]) - (a[0] - b[0])*(c[1]-a[1])) for a,b ,c in grouped(vertices[indices], 3)]
-    bins = np.linspace(0, 1, 10)
-    binned = np.digitize(areas, bins)
-    _ , counts = np.unique(binned, return_counts=True)
 
+    bins = np.linspace(np.min(areas),np.max(areas), 10)
+    binned = np.digitize(areas, bins)
+    counts = np.zeros(10)
+    for bin_ in binned:
+        counts[bin_ -1] += 1
+        
     return counts
 
 def cube_volume_tetrahedron(vertices):
@@ -195,10 +212,13 @@ def cube_volume_tetrahedron(vertices):
     indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
 
     volumes = [np.cbrt(np.linalg.norm(np.dot(a-d, np.cross(b-d,c-d))) / 6) for a, b ,c, d in grouped(vertices[indices], 4)]
-    bins = np.linspace(0, 1, 10)
-    binned = np.digitize(volumes, bins)
-    _ , counts = np.unique(binned, return_counts=True)
 
+    bins = np.linspace(np.min(volumes),np.max(volumes), 10)
+    binned = np.digitize(volumes, bins)
+    counts = np.zeros(10)
+    for bin_ in binned:
+        counts[bin_ -1] += 1
+        
     return counts
 
 
