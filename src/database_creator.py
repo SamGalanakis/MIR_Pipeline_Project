@@ -55,7 +55,7 @@ class Database:
             data["n_triangles"].append(shape.n_triangles)
             data["n_quads"].append(shape.n_quads)
             data["bounding_box"].append(str(shape.bounding_rect_vertices))
-            data["barycenter"].append(str(shape.barycenter))
+      
             data["classification"].append(classification)
             data["volume"].append(shape.pyvista_mesh.volume)
             data["surface_area"].append(sum(shape.pyvista_mesh.compute_cell_sizes(area = True, volume=False).cell_arrays["Area"]))

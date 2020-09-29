@@ -205,9 +205,14 @@ def cube_volume_tetrahedron(vertices):
 def grouped(iterable, n):
     return zip(*[iter(iterable)]*n)
 
+def parse_array_from_str(list_str):
+
+    temp = np.array(list(map(lambda x: float(x),   list_str.replace("[","").replace("]","").split())))
+    return temp
+
     
 if __name__ == "__main__":
-    
+
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
     reader= FileReader()
     path = path = Path(r"data/test.ply")
