@@ -13,7 +13,7 @@ def main():
     #viewer.process(path)
 
     database = Database()
-    database.create_database("unprocessed_data")
+    database.create_database("wtv")
 
 
 
