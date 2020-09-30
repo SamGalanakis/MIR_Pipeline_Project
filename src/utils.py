@@ -10,6 +10,7 @@ from scipy.stats import binned_statistic
 import collections
 import time
 import itertools
+import pandas as pd
 
 def bounding_box(vertices,indices):
         as_points = vertices.reshape(-1, 3)
@@ -248,16 +249,18 @@ def parse_array_from_str(list_str):
     temp = np.array(list(map(lambda x: float(x),   list_str.replace("[","").replace("]","").split())))
     return temp
 
-def model_feature_dist(df1,df2,single_columns,array_columns,norm,distribution_norm):
+def model_feature_dist(comparison_model,df2,single_columns,array_columns,norm):
     
-    single_dif = df1[single_columns].values - df2[single_columns]
+    single_dif = (comparison_model[single_columns].values - df2[single_columns].values).astype(np.float64)
 
-    array_difs = []
-    for array_column1,array_column2 in zipped(df1[array_columns].iteritems(),df2[array_columns].iteritems()):
-        array_difs.append(array_column1.values-array_column2.values)
-
-    temp = norm(np.append(single_dif,np.array(array_difs).flatten()))
-    return temp
+    if type(comparison_model)==pd.Series and type(df2)==pd.Series:
+        array_difs = (df2[array_columns] - comparison_model[array_columns] ).apply(lambda x: x.mean())
+        temp = np.linalg.norm(np.append(single_dif,array_difs.values,0),ord=2,axis=0)
+        return temp
+    else:
+        array_difs = (df2[array_columns] - comparison_model[array_columns] ).applymap(lambda x: x.mean())
+        temp = np.linalg.norm(np.append(single_dif,array_difs.values,1),ord=2,axis=1)
+        return temp
     
 if __name__ == "__main__":
   

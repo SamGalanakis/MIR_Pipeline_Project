@@ -30,10 +30,15 @@ non_numeric_columns = ["file_name","id","classification"]
 single_numeric_columns = list(set(df.columns)-set(non_numeric_columns+array_columns))
 df[array_columns]=df[array_columns].applymap(parse_array_from_str)
 df[distribution_columns]=df[distribution_columns].applymap(lambda x: x/x.sum()) 
-#df[single_numeric_columns].fillna(df[single_numeric_columns].median(axis=0),inplace=True)
+
 
 for col in single_numeric_columns:
     df[col].fillna(df[col].median(),inplace=True)
+
+
+#remove extreme outliers
+df = df[(df[single_numeric_columns]<=df[single_numeric_columns].quantile(0.999)).all(axis=1)]
+df = df[(df[single_numeric_columns]>=df[single_numeric_columns].quantile(0.001)).all(axis=1)]
 
 
 x = df[single_numeric_columns].values
@@ -41,7 +46,23 @@ x = df[single_numeric_columns].values
 min_max_scaler = preprocessing.MinMaxScaler()
 x_scaled = min_max_scaler.fit_transform(x)
 
-df[single_numeric_columns]= pd.DataFrame(x_scaled,columns=df[single_numeric_columns].columns)
+df[single_numeric_columns]= x_scaled
+
+
+problem_path = r"data\benchmark\db\2\m201\m201.off"
+inputt = df[df["file_name"]==problem_path].iloc[0,:]
+against = df
+
+
+dist = model_feature_dist(inputt,against,single_numeric_columns,array_columns,euclidean)
+
+sorted_index_by_dist= sorted(range(0,df.shape[0]),key = lambda x : dist[x],reverse=True)
+
+viewer = ModelViewer()
+viewer.process(inputt["file_name"])
+for id in sorted_index_by_dist:
+    path = df.iloc[id,:]["file_name"]
+    viewer.process(Path(path))
 plt.hist(df["n_triangles"],bins=25,range=(0,100000))
 plt.xlabel("Number of triangles")
 plt.ylabel("Occurences in dataset")
@@ -52,7 +73,7 @@ df_sorted = df.sort_values("n_triangles")
 min_example = df_sorted.iloc[0,:]["file_name"].replace("\\","/")
 max_example = df_sorted.iloc[-1,:]["file_name"].replace("\\","/")
 mean_example =  df.iloc[(df['n_triangles']-df["n_triangles"].mean()).abs().argsort()[0]]["file_name"].replace("\\","/")
-viewer = ModelViewer()
+
 
 viewer.process(Path(max_example))
 print('done')

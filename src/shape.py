@@ -133,7 +133,7 @@ if __name__ == "__main__":
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
-    #shape.decimate(0.9)
+
     shape.make_pyvista_mesh()
     shape.subdivide(2)
     shape.process_shape()
