@@ -9,7 +9,7 @@ from pathlib import Path
 from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_vertices, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
 
 
-def test_angle_three_vertices():
+def test_angle_three_vertices(vertices):
     a = np.array([1,-1,1])
     b = np.array([0,1,1])
     c = np.array([1,1,1])
@@ -20,19 +20,17 @@ def test_angle_three_vertices():
     assert np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)) == 0.4472135954999579, "test_angle_three_vertices() failed the test"
 
 
-def test_barycenter_vertice(vertices):
-    vertices = vertices.reshape(-1, 3)
-    barycenter = vertices.reshape(-1, 3).mean(axis=0) 
+def test_barycenter_vertice(vertices, barycenter):
     possible_value = 1.7320508
 
-    for i in range(4):
-        barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices]
-
-        for barycenter_vertice in barycenter_vertices:
-            assert barycenter_vertice != possible_value , "test_barycenter_vertice() failed the test"
+    results = barycenter_vertice(vertices,barycenter)
+        
+    for result in results:
+        assert results != possible_value , "test_barycenter_vertice() failed the test"
   
+    print("------------- test_barycenter_vertice() passed the test")
 
-def test_square_area_triangle():
+def test_square_area_triangle(vertices):
     a = np.array([1,-1,1])
     b = np.array([0,1,1])
     c = np.array([1,1,1])
@@ -44,15 +42,13 @@ def test_cube_volume_tetrahedron(vertices):
     possible_values =  [0,1.100642416298209]
 
     for i in range(4):
-        vertices = vertices.reshape(-1,3)
-        number_of_vertices = np.ceil(len(vertices) * 0.8)
-        while number_of_vertices % 4 != 0:
-            number_of_vertices += 1
+        _ , volumes = cube_volume_tetrahedron(vertices)
 
-        volumes = [np.cbrt(np.linalg.norm(np.dot(a-d, np.cross(b-d,c-d))) / 6) for a, b ,c, d in grouped(vertices, 4)]
-        
         for volume in volumes:
             assert volume in possible_values, "test_cube_volume_tetrahedron() failed the test"
+
+    print("------------- test_cube_volume_tetrahedron() passed the test")
+
 
 def grouped(iterable, n):
     return zip(*[iter(iterable)]*n)
@@ -65,14 +61,12 @@ if __name__ == '__main__':
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
 
-    test_angle_three_vertices()
+    test_angle_three_vertices(vertices)
     print("------------- test_angle_three_vertices()) passed the test")
 
-    test_barycenter_vertice(vertices)
-    print("------------- test_barycenter_vertice() passed the test")
+    test_barycenter_vertice(vertices,shape.barycenter)
 
     test_cube_volume_tetrahedron(vertices)
-    print("------------- test_cube_volume_tetrahedron() passed the test")
     
-    test_square_area_triangle()
+    test_square_area_triangle(vertices)
     print("------------- test_square_area_triangle() passed the test")
