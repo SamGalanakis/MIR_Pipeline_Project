@@ -10,13 +10,11 @@ from utils import bounding_box, cla_parser, calculate_diameter, align, angle_thr
 
 
 def test_angle_three_vertices(vertices):
-    a = np.array([1,-1,1])
-    b = np.array([0,1,1])
-    c = np.array([1,1,1])
-    ba = a - b
-    bc = c - b
-    bb= np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-    bbb = np.degrees(np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)))
+    
+
+    angle_three_vertices(vertices)
+
+
     assert np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc)) == 0.4472135954999579, "test_angle_three_vertices() failed the test"
 
 
