@@ -6,6 +6,9 @@ from utils import bounding_box, cla_parser, calculate_diameter, align, angle_thr
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
+import cProfile
+import pyvista
+import pyacvd
 
 
 class Database:
@@ -22,7 +25,7 @@ class Database:
                     
                     self.file_paths.append(os.path.join(root, file))
 
-        columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box","barycenter",
+        columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box",
                 "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
                 "diameter","eccentricity", "angle_three_vertices","barycenter_vertice", "two_vertices",
                 "square_area_triangle", "cube_volume_tetrahedron" ]
@@ -31,10 +34,43 @@ class Database:
         data = {k:[] for k in columns}
 
         n_not_classified=0
+        n_failed_subdivision=0
+        n_failed_decimation=0
+            
         for file in tqdm(self.file_paths):
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
 
+
+            shape.make_pyvista_mesh()
+            shape.pyvista_mesh.clean(inplace=True)
+            # shape.pyvista_mesh.fill_holes(1000,inplace=True)
+            if n_faces_target:
+                
+                
+                # try:
+                #     shape.subdivide(target=n_faces_target,undercut=False)
+                #     if shape.pyvista_mesh.n_faces==0:
+                #         raise Exception
+                # except:
+                    
+                #     print(f"Could not subdivie {file}")
+                #     n_failed_subdivision +=1
+                #     continue
+              
+                 
+                try:
+                    shape.decimate(target=n_faces_target)
+                    if shape.pyvista_mesh.n_faces==0:
+                        raise Exception
+                except:
+                    print(f"Could not decimate {file}")
+                    n_failed_decimation+=1
+                    continue
+                shape.pyvista_mesh_to_base(shape.pyvista_mesh)
+
+                
+                
             if process:
                 shape.process_shape()
 
@@ -47,7 +83,7 @@ class Database:
                 classification = None
                 
 
-            shape.make_pyvista_mesh()
+            
             print(id)
             data["file_name"].append(file)
             data["id"].append(id)
@@ -58,11 +94,12 @@ class Database:
       
             data["classification"].append(classification)
             data["volume"].append(shape.pyvista_mesh.volume)
-            data["surface_area"].append(sum(shape.pyvista_mesh.compute_cell_sizes(area = True, volume=False).cell_arrays["Area"]))
-            axis_size = shape.bounding_rect_vertices.reshape(-1 ,3).max(axis=0)
-            data["bounding_box_ratio"].append(np.max(axis_size)/np.min(axis_size))
-            data["compactness"].append(np.power(data["surface_area"][-1],3) / np.sqrt(data["volume"][-1]))
-            data["bounding_box_volume"].append(np.prod(axis_size))
+            
+            data["surface_area"].append(shape.pyvista_mesh.area)
+            bounding_box_sides = shape.bounding_rect_vertices.reshape((-1 ,3)).max(axis=0)-shape.bounding_rect_vertices.reshape((-1 ,3)).min(axis=0)
+            data["bounding_box_ratio"].append(np.max(bounding_box_sides)/np.min(bounding_box_sides))
+            data["compactness"].append(np.power(data["surface_area"][-1],3) / np.power(data["volume"][-1],2))
+            data["bounding_box_volume"].append(np.prod(bounding_box_sides))  #def wrong 
             data["diameter"].append(calculate_diameter(shape.vertices))
             data["eccentricity"].append(np.max(shape.eigenvalues)/np.min(shape.eigenvalues))
             #Histograms
@@ -73,11 +110,14 @@ class Database:
             data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices))
 
 
-            print()
+            
             
         n_classified_models = self.cla_info["n_models"]
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
-            
+        
+        if n_faces_target:
+            print(f"Failed subdivision on {n_failed_subdivision}, failed decimation on {n_failed_decimation}")
+
             
         path = (f"processed_data/{database_name}.csv")
         df = pd.DataFrame.from_dict(data,orient='columns')
@@ -88,7 +128,11 @@ class Database:
 
 if __name__=="__main__":
     database = Database()
-    database.create_database("dataNotProcessed",process=False,n_faces_target=False)
+    profiler= cProfile.Profile()
+   # database.create_database("dataTest",process=True,n_faces_target=1000)
+    profiler.run('database.create_database("dataTest",process=True,n_faces_target=1000)')
+    profiler.dump_stats("profiler_stats")
+    
 
 
 

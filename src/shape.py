@@ -7,7 +7,7 @@ from utils import bounding_box, align, flip_test
 from itertools import combinations
 import pyvista as pv
 import math
-
+from pyacvd import Clustering
 
 class Shape:
     def __init__(self,vertices, element_dict, info):
@@ -16,10 +16,9 @@ class Shape:
         self.info = info
         self.n_triangles = element_dict["triangles"].size/3
         self.n_quads = element_dict["quads"].size
-        self.n_vertices = vertices.size
+        self.n_vertices = vertices.size/3
         self.viewer = ModelViewer()
-        self.get_edges()
-        self.n_edges = len(self.edges)
+        
         self.pyvista_mesh = False
         self.barycenter =   vertices.reshape(-1, 3).mean(axis=0) 
         self.normalized_barycentered_vertices = vertices.reshape(-1, 3).mean(axis=0) - self.barycenter
@@ -39,7 +38,7 @@ class Shape:
 
         max_range = 1
         min_range = 0
-        processed_vertices = self.vertices.reshape(-1, 3) 
+        processed_vertices = self.vertices.reshape((-1, 3)) 
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
         self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
@@ -60,9 +59,13 @@ class Shape:
         self.viewer.process(vertices = self.vertices , indices = self.element_dict["triangles"],info=self.info)
 
     def pyvista_mesh_to_base(self,pyvista_mesh):
-        indices = pyvista_mesh.faces.reshape((-1,4))[:,1:]
-        vertices = pyvista_mesh.points.flatten()
-        return vertices, indices
+        self.element_dict["triangles"] = pyvista_mesh.faces.reshape((-1,4))[:,1:].astype(np.uint32)
+        self.vertices = np.array(pyvista_mesh.points.flatten())
+
+        self.n_vertices=self.vertices.size/3
+        self.n_triangles = self.element_dict["triangles"].size/3
+        
+        
 
     def make_pyvista_mesh(self):
         triangles = np.zeros((self.element_dict["triangles"].shape[0],4)) +3
@@ -77,7 +80,9 @@ class Shape:
     
 
 
-    def subdivide(self,times=1,algo="loop",target=False,undercut=True):
+    def subdivide(self,times=1,algo="linear",target=False,undercut=True):
+       
+        
         if type(self.pyvista_mesh) == bool:
             self.make_pyvista_mesh()
         if undercut:
@@ -89,7 +94,7 @@ class Shape:
             print(f"Subdividing {times} times")
    
         
-
+       
         self.pyvista_mesh.subdivide(times,algo, inplace=True)
         
         
@@ -101,7 +106,9 @@ class Shape:
 
         if target:
             reduction = 1- target/self.pyvista_mesh.n_faces
-        assert(reduction<1,"Nothing to reduce!")
+        if reduction <= 0:
+            print("Nothing to reduce")
+            return
         if algo=="pro":
             self.pyvista_mesh.decimate_pro(reduction,inplace=True)
         
@@ -122,11 +129,13 @@ if __name__ == "__main__":
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
     pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
-    path = pig_path
+    path = path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
     #shape.decimate(0.9)
+    shape.make_pyvista_mesh()
+    shape.subdivide(2)
     shape.process_shape()
     shape.view_processed()
     

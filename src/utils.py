@@ -1,13 +1,15 @@
+from math import sin
 import numpy as np
 from pathlib import Path
+from numpy.compat.py3k import asstr
 import pyrr
 import math
 from file_reader import FileReader
 from scipy.spatial import ConvexHull
 from scipy.stats import binned_statistic
-
-
-
+import collections
+import time
+import itertools
 
 def bounding_box(vertices,indices):
         as_points = vertices.reshape(-1, 3)
@@ -103,18 +105,28 @@ def flip_test(vertices,triangle_indices):
 
 
 def calculate_diameter(vertices):
+    
+    vertices=vertices.reshape((-1,3))
     try:
-        hull = ConvexHull(vertices.reshape(-1,3))
+        hull = ConvexHull(vertices)
         
     except:
         print("Could not calculate hull for diameter")
         return None
-    diameter = 0
-    for idx, simplice in enumerate(hull.simplices):
-        if idx + 1 >= len(hull.simplices):
-            diameter += np.linalg.norm(simplice - hull.simplices[0])
-        else:
-            diameter += np.linalg.norm(simplice - hull.simplices[idx+1])
+
+
+
+    f = lambda x : vertices[x,:]
+    unique_hull_points = f(np.unique(hull.simplices))
+
+    
+   # Naive algorithm, quite inefficient can take ~ 3s for larger model
+    point_pairs = itertools.combinations(list(unique_hull_points),2)
+    return max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
+        
+
+
+    
 
     return diameter
 
@@ -142,10 +154,11 @@ def angle_three_vertices(vertices):
     
     bins = np.linspace(np.min(angles_three_vertices),np.max(angles_three_vertices), 10)
     binned = np.digitize(angles_three_vertices, bins)
+    count_collections= collections.Counter(binned)
     counts = np.zeros(10)
-    for bin_ in binned:
-        counts[bin_ -1] += 1
-
+    for key, val in count_collections.items():
+        counts[key-1] = val
+    
     return counts
 
 
@@ -157,10 +170,10 @@ def barycenter_vertice(vertices, barycenter):
 
     bins = np.linspace(np.min(barycenter_vertices),np.max(barycenter_vertices), 10)
     binned = np.digitize(barycenter_vertices, bins)
+    count_collections= collections.Counter(binned)
     counts = np.zeros(10)
-    for bin_ in binned:
-        counts[bin_ -1] += 1
-        
+    for key, val in count_collections.items():
+        counts[key-1] = val
     return counts
 
 
@@ -179,9 +192,11 @@ def two_vertices(vertices):
 
     bins = np.linspace(np.min(vertices_difference),np.max(vertices_difference), 10)
     binned = np.digitize(vertices_difference, bins)
+    count_collections= collections.Counter(binned)
     counts = np.zeros(10)
-    for bin_ in binned:
-        counts[bin_ -1] += 1
+    for key, val in count_collections.items():
+        counts[key-1] = val
+  
         
     return counts
 
@@ -215,10 +230,11 @@ def cube_volume_tetrahedron(vertices):
 
     bins = np.linspace(np.min(volumes),np.max(volumes), 10)
     binned = np.digitize(volumes, bins)
+    count_collections= collections.Counter(binned)
     counts = np.zeros(10)
-    for bin_ in binned:
-        counts[bin_ -1] += 1
-        
+    for key, val in count_collections.items():
+        counts[key-1] = val
+
     return counts
 
 
@@ -226,13 +242,25 @@ def grouped(iterable, n):
     return zip(*[iter(iterable)]*n)
 
 def parse_array_from_str(list_str):
-
+    if type(list_str)!=str:
+        print(f"{list_str} could not be parsed to an array, returning None")
+        return None
     temp = np.array(list(map(lambda x: float(x),   list_str.replace("[","").replace("]","").split())))
     return temp
 
+def model_feature_dist(df1,df2,single_columns,array_columns,norm,distribution_norm):
+    
+    single_dif = df1[single_columns].values - df2[single_columns]
+
+    array_difs = []
+    for array_column1,array_column2 in zipped(df1[array_columns].iteritems(),df2[array_columns].iteritems()):
+        array_difs.append(array_column1.values-array_column2.values)
+
+    temp = norm(np.append(single_dif,np.array(array_difs).flatten()))
+    return temp
     
 if __name__ == "__main__":
-
+  
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
     reader= FileReader()
     path = path = Path(r"data/test.ply")
