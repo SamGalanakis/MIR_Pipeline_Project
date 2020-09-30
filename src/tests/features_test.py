@@ -9,7 +9,6 @@ from pathlib import Path
 from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_vertices, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
 
 
-
 def test_angle_three_vertices():
     a = np.array([1,-1,1])
     b = np.array([0,1,1])
