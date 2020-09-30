@@ -49,17 +49,18 @@ x_scaled = min_max_scaler.fit_transform(x)
 df[single_numeric_columns]= x_scaled
 
 
-problem_path = r"data\benchmark\db\2\m201\m201.off"
-inputt = df[df["file_name"]==problem_path].iloc[0,:]
+
+
+inputt = df.sample().iloc[0,:]
 against = df
 
 
 dist = model_feature_dist(inputt,against,single_numeric_columns,array_columns,euclidean)
 
-sorted_index_by_dist= sorted(range(0,df.shape[0]),key = lambda x : dist[x],reverse=True)
+sorted_index_by_dist= sorted(range(0,df.shape[0]),key = lambda x : dist[x],reverse=False)
 
 viewer = ModelViewer()
-viewer.process(inputt["file_name"])
+
 for id in sorted_index_by_dist:
     path = df.iloc[id,:]["file_name"]
     viewer.process(Path(path))
