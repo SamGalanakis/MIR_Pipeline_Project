@@ -126,11 +126,6 @@ def calculate_diameter(vertices):
     return max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
         
 
-
-    
-
-    return diameter
-
 def calculate_angle(a, b, c):
     """
         Calculates angle between three vertices
@@ -145,7 +140,7 @@ def calculate_angle(a, b, c):
 
 def angle_three_vertices(vertices):
     vertices = vertices.reshape(-1,3)
-    number_of_vertices = np.ceil(len(vertices) * 0.8)
+    number_of_vertices = np.floor(len(vertices) * 0.8)
     while number_of_vertices % 3 != 0:
         number_of_vertices += 1
 
