@@ -93,15 +93,16 @@ class Database:
             data["bounding_box"].append(str(shape.bounding_rect_vertices))
       
             data["classification"].append(classification)
-            data["volume"].append(shape.pyvista_mesh.volume)
+            data["volume"].append(np.maximum(shape.pyvista_mesh.volume,0.01))#clamp to avoid 0 volume for 2d models
             
             data["surface_area"].append(shape.pyvista_mesh.area)
             bounding_box_sides = shape.bounding_rect_vertices.reshape((-1 ,3)).max(axis=0)-shape.bounding_rect_vertices.reshape((-1 ,3)).min(axis=0)
+            bounding_box_sides = np.maximum(bounding_box_sides,0.01) #clamp above so no zero division for essentially 2d models
             data["bounding_box_ratio"].append(np.max(bounding_box_sides)/np.min(bounding_box_sides))
             data["compactness"].append(np.power(data["surface_area"][-1],3) / np.power(data["volume"][-1],2))
             data["bounding_box_volume"].append(np.prod(bounding_box_sides))  #def wrong 
             data["diameter"].append(calculate_diameter(shape.vertices))
-            data["eccentricity"].append(np.max(shape.eigenvalues)/np.min(shape.eigenvalues))
+            data["eccentricity"].append(np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01)) #also clamp
             #Histograms
             data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
             data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter))
