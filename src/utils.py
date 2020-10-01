@@ -160,7 +160,7 @@ def angle_three_vertices(vertices):
     for key, val in count_collections.items():
         counts[key-1] = val
     
-    return counts , angle_three_vertices
+    return counts
 
 
 def barycenter_vertice(vertices, barycenter):
@@ -175,7 +175,7 @@ def barycenter_vertice(vertices, barycenter):
     counts = np.zeros(10)
     for key, val in count_collections.items():
         counts[key-1] = val
-    return counts , barycenter_vertice
+    return counts 
 
 
 
@@ -199,7 +199,7 @@ def two_vertices(vertices):
         counts[key-1] = val
   
         
-    return counts , vertices_difference
+    return counts 
 
 def square_area_triangle(vertices):
     vertices = vertices.reshape(-1,3)
@@ -217,7 +217,7 @@ def square_area_triangle(vertices):
     for bin_ in binned:
         counts[bin_ -1] += 1
         
-    return counts , areas
+    return counts
 
 def cube_volume_tetrahedron(vertices):
     vertices = vertices.reshape(-1,3)
@@ -236,7 +236,7 @@ def cube_volume_tetrahedron(vertices):
     for key, val in count_collections.items():
         counts[key-1] = val
 
-    return counts , volumes
+    return counts
 
 
 def grouped(iterable, n):
