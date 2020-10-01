@@ -38,7 +38,7 @@ class Database:
         n_failed_subdivision=0
         n_failed_decimation=0
             
-        for file in tqdm(self.file_paths[0:100]):
+        for file in tqdm(self.file_paths):
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
             if apply_processing:
