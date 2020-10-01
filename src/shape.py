@@ -44,9 +44,9 @@ class Shape:
         processed_vertices, self.eigenvectors, self.eigenvalues = align(processed_vertices.flatten())
         processed_vertices = flip_test(processed_vertices,self.element_dict["triangles"]).astype(np.float32)
 
-        barycenter =   processed_vertices.reshape(-1, 3).mean(axis=0)
+        self.barycenter =   processed_vertices.reshape(-1, 3).mean(axis=0)
   
-        processed_vertices = processed_vertices.reshape(-1, 3)  - barycenter
+        processed_vertices = processed_vertices.reshape(-1, 3)  - self.barycenter
 
         self.vertices = processed_vertices
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(processed_vertices,self.element_dict["triangles"])
