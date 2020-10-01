@@ -20,10 +20,9 @@ class Shape:
         self.viewer = ModelViewer()
         
         self.pyvista_mesh = False
-        self.barycenter = vertices.reshape(-1, 3).mean(axis=0) 
-        self.normalized_barycentered_vertices = vertices.reshape(-1, 3).mean(axis=0) - self.barycenter
+    
         self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.vertices.reshape(-1, 3) ,self.element_dict["triangles"])
-        _, self.eigenvectors, self.eigenvalues = align(vertices)
+        
 
     def get_edges(self):
         self.edges = set() 
@@ -41,26 +40,28 @@ class Shape:
         processed_vertices = self.vertices.reshape((-1, 3)) 
         scaled_unit = (max_range - min_range) / (np.max(processed_vertices) - np.min(processed_vertices))
 
-        self.processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
-        self.processed_vertices, self.eigenvectors, self.eigenvalues = align(self.processed_vertices.flatten())
-        self.processed_vertices = flip_test(self.processed_vertices,self.element_dict["triangles"]).astype(np.float32)
+        processed_vertices = processed_vertices*scaled_unit - np.min(processed_vertices)*scaled_unit + min_range
+        processed_vertices, self.eigenvectors, self.eigenvalues = align(processed_vertices.flatten())
+        processed_vertices = flip_test(processed_vertices,self.element_dict["triangles"]).astype(np.float32)
 
-        self.barycenter =   self.processed_vertices.reshape(-1, 3).mean(axis=0)
-        self.processed_vertices = self.processed_vertices.reshape(-1, 3)  - self.barycenter
-        self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(self.processed_vertices,self.element_dict["triangles"])
+        barycenter =   processed_vertices.reshape(-1, 3).mean(axis=0)
+  
+        processed_vertices = processed_vertices.reshape(-1, 3)  - barycenter
+
+        self.vertices = processed_vertices
+        self.bounding_rect_vertices, self.bounding_rect_indices = bounding_box(processed_vertices,self.element_dict["triangles"])
     
 
   
     
 
-    def view_processed(self):
-        self.viewer.process(vertices = self.processed_vertices,indices = self.element_dict["triangles"],info=self.info)
+    
     def view(self):
         self.viewer.process(vertices = self.vertices , indices = self.element_dict["triangles"],info=self.info)
 
     def pyvista_mesh_to_base(self,pyvista_mesh):
         self.element_dict["triangles"] = pyvista_mesh.faces.reshape((-1,4))[:,1:].astype(np.uint32)
-        self.vertices = np.array(pyvista_mesh.points.flatten())
+        self.vertices = np.array(pyvista_mesh.points.flatten()).astype(np.float32)
 
         self.n_vertices=self.vertices.size/3
         self.n_triangles = self.element_dict["triangles"].size/3
@@ -72,11 +73,7 @@ class Shape:
         triangles [:,1:4] = self.element_dict["triangles"]
         triangles = np.array(triangles,dtype=np.int)
         self.pyvista_mesh = pv.PolyData(self.vertices.reshape(-1,3),triangles)
-    def make_pyvista_mesh_processed(self):
-        triangles = np.zeros((self.element_dict["triangles"].shape[0],4)) +3
-        triangles [:,1:4] = self.element_dict["triangles"]
-        triangles = np.array(triangles,dtype=np.int)
-        self.pyvista_mesh_processed = pv.PolyData(self.processed_vertices.reshape(-1,3),triangles)
+
     
 
 
@@ -137,10 +134,9 @@ if __name__ == "__main__":
     shape.make_pyvista_mesh()
     shape.subdivide(2)
     shape.process_shape()
-    shape.view_processed()
+
     
-    shape.make_pyvista_mesh_processed()
-    shape.pyvista_mesh_processed.plot()
+
     
     print("done")
 

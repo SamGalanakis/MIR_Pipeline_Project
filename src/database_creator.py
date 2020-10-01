@@ -9,15 +9,25 @@ from file_reader import FileReader
 import cProfile
 import pyvista
 import pyacvd
+<<<<<<< HEAD
 
 
+=======
+from preprocessing import process
+from feature_extractor import extract_features
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 class Database:
     def __init__(self):
         self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
         self.reader = FileReader()
         self.file_paths = []
 
+<<<<<<< HEAD
     def create_database(self, database_name, process = False,n_faces_target=False):
+=======
+    def create_database(self, database_name, apply_processing = True,n_faces_target=False):
+
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
@@ -37,9 +47,10 @@ class Database:
         n_failed_subdivision=0
         n_failed_decimation=0
             
-        for file in tqdm(self.file_paths):
+        for file in tqdm(self.file_paths[0:100]):
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
+<<<<<<< HEAD
 
 
             shape.make_pyvista_mesh()
@@ -73,6 +84,12 @@ class Database:
                 
             if process:
                 shape.process_shape()
+=======
+            if apply_processing:
+                
+                shape = process(shape,n_faces_target=n_faces_target)
+               # shape.pyvista_mesh.plot()
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 
             id = os.path.basename(file).split(".")[0].replace("m","")
             if id in self.classification_dict.keys():
@@ -84,9 +101,10 @@ class Database:
                 
 
             
-            print(id)
+            data["classification"] = classification
             data["file_name"].append(file)
             data["id"].append(id)
+<<<<<<< HEAD
             data["n_vertices"].append(shape.n_vertices)
             data["n_triangles"].append(shape.n_triangles)
             data["n_quads"].append(shape.n_quads)
@@ -108,29 +126,43 @@ class Database:
             data["two_vertices"].append(two_vertices(shape.vertices)[0])
             data["square_area_triangle"].append(square_area_triangle(shape.vertices)[0])
             data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices)[0])
+=======
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 
 
+
+
+            #Get features
+            feature_dict = extract_features(shape)
+
+            #Add them to total data
+            for key,val in feature_dict.items():
+                data[key].append(val)
             
             
         n_classified_models = self.cla_info["n_models"]
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
         
-        if n_faces_target:
-            print(f"Failed subdivision on {n_failed_subdivision}, failed decimation on {n_failed_decimation}")
+
 
             
         path = (f"processed_data/{database_name}.csv")
         df = pd.DataFrame.from_dict(data,orient='columns')
         df.columns =columns
         df.to_csv(Path(path))
-        print("done")
+        print(f"Done making dataset and saved to {path}!")
 
 
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
+<<<<<<< HEAD
    # database.create_database("dataTest",process=True,n_faces_target=1000)
     profiler.run('database.create_database("dataTest",process=True,n_faces_target=1000)')
+=======
+   # database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)
+    profiler.run('database.create_database("dataTest",apply_processing=True,n_faces_target=5000)')
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
     profiler.dump_stats("profiler_stats")
     
 

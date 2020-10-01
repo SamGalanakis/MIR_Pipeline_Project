@@ -5,7 +5,7 @@ from numpy.compat.py3k import asstr
 import pyrr
 import math
 from file_reader import FileReader
-from scipy.spatial import ConvexHull
+from scipy.spatial import ConvexHull, distance_matrix
 from scipy.stats import binned_statistic
 import collections
 import time
@@ -31,7 +31,7 @@ def bounding_box(vertices,indices):
 def cla_parser(path):
     classification_dict = {}
     hierarchy_dict = {}
-    assert(path.suffix == ".cla", "Not a cla file!")
+    assert path.suffix == ".cla", "Not a cla file!"
     with open(path) as f:
         lines_list = f.readlines()
     lines_list = [x.strip() for x in lines_list]
@@ -120,10 +120,15 @@ def calculate_diameter(vertices):
     f = lambda x : vertices[x,:]
     unique_hull_points = f(np.unique(hull.simplices))
 
+    diam = distance_matrix(unique_hull_points,unique_hull_points).max()
+
+
     
    # Naive algorithm, quite inefficient can take ~ 3s for larger model
-    point_pairs = itertools.combinations(list(unique_hull_points),2)
-    return max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
+   # diam = itertools.combinations(list(unique_hull_points),2).max()
+  #  diam = max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
+   
+    return diam
         
 
 def calculate_angle(a, b, c):
@@ -155,7 +160,7 @@ def angle_three_vertices(vertices):
     for key, val in count_collections.items():
         counts[key-1] = val
     
-    return counts , angle_three_vertices
+    return counts
 
 
 def barycenter_vertice(vertices, barycenter):
@@ -170,7 +175,7 @@ def barycenter_vertice(vertices, barycenter):
     counts = np.zeros(10)
     for key, val in count_collections.items():
         counts[key-1] = val
-    return counts , barycenter_vertice
+    return counts 
 
 
 
@@ -194,7 +199,7 @@ def two_vertices(vertices):
         counts[key-1] = val
   
         
-    return counts , vertices_difference
+    return counts 
 
 def square_area_triangle(vertices):
     vertices = vertices.reshape(-1,3)
@@ -212,7 +217,7 @@ def square_area_triangle(vertices):
     for bin_ in binned:
         counts[bin_ -1] += 1
         
-    return counts , areas
+    return counts
 
 def cube_volume_tetrahedron(vertices):
     vertices = vertices.reshape(-1,3)
@@ -231,7 +236,7 @@ def cube_volume_tetrahedron(vertices):
     for key, val in count_collections.items():
         counts[key-1] = val
 
-    return counts , volumes
+    return counts
 
 
 def grouped(iterable, n):
