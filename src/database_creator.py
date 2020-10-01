@@ -10,7 +10,6 @@ import cProfile
 import pyvista
 import pyacvd
 
-from preprocessing import process
 
 class Database:
     def __init__(self):
@@ -18,7 +17,7 @@ class Database:
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, database_name, apply_procesing = False,n_faces_target=False):
+    def create_database(self, database_name, process = False,n_faces_target=False):
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
@@ -42,7 +41,38 @@ class Database:
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
 
-            shape = process(shape,n_faces_target=n_faces_target)
+
+            shape.make_pyvista_mesh()
+            shape.pyvista_mesh.clean(inplace=True)
+            # shape.pyvista_mesh.fill_holes(1000,inplace=True)
+            if n_faces_target:
+                
+                
+                # try:
+                #     shape.subdivide(target=n_faces_target,undercut=False)
+                #     if shape.pyvista_mesh.n_faces==0:
+                #         raise Exception
+                # except:
+                    
+                #     print(f"Could not subdivie {file}")
+                #     n_failed_subdivision +=1
+                #     continue
+              
+                 
+                try:
+                    shape.decimate(target=n_faces_target)
+                    if shape.pyvista_mesh.n_faces==0:
+                        raise Exception
+                except:
+                    print(f"Could not decimate {file}")
+                    n_failed_decimation+=1
+                    continue
+                shape.pyvista_mesh_to_base(shape.pyvista_mesh)
+
+                
+                
+            if process:
+                shape.process_shape()
 
             id = os.path.basename(file).split(".")[0].replace("m","")
             if id in self.classification_dict.keys():
@@ -68,21 +98,16 @@ class Database:
             bounding_box_sides = shape.bounding_rect_vertices.reshape((-1 ,3)).max(axis=0)-shape.bounding_rect_vertices.reshape((-1 ,3)).min(axis=0)
             bounding_box_sides = np.maximum(bounding_box_sides,0.01) #clamp above so no zero division for essentially 2d models
             data["bounding_box_ratio"].append(np.max(bounding_box_sides)/np.min(bounding_box_sides))
-            data["compactness"].append(np.power(data["surface_area"][-1],3) / np.power(data["volume"][-1],2))
-<<<<<<< HEAD
+            data["compactness"].append(np.power(data["surface_area"][-1],3) /  (np.pi * 36* np.power(data["volume"][-1],2)))
             data["bounding_box_volume"].append(np.prod(bounding_box_sides))  
-=======
-            data["bounding_box_volume"].append(np.prod(bounding_box_sides)) 
->>>>>>> baca74cfdcb95bcb88187c221f862ad4361b83e1
             data["diameter"].append(calculate_diameter(shape.vertices))
             data["eccentricity"].append(np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01)) #also clamp
-            
             #Histograms
-            data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
-            data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter))
-            data["two_vertices"].append(two_vertices(shape.vertices))
-            data["square_area_triangle"].append(square_area_triangle(shape.vertices))
-            data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices))
+            data["angle_three_vertices"].append(angle_three_vertices(shape.vertices)[0])
+            data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter)[0])
+            data["two_vertices"].append(two_vertices(shape.vertices)[0])
+            data["square_area_triangle"].append(square_area_triangle(shape.vertices)[0])
+            data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices)[0])
 
 
             
@@ -104,8 +129,8 @@ class Database:
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
-   # database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)
-    profiler.run('database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)')
+   # database.create_database("dataTest",process=True,n_faces_target=1000)
+    profiler.run('database.create_database("dataTest",process=True,n_faces_target=1000)')
     profiler.dump_stats("profiler_stats")
     
 
