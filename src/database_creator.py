@@ -11,6 +11,7 @@ import pyvista
 import pyacvd
 from preprocessing import process
 from feature_extractor import extract_features
+
 class Database:
     def __init__(self):
         self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
@@ -41,6 +42,37 @@ class Database:
         for file in tqdm(self.file_paths):
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
+
+
+            shape.make_pyvista_mesh()
+            shape.pyvista_mesh.clean(inplace=True)
+            # shape.pyvista_mesh.fill_holes(1000,inplace=True)
+            if n_faces_target:
+                
+                
+                # try:
+                #     shape.subdivide(target=n_faces_target,undercut=False)
+                #     if shape.pyvista_mesh.n_faces==0:
+                #         raise Exception
+                # except:
+                    
+                #     print(f"Could not subdivie {file}")
+                #     n_failed_subdivision +=1
+                #     continue
+              
+                 
+                try:
+                    shape.decimate(target=n_faces_target)
+                    if shape.pyvista_mesh.n_faces==0:
+                        raise Exception
+                except:
+                    print(f"Could not decimate {file}")
+                    n_failed_decimation+=1
+                    continue
+                shape.pyvista_mesh_to_base(shape.pyvista_mesh)
+
+                
+    
             if apply_processing:
                 
                 shape = process(shape,n_faces_target=n_faces_target)
@@ -59,6 +91,30 @@ class Database:
             data["classification"] = classification
             data["file_name"].append(file)
             data["id"].append(id)
+<<<<<<< HEAD
+            data["n_vertices"].append(shape.n_vertices)
+            data["n_triangles"].append(shape.n_triangles)
+            data["n_quads"].append(shape.n_quads)
+            data["bounding_box"].append(str(shape.bounding_rect_vertices))
+      
+            data["classification"].append(classification)
+            data["volume"].append(np.maximum(shape.pyvista_mesh.volume,0.01))#clamp to avoid 0 volume for 2d models
+            data["surface_area"].append(shape.pyvista_mesh.area)
+            bounding_box_sides = shape.bounding_rect_vertices.reshape((-1 ,3)).max(axis=0)-shape.bounding_rect_vertices.reshape((-1 ,3)).min(axis=0)
+            bounding_box_sides = np.maximum(bounding_box_sides,0.01) #clamp above so no zero division for essentially 2d models
+            data["bounding_box_ratio"].append(np.max(bounding_box_sides)/np.min(bounding_box_sides))
+            data["compactness"].append(np.power(data["surface_area"][-1],3) /  (np.pi * 36* np.power(data["volume"][-1],2)))
+            data["bounding_box_volume"].append(np.prod(bounding_box_sides))  
+            data["diameter"].append(calculate_diameter(shape.vertices))
+            data["eccentricity"].append(np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01)) #also clamp
+            #Histograms
+            data["angle_three_vertices"].append(angle_three_vertices(shape.vertices)[0])
+            data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter)[0])
+            data["two_vertices"].append(two_vertices(shape.vertices)[0])
+            data["square_area_triangle"].append(square_area_triangle(shape.vertices)[0])
+            data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices)[0])
+=======
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 
 
 
@@ -87,8 +143,13 @@ class Database:
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
+<<<<<<< HEAD
+   # database.create_database("dataTest",process=True,n_faces_target=1000)
+    profiler.run('database.create_database("dataTest",process=True,n_faces_target=1000)')
+=======
    # database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)
     profiler.run('database.create_database("dataTest",apply_processing=True,n_faces_target=5000)')
+>>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
     profiler.dump_stats("profiler_stats")
     
 
