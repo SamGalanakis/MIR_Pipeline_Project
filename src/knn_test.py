@@ -5,9 +5,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 
-
-
-
+"""
+    #Make new environmen with Python 3.7
+    #Install CUDA 10.0 
+    #RUN on new environment: conda install faiss-gpu cudatoolkit=10.0 -c pytorch 
+"""
 class FaissKNeighbors:
     def __init__(self, k=5):
         self.index = None
@@ -30,9 +32,7 @@ mnist = datasets.load_digits()
 
 (trainData, testData, trainLabels, testLabels) = train_test_split(np.array(mnist.data), mnist.target, test_size=0.25, random_state=42)
 
-print("asd")
 knn = FaissKNeighbors()
 knn.fit(trainData,trainLabels)
-
 predictions = knn.predict(testData)
 print(accuracy_score(testLabels,predictions))
