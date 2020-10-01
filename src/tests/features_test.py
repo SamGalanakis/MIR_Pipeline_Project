@@ -55,8 +55,6 @@ def test_cube_volume_tetrahedron(vertices):
         for volume in volumes:
             assert volume in possible_values, "test_cube_volume_tetrahedron() failed the test"
 
-def grouped(iterable, n):
-    return zip(*[iter(iterable)]*n)
 
 
 

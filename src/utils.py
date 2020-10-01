@@ -5,7 +5,7 @@ from numpy.compat.py3k import asstr
 import pyrr
 import math
 from file_reader import FileReader
-from scipy.spatial import ConvexHull
+from scipy.spatial import ConvexHull, distance_matrix
 from scipy.stats import binned_statistic
 import collections
 import time
@@ -31,7 +31,7 @@ def bounding_box(vertices,indices):
 def cla_parser(path):
     classification_dict = {}
     hierarchy_dict = {}
-    assert(path.suffix == ".cla", "Not a cla file!")
+    assert path.suffix == ".cla", "Not a cla file!"
     with open(path) as f:
         lines_list = f.readlines()
     lines_list = [x.strip() for x in lines_list]
@@ -120,10 +120,15 @@ def calculate_diameter(vertices):
     f = lambda x : vertices[x,:]
     unique_hull_points = f(np.unique(hull.simplices))
 
+    diam = distance_matrix(unique_hull_points,unique_hull_points).max()
+
+
     
    # Naive algorithm, quite inefficient can take ~ 3s for larger model
-    point_pairs = itertools.combinations(list(unique_hull_points),2)
-    return max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
+   # diam = itertools.combinations(list(unique_hull_points),2).max()
+  #  diam = max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
+   
+    return diam
         
 
 def calculate_angle(a, b, c):

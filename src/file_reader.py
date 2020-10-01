@@ -67,7 +67,7 @@ class FileReader:
 
         triangles = np.array([x[1:] for x in elements if x[0]==3],dtype = np.uint32)
         quads = np.array([x[1:] for x in elements if x[0]==4],dtype = np.uint32)
-        assert((triangles.size +quads.size) == len(elements), "Non quad/triangle elements!")
+        assert triangles.size/3 +quads.size/4 == len(elements), "Non quad/triangle elements!"
         element_dict = {"triangles":triangles, "quads":quads}
 
         print(f" File type: {path.suffix} Triangles: {triangles.size}, Quads: {quads.size}.")

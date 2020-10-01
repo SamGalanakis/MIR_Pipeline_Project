@@ -1,6 +1,7 @@
 import pyvista
 from shape import Shape
-
+import pyacvd
+import numpy as np
 
 def process(shape,n_faces_target=False):
     assert isinstance(shape,Shape), "Input must be instance of Shape"
@@ -9,27 +10,27 @@ def process(shape,n_faces_target=False):
     shape.make_pyvista_mesh()
     shape.pyvista_mesh.clean(inplace=True)
 
-
+    
     if n_faces_target:
             
-        # try:
-        #     shape.subdivide(target=n_faces_target,undercut=False)
-        #     if shape.pyvista_mesh.n_faces==0:
-        #         raise Exception
-        # except:
-            
-        #     print(f"Could not subdivie {file}")
-        #    
-        #     continue
-    
-        try:
-            shape.decimate(target=n_faces_target)
-            if shape.pyvista_mesh.n_faces==0:
-                raise Exception
-        except:
-            print(f"Could not decimate")
-        shape.pyvista_mesh_to_base(shape.pyvista_mesh)
+        clus = pyacvd.Clustering(shape.pyvista_mesh)
 
+        n_subdiv= int(np.ceil(np.log(n_faces_target/clus.mesh.n_faces)/np.log(4))) # Number of subdivisions to overshoot target
+        
+        clus.subdivide(n_subdiv)
+        clus.cluster(6000)
+    
+        new_mesh = clus.create_mesh()
+    
+
+        
+    
+        shape.pyvista_mesh = new_mesh
+        shape.decimate(target=n_faces_target)
+       
+   
+        shape.pyvista_mesh_to_base(shape.pyvista_mesh)
+       
         shape.process_shape()
 
         return shape
