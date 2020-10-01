@@ -27,12 +27,30 @@ class FaissKNeighbors:
         predictions = np.array([np.argmax(np.bincount(x)) for x in votes])
         return predictions
 
-    
-mnist = datasets.load_digits()
 
-(trainData, testData, trainLabels, testLabels) = train_test_split(np.array(mnist.data), mnist.target, test_size=0.25, random_state=42)
+def test():
+    mnist = datasets.load_digits()
 
-knn = FaissKNeighbors()
-knn.fit(trainData,trainLabels)
-predictions = knn.predict(testData)
-print(accuracy_score(testLabels,predictions))
+    (trainData, testData, trainLabels, testLabels) = train_test_split(np.array(mnist.data), mnist.target, test_size=0.25, random_state=42)
+
+    knn = FaissKNeighbors()
+    knn.fit(trainData,trainLabels)
+    predictions = knn.predict(testData)
+    print(accuracy_score(testLabels,predictions))
+
+df = pd.read_csv(data_path,index_col=0)
+
+# Make sure np arrays are read from strings, probably better way to do this tbh"
+
+array_columns = ["bounding_box",
+                "angle_three_vertices","barycenter_vertice", "two_vertices",
+                "square_area_triangle", "cube_volume_tetrahedron" ]
+                
+distribution_columns = [ "angle_three_vertices","barycenter_vertice", "two_vertices",
+                "square_area_triangle", "cube_volume_tetrahedron" ]
+
+non_numeric_columns = ["file_name","id","classification"]
+
+single_numeric_columns = list(set(df.columns)-set(non_numeric_columns+array_columns))
+df[array_columns]=df[array_columns].applymap(parse_array_from_str)
+df[distribution_columns]=df[distribution_columns].applymap(lambda x: x/x.sum()) 

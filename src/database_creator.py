@@ -9,25 +9,17 @@ from file_reader import FileReader
 import cProfile
 import pyvista
 import pyacvd
-<<<<<<< HEAD
-
-
-=======
 from preprocessing import process
 from feature_extractor import extract_features
->>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
+
 class Database:
     def __init__(self):
         self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
         self.reader = FileReader()
         self.file_paths = []
 
-<<<<<<< HEAD
-    def create_database(self, database_name, process = False,n_faces_target=False):
-=======
     def create_database(self, database_name, apply_processing = True,n_faces_target=False):
 
->>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
             for file in files:
@@ -50,7 +42,6 @@ class Database:
         for file in tqdm(self.file_paths[0:100]):
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
-<<<<<<< HEAD
 
 
             shape.make_pyvista_mesh()
@@ -81,15 +72,11 @@ class Database:
                 shape.pyvista_mesh_to_base(shape.pyvista_mesh)
 
                 
-                
-            if process:
-                shape.process_shape()
-=======
+    
             if apply_processing:
                 
                 shape = process(shape,n_faces_target=n_faces_target)
                # shape.pyvista_mesh.plot()
->>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
 
             id = os.path.basename(file).split(".")[0].replace("m","")
             if id in self.classification_dict.keys():
