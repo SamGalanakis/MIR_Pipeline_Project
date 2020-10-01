@@ -88,10 +88,8 @@ class Database:
                 
 
             
-            data["classification"] = classification
             data["file_name"].append(file)
             data["id"].append(id)
-<<<<<<< HEAD
             data["n_vertices"].append(shape.n_vertices)
             data["n_triangles"].append(shape.n_triangles)
             data["n_quads"].append(shape.n_quads)
@@ -108,13 +106,11 @@ class Database:
             data["diameter"].append(calculate_diameter(shape.vertices))
             data["eccentricity"].append(np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01)) #also clamp
             #Histograms
-            data["angle_three_vertices"].append(angle_three_vertices(shape.vertices)[0])
-            data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter)[0])
-            data["two_vertices"].append(two_vertices(shape.vertices)[0])
-            data["square_area_triangle"].append(square_area_triangle(shape.vertices)[0])
-            data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices)[0])
-=======
->>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
+            data["angle_three_vertices"].append(angle_three_vertices(shape.vertices))
+            data["barycenter_vertice"].append(barycenter_vertice(shape.vertices, shape.barycenter))
+            data["two_vertices"].append(two_vertices(shape.vertices))
+            data["square_area_triangle"].append(square_area_triangle(shape.vertices))
+            data["cube_volume_tetrahedron"].append(cube_volume_tetrahedron(shape.vertices))
 
 
 
@@ -143,13 +139,8 @@ class Database:
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
-<<<<<<< HEAD
-   # database.create_database("dataTest",process=True,n_faces_target=1000)
-    profiler.run('database.create_database("dataTest",process=True,n_faces_target=1000)')
-=======
    # database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)
     profiler.run('database.create_database("dataTest",apply_processing=True,n_faces_target=5000)')
->>>>>>> 281f04a5fdd14acd4db3907d56c894c67fad4969
     profiler.dump_stats("profiler_stats")
     
 
