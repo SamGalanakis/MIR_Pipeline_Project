@@ -1,20 +1,54 @@
+appdirs==1.4.4
+backcall==0.2.0
 certifi==2020.6.20
+colorama==0.4.3
+cycler==0.10.0
+decorator==4.4.2
 glfw==1.12.0
+imageio==2.9.0
 imgui==1.2.0
+ipykernel @ file:///C:/ci/ipykernel_1596190155316/work/dist/ipykernel-5.3.4-py3-none-any.whl
+ipython @ file:///C:/ci/ipython_1598865816163/work
+ipython-genutils==0.2.0
+jedi @ file:///C:/ci/jedi_1598353661586/work
+joblib==0.16.0
+jupyter-client @ file:///tmp/build/80754af9/jupyter_client_1601311786391/work
+jupyter-core==4.6.3
+kiwisolver==1.2.0
+matplotlib==3.3.2
+meshio==4.2.0
 mkl-fft==1.1.0
 mkl-random==1.1.1
 mkl-service==2.3.0
 multipledispatch==0.6.0
 numpy @ file:///C:/Users/samme/Google_Drive/Code_library/MIR_Pipeline_Project/extras/numpy-1.19.1%2Bmkl-cp38-cp38-win_amd64.whl
 pandas==1.1.2
+parso==0.7.0
+pickleshare==0.7.5
 Pillow==7.2.0
+prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1598885458782/work
+pyacvd==0.2.5
 pyglfw==0.2.2
+Pygments @ file:///tmp/build/80754af9/pygments_1600458456400/work
 PyOpenGL==3.1.5
 PyOpenGL-accelerate==3.1.5
+pyparsing==2.4.7
 pyrr==0.10.3
 python-dateutil==2.8.1
 pytz==2020.1
+pyvista==0.26.0
+pywin32==227
+pyzmq==19.0.2
+scikit-learn==0.23.2
 scipy @ file:///C:/Users/samme/Google_Drive/Code_library/MIR_Pipeline_Project/extras/scipy-1.5.2-cp38-cp38-win_amd64.whl
+scooby==0.5.6
 six==1.15.0
+sklearn==0.0
+snakeviz==2.1.0
+threadpoolctl==2.1.0
+tornado==6.0.4
 tqdm==4.48.2
+traitlets @ file:///tmp/build/80754af9/traitlets_1600712679583/work
+vtk==9.0.1
+wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
 wincertstore==0.2

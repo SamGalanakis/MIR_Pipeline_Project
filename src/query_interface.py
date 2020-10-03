@@ -26,7 +26,9 @@ def QueryInterface():
 
 if __name__ == '__main__':
     data_path = Path("processed_data/dataTest.csv")
+    ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
     query_interface = QueryInterface(data_path)
+    query_interface.query(ant_path)
 
 
 
