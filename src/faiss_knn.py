@@ -19,35 +19,34 @@ from feature_extractor import extract_features
 
 
 class FaissKNeighbors:
-    def __init__(self, data_path):
+    def __init__(self, data_path,  metric = "L2"):
         self.index = None
+        self.metric = None
         self.data_path = Path(data_path)
         _, _, self.df = process_dataset_for_knn(data_path)
 
-    def train(self, ncentroids = 10, niter = 20, verbose = True ):
-        x_train = self.df.select_dtypes(include=np.number).values
-
-        ### Option 1
-        self.test_query = np.ascontiguousarray(x_train[0], dtype=np.float32)
-        self.d = x_train.shape[1]
-        self.kmeans = faiss.Kmeans(self.d, ncentroids, niter=niter, verbose=verbose)
-        self.kmeans.train(np.ascontiguousarray(x_train, dtype=np.float32))
-
-        ### Option 2
-        self.index = faiss.IndexFlatL2(x_train.shape[1])
-        self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
-
+    def train(self):
+        if metric == "L2":
+            x_train = self.df.select_dtypes(include=np.number).values
+            self.index = faiss.IndexFlatL2(x_train.shape[1])
+            self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
+        else:
+            #COSINE SIMILARITY
+            self.index = faiss.IndexFlatIp(x_train.shape[1])
+            self.index.add(np.ascontiguousarray(faiss.normalize_L2(x_train), dtype=np.float32))
 
 
     def query(self, query, number_answers):
         #to test it out
-        a = self.test_query.reshape(-1,84)
-       # D, I = self.kmeans.index.search(self.test_query, 1)
-        distances, indices = self.index.search(self.test_query.reshape(-1,84), k = 10)
-        D, I = self.kmeans.index.search(self.test_query.reshape(-1,84), 1)
+        #query = self.test_query.reshape(-1,84)
+        if self.metric == "L2":
+            distances, indices = self.index.search(query, k=number_answers)
+        
+        else:
+            distances, indices = self.index.search(faiss.normalize_l2(query), k=number_answers)
 
-        print()
 
+        return indices
 
 
 if __name__ == '__main__':
@@ -55,4 +54,4 @@ if __name__ == '__main__':
 
     knn = FaissKNeighbors(data_path)
     knn.train()
-    knn.query("asd",1)
+    knn.query("asd",3)
