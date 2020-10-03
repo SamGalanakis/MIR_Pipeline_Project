@@ -23,16 +23,28 @@ df = pd.read_csv(data_path,index_col=0)
 array_columns = ["bounding_box",
                 "angle_three_vertices","barycenter_vertice", "two_vertices",
                 "square_area_triangle", "cube_volume_tetrahedron" ]
-                
-distribution_columns = [ "angle_three_vertices","barycenter_vertice", "two_vertices",
-                "square_area_triangle", "cube_volume_tetrahedron" ]
 
-non_numeric_columns = ["file_name","id","classification"]
 
-single_numeric_columns = list(set(df.columns)-set(non_numeric_columns+array_columns))
-df[array_columns]=df[array_columns].applymap(parse_array_from_str)
-df[distribution_columns]=df[distribution_columns].applymap(lambda x: x/x.sum()) 
+def is_array_col(array_columns,col_name):
+    #Matching array names to numbered columns or returning False
+    for y in array_columns:
+        if y in col_name and col_name.replace(y+'_',"").isdigit():
+            return y
+    return False
+  
 
+#distribution_columns = [ "angle_three_vertices","barycenter_vertice", "two_vertices","square_area_triangle", "cube_volume_tetrahedron" ]
+
+#Get array lengths, replace...isdigit to make sure not to count things like bounding_box_volume as part of bounding_box array.
+array_lengths = [len([x for x in df.columns if is_array_col(array_columns,x)==y]) for y in array_columns]
+
+non_numeric_columns = ["file_name","classification"]
+
+
+single_numeric_columns = [ x for x in set(df.columns)-set(non_numeric_columns) if not is_array_col(array_columns,x)]
+
+
+assert len(single_numeric_columns) +len(non_numeric_columns) + sum(array_lengths) == df.shape[1], "Column counts may be incorrect!"
 
 for col in single_numeric_columns:
     df[col].fillna(df[col].median(),inplace=True)
@@ -42,7 +54,7 @@ for col in single_numeric_columns:
 df = df[(df[single_numeric_columns]<=df[single_numeric_columns].quantile(0.999)).all(axis=1)]
 df = df[(df[single_numeric_columns]>=df[single_numeric_columns].quantile(0.001)).all(axis=1)]
 
-
+# Do min max scaling
 x = df[single_numeric_columns].values
 
 min_max_scaler = preprocessing.MinMaxScaler()
@@ -50,14 +62,21 @@ x_scaled = min_max_scaler.fit_transform(x)
 
 df[single_numeric_columns]= x_scaled
 
+#Divide array entries by lenght so they only contribute as a single entry in total when taking L2 norm
+
+for length , array_name in zip(array_lengths,array_columns):
+    for col in df.columns:
+        if is_array_col(array_columns,col)==array_name:
+            df[col] = df[col]/length
 
 
-
-inputt = df.sample().iloc[0,:]
+sample = df.sample().iloc[0,:]
 against = df
 
-
-dist = model_feature_dist(inputt,against,single_numeric_columns,array_columns,euclidean)
+numeric_df =  df.select_dtypes(include=np.number)
+sample_numeric = sample[numeric_df.columns]
+dist = np.linalg.norm((numeric_df.values-sample_numeric.values).astype(np.float32),axis=1,ord=2)
+#dist = model_feature_dist(inputt,against,single_numeric_columns,array_columns,euclidean)
 
 sorted_index_by_dist= sorted(range(0,df.shape[0]),key = lambda x : dist[x],reverse=False)
 

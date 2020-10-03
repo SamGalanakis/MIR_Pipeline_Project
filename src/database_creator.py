@@ -27,13 +27,15 @@ class Database:
                     
                     self.file_paths.append(os.path.join(root, file))
 
-        columns=["file_name","id","n_vertices","n_triangles","n_quads","bounding_box",
+        columns=["file_name","n_vertices","n_triangles","n_quads",
                 "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
-                "diameter","eccentricity", "angle_three_vertices","barycenter_vertice", "two_vertices",
-                "square_area_triangle", "cube_volume_tetrahedron" ]
+                "diameter","eccentricity" ]
+        col_array = ["bounding_box","angle_three_vertices","barycenter_vertice", "two_vertices",
+                "square_area_triangle", "cube_volume_tetrahedron"]
+        
+        col_numeric = ["n_vertices","n_triangles","n_quads","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume","diameter","eccentricity"]
 
-
-        data = {k:[] for k in columns}
+        data = {k:[] for k in columns+col_array}
 
         n_not_classified=0
         n_failed_subdivision=0
@@ -43,13 +45,6 @@ class Database:
             vertices, element_dict, info = self.reader.read(Path(file))
             shape = Shape(vertices,element_dict,info)
 
-
-        
-            
-                
-                
-
-                
     
             if apply_processing:
                 
@@ -70,7 +65,7 @@ class Database:
             
             data["classification"].append(classification)
             data["file_name"].append(file)
-            data["id"].append(id)
+         #   data["id"].append(id)
 
 
 
@@ -83,15 +78,24 @@ class Database:
                 data[key].append(val)
             
             
+            
         n_classified_models = self.cla_info["n_models"]
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
         
-
-
-            
-        path = (f"processed_data/{database_name}.csv")
+        
         df = pd.DataFrame.from_dict(data,orient='columns')
-        df.columns =columns
+    
+        for index , x in enumerate(col_array):
+            arrray_length = data[x][0].size
+            col_labels_list = [f"{x}_{num}" for num in range(arrray_length)]
+            df[col_labels_list] = np.array(data[x],np.float32)
+         
+
+ 
+        
+        path = f"processed_data/{database_name}.csv"
+        
+        df=df.drop(col_array,axis=1) #remove the col_arrays since they have single entries
         df.to_csv(Path(path))
         print(f"Done making dataset and saved to {path}!")
 

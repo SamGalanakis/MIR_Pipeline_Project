@@ -160,7 +160,7 @@ def angle_three_vertices(vertices):
     for key, val in count_collections.items():
         counts[key-1] = val
     
-    return counts
+    return counts/sum(counts)
 
 
 def barycenter_vertice(vertices, barycenter):
@@ -175,7 +175,7 @@ def barycenter_vertice(vertices, barycenter):
     counts = np.zeros(10)
     for key, val in count_collections.items():
         counts[key-1] = val
-    return counts 
+    return counts/sum(counts)
 
 
 
@@ -199,7 +199,7 @@ def two_vertices(vertices):
         counts[key-1] = val
   
         
-    return counts 
+    return counts/sum(counts)
 
 def square_area_triangle(vertices):
     vertices = vertices.reshape(-1,3)
@@ -217,7 +217,7 @@ def square_area_triangle(vertices):
     for bin_ in binned:
         counts[bin_ -1] += 1
         
-    return counts
+    return counts/sum(counts)
 
 def cube_volume_tetrahedron(vertices):
     vertices = vertices.reshape(-1,3)
@@ -236,7 +236,7 @@ def cube_volume_tetrahedron(vertices):
     for key, val in count_collections.items():
         counts[key-1] = val
 
-    return counts
+    return counts/sum(counts)
 
 
 def grouped(iterable, n):
@@ -253,14 +253,21 @@ def model_feature_dist(comparison_model,df2,single_columns,array_columns,norm):
     
     single_dif = (comparison_model[single_columns].values - df2[single_columns].values).astype(np.float64)
 
+
     if type(comparison_model)==pd.Series and type(df2)==pd.Series:
         array_difs = (df2[array_columns] - comparison_model[array_columns] ).apply(lambda x: x.mean())
         temp = np.linalg.norm(np.append(single_dif,array_difs.values,0),ord=2,axis=0)
         return temp
     else:
+
         array_difs = (df2[array_columns] - comparison_model[array_columns] ).applymap(lambda x: x.mean())
+        array_difs2 = (df2[array_columns] - comparison_model[array_columns] ).applymap(lambda x: x/x.size)
         temp = np.linalg.norm(np.append(single_dif,array_difs.values,1),ord=2,axis=1)
+
+        temp2 = np.linalg.norm(np.append(single_dif,array_difs2.values,1),ord=2,axis=1)
         return temp
+    
+
     
 if __name__ == "__main__":
   

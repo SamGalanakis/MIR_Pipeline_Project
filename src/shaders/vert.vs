@@ -11,7 +11,8 @@ uniform mat4 projection;
 uniform mat4 light;
 
 
-out vec3 fragNormal;
+flat out vec3 fragNormal;
+
 
 void main()
 {

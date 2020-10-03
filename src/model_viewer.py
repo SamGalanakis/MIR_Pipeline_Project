@@ -254,9 +254,10 @@ class ModelViewer:
     
 
             if input_handler.mode == "default":
+    
                 glDrawElements(GL_TRIANGLES, pre_box, GL_UNSIGNED_INT, None)
             elif input_handler.mode == "point_cloud":
-          
+                
                 glDrawElements(GL_POINTS, pre_box, GL_UNSIGNED_INT, None)
                 
             elif input_handler.mode=="wireframe":

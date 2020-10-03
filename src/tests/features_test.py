@@ -32,12 +32,7 @@ if __name__ == '__main__':
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
 
-    test_angle_three_vertices(vertices)
-    print("------------- test_angle_three_vertices()) passed the test")
 
-    test_barycenter_vertice(vertices,shape.barycenter)
-
-    test_cube_volume_tetrahedron(vertices)
     
     test_square_area_triangle(vertices)
     print("------------- test_square_area_triangle() passed the test")
