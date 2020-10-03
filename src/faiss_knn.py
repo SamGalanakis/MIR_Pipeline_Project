@@ -26,13 +26,16 @@ class FaissKNeighbors:
         _, _, self.df = process_dataset_for_knn(data_path)
 
     def train(self):
+        x_train = self.df.select_dtypes(include=np.number).values
+        #to test it out
+        #self.test_query = x_train[0]
+
         if self.metric == "L2":
-            x_train = self.df.select_dtypes(include=np.number).values
             self.index = faiss.IndexFlatL2(x_train.shape[1])
             self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
         else:
             #COSINE SIMILARITY
-            self.index = faiss.IndexFlatIp(x_train.shape[1])
+            self.index = faiss.IndexFlatIP(x_train.shape[1])
             faiss.normalize_L2(x_train)
             self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
 
@@ -40,6 +43,7 @@ class FaissKNeighbors:
     def query(self, query, number_answers):
         #to test it out
         #query = self.test_query.reshape(-1,84)
+
         if self.metric == "L2":
             distances, indices = self.index.search(query, k=number_answers)
         
@@ -56,4 +60,4 @@ if __name__ == '__main__':
 
     knn = FaissKNeighbors(data_path)
     knn.train()
-    knn.query("asd",3)
+    #knn.query("asd",3)
