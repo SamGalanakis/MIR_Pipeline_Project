@@ -21,19 +21,20 @@ from feature_extractor import extract_features
 class FaissKNeighbors:
     def __init__(self, data_path,  metric = "L2"):
         self.index = None
-        self.metric = None
+        self.metric = metric
         self.data_path = Path(data_path)
         _, _, self.df = process_dataset_for_knn(data_path)
 
     def train(self):
-        if metric == "L2":
+        if self.metric == "L2":
             x_train = self.df.select_dtypes(include=np.number).values
             self.index = faiss.IndexFlatL2(x_train.shape[1])
             self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
         else:
             #COSINE SIMILARITY
             self.index = faiss.IndexFlatIp(x_train.shape[1])
-            self.index.add(np.ascontiguousarray(faiss.normalize_L2(x_train), dtype=np.float32))
+            faiss.normalize_L2(x_train)
+            self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
 
 
     def query(self, query, number_answers):
@@ -43,7 +44,8 @@ class FaissKNeighbors:
             distances, indices = self.index.search(query, k=number_answers)
         
         else:
-            distances, indices = self.index.search(faiss.normalize_l2(query), k=number_answers)
+            faiss.normalize_L2(query)
+            distances, indices = self.index.search(query, k=number_answers)
 
 
         return indices
