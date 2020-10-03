@@ -1,5 +1,5 @@
 import numpy as np
-import faiss
+from faiss import FaissKNeighbors
 from utils import parse_array_from_str
 from sklearn import datasets
 from pathlib import Path
