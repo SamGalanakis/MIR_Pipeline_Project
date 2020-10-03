@@ -1,5 +1,6 @@
 from process_data_for_knn import process_dataset_for_knn
 from pathlib import Path
+
 from faiss_knn import FaissKNeighbors
 from file_reader import FileReader
 from shape import Shape
