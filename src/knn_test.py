@@ -17,41 +17,13 @@ import pandas as pd
 
 
 class FaissKNeighbors:
-    def __init__(self, k=5):
+    def __init__(self, data_path):
         self.index = None
-        self.y = None
-        self.k = k
+        self.data_path = Path(data_path)
+        self.single_numeric_columns, self.min_max_scaler, self.df = process_dataset_for_knn(data_path)
 
-    def fit(self, X, y):
-        self.index = faiss.IndexFlatL2(X.shape[1])
-        self.index.add(X.astype(np.float32))
-        self.y = y
-
-    def query(self, query, number_answers):
-        pass
-
-    def predict(self, X):
-        distances, indices = self.index.search(X.astype(np.float32), k=self.k)
-        votes = self.y[indices]
-        predictions = np.array([np.argmax(np.bincount(x)) for x in votes])
-        return predictions
-
-
-def test():
-    mnist = datasets.load_digits()
-
-    (trainData, testData, trainLabels, testLabels) = train_test_split(np.array(mnist.data), mnist.target, test_size=0.25, random_state=42)
-
-    knn = FaissKNeighbors()
-    knn.fit(trainData,trainLabels)
-    predictions = knn.predict(testData)
-    print(accuracy_score(testLabels,predictions))
-
-def knn_maker():
-    data_path = Path("processed_data/dataTest.csv")
-    single_numeric_columns, min_max_scaler, df = process_dataset_for_knn(data_path)
-
-    features = ['volume', 'surface_area','bounding_box_ratio', 'compactness', 'bounding_box_volume', 'diameter',
+    def train(self, ncentroids = 1024, niter = 20, verbose = True ):
+        features = ['volume', 'surface_area','bounding_box_ratio', 'compactness', 'bounding_box_volume', 'diameter',
        'eccentricity', 'bounding_box_0', 'bounding_box_1', 'bounding_box_2',
        'bounding_box_3', 'bounding_box_4', 'bounding_box_5', 'bounding_box_6',
        'bounding_box_7', 'bounding_box_8', 'bounding_box_9', 'bounding_box_10',
@@ -81,13 +53,21 @@ def knn_maker():
        'cube_volume_tetrahedron_6', 'cube_volume_tetrahedron_7',
        'cube_volume_tetrahedron_8', 'cube_volume_tetrahedron_9']
 
-    x_train, x_val = train_test_split(df[features].values, test_size=0.10)
+        x_train =  self.df[features].values
 
-    ncentroids = 1024
-    niter = 20
-    verbose = True
-    d = x_train.shape[1]
-    kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu = )
-    kmeans.train(x_train.astype(np.float32))
+        d = x_train.shape[1]
+        self.kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu = True)
+        self.kmeans.train(x_train.astype(np.float32))
 
-knn_maker()
+    def query(self, query, number_answers):
+        query = self.min_max_scaler.fit_transform(query)
+
+
+
+
+if __name__ == '__main__':
+    data_path = Path("processed_data/dataTest.csv")
+    a = process_dataset_for_knn(data_path)
+    knn = FaissKNeighbors(data_path)
+    knn.train()
+    knn.query()
