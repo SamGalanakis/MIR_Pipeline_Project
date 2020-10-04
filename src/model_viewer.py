@@ -261,6 +261,8 @@ class ModelViewer:
                 glDrawElements(GL_POINTS, pre_box, GL_UNSIGNED_INT, None)
                 
             elif input_handler.mode=="wireframe":
+                glEnable(GL_POLYGON_OFFSET_FILL);
+                glPolygonOffset(1.0, 2)
                 glDrawElements(GL_TRIANGLES, pre_box, GL_UNSIGNED_INT, None)
                 RGB = np.zeros(shape=(3,),dtype=np.float32) 
                 color = pyrr.Vector3(RGB)

@@ -126,7 +126,7 @@ if __name__ == "__main__":
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
     pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
-    path = problem_path
+    path = path
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
