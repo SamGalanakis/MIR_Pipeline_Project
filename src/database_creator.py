@@ -32,14 +32,15 @@ class Database:
                 "diameter","eccentricity" ]
         col_array = ["bounding_box","angle_three_vertices","barycenter_vertice", "two_vertices",
                 "square_area_triangle", "cube_volume_tetrahedron"]
+
         
-        col_numeric = ["n_vertices","n_triangles","n_quads","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume","diameter","eccentricity"]
+        
+        # col_numeric = ["n_vertices","n_triangles","n_quads","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume","diameter","eccentricity"]
 
         data = {k:[] for k in columns+col_array}
 
         n_not_classified=0
-        n_failed_subdivision=0
-        n_failed_decimation=0
+        
             
         for file in tqdm(self.file_paths):
             vertices, element_dict, info = self.reader.read(Path(file))

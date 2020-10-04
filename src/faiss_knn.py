@@ -1,5 +1,5 @@
 import numpy as np
-from faiss import FaissKNeighbors
+import faiss   
 from utils import parse_array_from_str
 from sklearn import datasets
 from pathlib import Path
@@ -19,40 +19,39 @@ from feature_extractor import extract_features
 
 
 class FaissKNeighbors:
-    def __init__(self, data_path,  metric = "L2"):
-        self.index = None
+    def __init__(self, dataset,  metric = "L2"):
+       # self.index = None
         self.metric = metric
-        self.data_path = Path(data_path)
-        _, _, self.df = process_dataset_for_knn(data_path)
+   
+        self.dataset = dataset
 
     def train(self):
-        x_train = self.df.select_dtypes(include=np.number).values
+        
         #to test it out
         #self.test_query = x_train[0]
 
         if self.metric == "L2":
-            self.index = faiss.IndexFlatL2(x_train.shape[1])
-            self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
+            self.index = faiss.IndexFlatL2(self.dataset.shape[1])
+            self.index.add(np.ascontiguousarray(self.dataset, dtype=np.float32))
         else:
             #COSINE SIMILARITY
-            self.index = faiss.IndexFlatIP(x_train.shape[1])
-            faiss.normalize_L2(x_train)
-            self.index.add(np.ascontiguousarray(x_train, dtype=np.float32))
+            self.index = faiss.IndexFlatIP(self.dataset.shape[1])
+            faiss.normalize_L2(self.dataset)
+            self.index.add(np.ascontiguousarray(self.dataset, dtype=np.float32))
 
 
-    def query(self, query, number_answers):
-        #to test it out
-        #query = self.test_query.reshape(-1,84)
+    def query(self, query, n_results):
+        query = query.reshape((1,-1)).astype(np.float32)
 
         if self.metric == "L2":
-            distances, indices = self.index.search(query, k=number_answers)
+            distances, indices = self.index.search(query,k=n_results)
         
         else:
             faiss.normalize_L2(query)
-            distances, indices = self.index.search(query, k=number_answers)
+            distances, indices = self.index.search(query, k=n_results)
 
 
-        return indices
+        return distances, indices
 
 
 if __name__ == '__main__':
