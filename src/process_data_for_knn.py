@@ -51,12 +51,13 @@ def process_dataset_for_knn(data_path):
     df = df[(df[single_numeric_columns]>=df[single_numeric_columns].quantile(0.001)).all(axis=1)]
     df.reset_index(inplace=True,drop=True) #Reset index after removing outliers
     # Do min max scaling
-    x = df.select_dtypes(include=np.number).iloc[:,0:len(single_numeric_columns)] #Select single columns but keep order of df
+    x = df.select_dtypes(include=np.number) #Select single columns but keep order of df
 
     min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = min_max_scaler.fit_transform(x)
 
-    df[single_numeric_columns]= x_scaled
+    #df.select_dtypes(include=np.number)= x_scaled
+    df[x.columns] = x_scaled
 
     #Divide array entries by length so they only contribute as a single entry in total when taking L2 norm
 
