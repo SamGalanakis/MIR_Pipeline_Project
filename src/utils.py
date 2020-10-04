@@ -12,6 +12,15 @@ import time
 import itertools
 import pandas as pd
 
+
+
+def is_array_col(array_columns,col_name):
+    #Matching array names to numbered columns or returning False
+    for y in array_columns:
+        if y in col_name and col_name.replace(y+'_',"").isdigit():
+            return y
+    return False
+
 def bounding_box(vertices,indices):
         as_points = vertices.reshape(-1, 3)
 

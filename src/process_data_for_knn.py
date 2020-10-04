@@ -1,7 +1,7 @@
 from ast import parse
 import matplotlib.pyplot as plt
 from scipy.stats import distributions
-from utils import parse_array_from_str, model_feature_dist
+from utils import parse_array_from_str, model_feature_dist, is_array_col
 import pandas as pd
 from pathlib import Path
 import numpy as np
@@ -26,12 +26,7 @@ def process_dataset_for_knn(data_path):
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def is_array_col(array_columns,col_name):
-        #Matching array names to numbered columns or returning False
-        for y in array_columns:
-            if y in col_name and col_name.replace(y+'_',"").isdigit():
-                return y
-        return False
+ 
     
 
 
