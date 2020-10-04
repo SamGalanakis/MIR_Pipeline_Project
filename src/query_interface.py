@@ -48,10 +48,22 @@ class QueryInterface:
 
         distances, indices = self.faiss_knn.query(query_vector,n_results=5)
         
+        resulting_paths = [self.df['file_name'].to_list()[ind] for ind in indices.flatten()]
+        #Send results for visualization
+        self.visualize_results(shape,resulting_paths)
+
+    def visualize_results(self,query_model,sorted_resulting_paths):
+        query_model.view()
+        for path in sorted_resulting_paths:
+            match_path = Path(path)
+            
+            match_shape = Shape(*self.reader.read(match_path))
+            match_shape.view()
 
 
 
-        print("done")
+
+
 
 
 
