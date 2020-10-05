@@ -33,7 +33,7 @@ def extract_features(shape):
     bounding_box_sides = shape.bounding_rect_vertices.reshape((-1 ,3)).max(axis=0)-shape.bounding_rect_vertices.reshape((-1 ,3)).min(axis=0)
     bounding_box_sides = np.maximum(bounding_box_sides,0.01) #clamp above so no zero division for essentially 2d models
     feature_dict["bounding_box_ratio"]=np.max(bounding_box_sides)/np.min(bounding_box_sides)
-    feature_dict["compactness"]=np.power(feature_dict["surface_area"],3) / np.power(feature_dict["volume"],2)
+    feature_dict["compactness"]=np.power(feature_dict["surface_area"],3) / (36 * np.pi * np.power(feature_dict["volume"],2))
     feature_dict["bounding_box_volume"]=np.prod(bounding_box_sides)
     feature_dict["diameter"]=calculate_diameter(shape.vertices)
     feature_dict["eccentricity"]=np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01) #also clamp

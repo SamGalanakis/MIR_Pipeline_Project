@@ -62,7 +62,7 @@ class QueryInterface:
     def visualize_results(self,query_model,sorted_resulting_paths,distances):
         query_model.view()
         for path in sorted_resulting_paths:
-            match_path = Path(path)
+            match_path = Path(path.replace("\\","/"))
             
             match_shape = Shape(*self.reader.read(match_path))
             match_shape.view()
@@ -76,7 +76,7 @@ class QueryInterface:
 
 
 if __name__ == '__main__':
-    data_path = Path("processed_data/dataTest.csv")
+    data_path = Path("processed_data/dataTest1000.csv")
     model_path = Path(r"data/benchmark/db/1/m102/m102.off")
     query_interface = QueryInterface(data_path)
     query_interface.query(model_path)
