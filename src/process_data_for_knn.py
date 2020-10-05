@@ -18,10 +18,18 @@ from sklearn.impute import SimpleImputer
 def process_dataset_for_knn(data_path):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
+    
 
-     #Drop numerical features not relevant for similarity
+
+    #Drop numerical features not relevant for similarity
     exclude = ['n_quads','n_vertices','n_triangles']
    
+
+    #%%
+    
+
+
+
     df = df.drop(exclude,axis=1)
     array_columns = ["bounding_box",
                     "angle_three_vertices","barycenter_vertice", "two_vertices",

@@ -106,7 +106,7 @@ if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
    # database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)
-    profiler.run('database.create_database("dataTest",apply_processing=True,n_faces_target=5000)')
+    profiler.run('database.create_database("dataTest1000",apply_processing=True,n_faces_target=1000)')
     profiler.dump_stats("profiler_stats")
     
 
