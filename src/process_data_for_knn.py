@@ -18,6 +18,8 @@ from sklearn.impute import SimpleImputer
 def process_dataset_for_knn(data_path):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
+
+    df = df[abs(df.n_triangles-1000)<100] #Remove models that did not get properly subdivided
     
 
 
@@ -25,7 +27,7 @@ def process_dataset_for_knn(data_path):
     exclude = ['n_quads','n_vertices','n_triangles']
    
 
-    #%%
+   
     
 
 
@@ -81,7 +83,7 @@ def process_dataset_for_knn(data_path):
 
 
 if __name__ == '__main__':
-    data_path = Path("processed_data/dataTest.csv")
+    data_path = Path("processed_data/dataTest1000.csv")
     a = process_dataset_for_knn(data_path)
    
 

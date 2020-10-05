@@ -129,6 +129,7 @@ if __name__ == "__main__":
     pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
     path = path
     reader = FileReader()
+  
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices,element_dict,info)
     shape.view()
