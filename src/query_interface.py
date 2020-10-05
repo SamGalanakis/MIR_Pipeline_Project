@@ -31,6 +31,7 @@ class QueryInterface:
         query_vector = np.zeros(shape=(self.df_numeric.shape[1],))
         curr_index = 0
         seen_arrays=[]
+        array_indices_length_dict = {}
         for col in self.df_numeric.columns:
             if col in feature_dict.keys():
                 query_vector[curr_index]= feature_dict[col]
@@ -41,17 +42,35 @@ class QueryInterface:
                     continue
                 seen_arrays.append(array_name)
                 length = feature_dict[array_name].size
-                query_vector[curr_index:curr_index+length] = feature_dict[array_name]/np.sqrt(length)
+                query_vector[curr_index:curr_index+length] = feature_dict[array_name]
+                array_indices_length_dict[curr_index]=length
                 curr_index += length
-        n_single =  len(self.single_numeric_columns)
-        query_vector[0:n_single] = self.min_max_scaler.transform(query_vector[0:n_single].reshape(1,-1))
+
+
+      
+        query_vector= self.min_max_scaler.transform(query_vector.reshape(1,-1))
+
+        for ind, length in array_indices_length_dict.items():
+            query_vector[0,ind:ind+length]= query_vector[0,ind:ind+length]/np.sqrt(length)
 
         distances, indices = self.faiss_knn.query(query_vector,n_results=5)
         
+        resulting_paths = [self.df['file_name'].to_list()[ind] for ind in indices.flatten()]
+        #Send results for visualization
+        self.visualize_results(shape,resulting_paths)
+
+    def visualize_results(self,query_model,sorted_resulting_paths):
+        query_model.view()
+        for path in sorted_resulting_paths:
+            match_path = Path(path)
+            
+            match_shape = Shape(*self.reader.read(match_path))
+            match_shape.view()
 
 
 
-        print("done")
+
+
 
 
 
