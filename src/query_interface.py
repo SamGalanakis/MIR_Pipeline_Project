@@ -62,7 +62,8 @@ class QueryInterface:
     def visualize_results(self,query_model,sorted_resulting_paths,distances):
        # query_model.view()
         for path in sorted_resulting_paths:
-            match_path = Path(path)
+            match_path = Path(path.replace("\\","/"))
+            
             match_shape = Shape(*self.reader.read(match_path))
             resulting_classes = self.df[self.df.file_name.isin(sorted_resulting_paths)]['classification']
             print(f'Query resulted in results classified with following distances : {zip(resulting_classes,distances)}')
