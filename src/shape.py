@@ -123,6 +123,7 @@ class Shape:
 if __name__ == "__main__":
     ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
     path = Path(r"data/test.ply")
+    
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
     pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
