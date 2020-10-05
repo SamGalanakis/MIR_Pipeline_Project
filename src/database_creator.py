@@ -12,6 +12,7 @@ import pyacvd
 from preprocessing import process
 from feature_extractor import extract_features
 
+
 class Database:
     def __init__(self):
         self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
@@ -66,7 +67,7 @@ class Database:
             
             data["classification"].append(classification)
             data["file_name"].append(file)
-         #   data["id"].append(id)
+       
 
 
 

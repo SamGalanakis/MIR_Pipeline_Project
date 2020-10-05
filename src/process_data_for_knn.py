@@ -19,8 +19,10 @@ def process_dataset_for_knn(data_path):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
 
-    # Make sure np arrays are read from strings, probably better way to do this tbh"
-
+     #Drop numerical features not relevant for similarity
+    exclude = ['n_quads','n_vertices','n_triangles']
+   
+    df = df.drop(exclude,axis=1)
     array_columns = ["bounding_box",
                     "angle_three_vertices","barycenter_vertice", "two_vertices",
                     "square_area_triangle", "cube_volume_tetrahedron" ]
@@ -66,7 +68,7 @@ def process_dataset_for_knn(data_path):
             if is_array_col(array_columns,col)==array_name:
                 df[col] = df[col]/np.sqrt(length)
 
-
+    
     return single_numeric_columns, min_max_scaler, df
 
 
