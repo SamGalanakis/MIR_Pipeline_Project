@@ -12,14 +12,7 @@ import time
 import itertools
 import pandas as pd
 
-def parse_feature_dic(feature_dict):
-    #Sort dict to enforce order 
-    output = []
-    for key,val in sorted(feature_dict):
-        if isinstance(val,np.ndarray):
-            output.extend(list(val/np.sqrt(val.size)))
-        else: output.append(val)
-    return np.array(output,np.float32)
+
         
 
 

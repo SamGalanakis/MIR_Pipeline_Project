@@ -2,16 +2,42 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_vertices, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
+from utils import cla_parser
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
 import cProfile
-import pyvista
-import pyacvd
 from preprocessing import process
 from feature_extractor import extract_features
 
+
+def data_dict_parser(data_dict):
+        if  isinstance(list(data_dict.values())[0],list):
+            lengths  = {key:(val[0].size if isinstance(val[0],np.ndarray) else 1 ) for key,val  in data_dict.items() }
+            col_length = len(list(data_dict.values())[0])
+            
+            
+        else:
+            lengths  = {key:(val.size if isinstance(val,np.ndarray) else 1 ) for key,val  in data_dict.items() }
+            col_length=1
+            
+        df = pd.DataFrame(index = range(col_length)) 
+        row_length = sum(lengths.values())
+            
+        
+        for key in sorted(data_dict):
+            val = data_dict[key]
+            length = lengths[key]
+            if length ==1:
+                col_names = key
+                
+            else:
+                col_names =  [f"{key}_{num}" for num in range(length)]
+                val = np.array(val,dtype=np.float32)
+            
+            df[col_names] = val
+        assert row_length == df.shape[1] , "Shape mismatch!"
+        return df
 
 class Database:
     def __init__(self):
@@ -34,8 +60,8 @@ class Database:
         col_array = ["bounding_box","angle_three_vertices","barycenter_vertice", "two_vertices",
                 "square_area_triangle", "cube_volume_tetrahedron"]
 
-        
-        
+        col_array=[]
+            
         # col_numeric = ["n_vertices","n_triangles","n_quads","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume","diameter","eccentricity"]
 
         data = {k:[] for k in columns+col_array}
@@ -76,28 +102,38 @@ class Database:
             feature_dict = extract_features(shape)
 
             #Add them to total data
+
+            
             for key,val in feature_dict.items():
                 data[key].append(val)
             
             
-            
+        #new
+      
+
+        df = data_dict_parser(data)
+
+
+
+
+        #new
         n_classified_models = self.cla_info["n_models"]
         print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
         
         
-        df = pd.DataFrame.from_dict(data,orient='columns')
+        # df = pd.DataFrame.from_dict(data,orient='columns')
     
-        for index , x in enumerate(col_array):
-            arrray_length = data[x][0].size
-            col_labels_list = [f"{x}_{num}" for num in range(arrray_length)]
-            df[col_labels_list] = np.array(data[x],np.float32)
+        # for index , x in enumerate(col_array):
+        #     arrray_length = data[x][0].size
+        #     col_labels_list = [f"{x}_{num}" for num in range(arrray_length)]
+        #     df[col_labels_list] = np.array(data[x],np.float32)
          
 
  
         
         path = f"processed_data/{database_name}.csv"
         
-        df=df.drop(col_array,axis=1) #remove the col_arrays since they have single entries
+        # df=df.drop(col_array,axis=1) #remove the col_arrays since they have single entries
         df.to_csv(Path(path))
         print(f"Done making dataset and saved to {path}!")
 
@@ -105,7 +141,6 @@ class Database:
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
-   # database.create_database("dataTest",apply_procesing=True,n_faces_target=1000)
     profiler.run('database.create_database("dataTest1000",apply_processing=True,n_faces_target=1000)')
     profiler.dump_stats("profiler_stats")
     

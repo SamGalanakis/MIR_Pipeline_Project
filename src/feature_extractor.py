@@ -25,7 +25,7 @@ def extract_features(shape):
     feature_dict["n_vertices"]=shape.n_vertices
     feature_dict["n_triangles"]=shape.n_triangles
     feature_dict["n_quads"]=shape.n_quads
-    feature_dict["bounding_box"]=shape.bounding_rect_vertices
+   # feature_dict["bounding_box"]=shape.bounding_rect_vertices
 
     feature_dict["volume"]=np.maximum(shape.pyvista_mesh.volume,0.01)#clamp to avoid 0 volume for 2d models
 
@@ -38,11 +38,11 @@ def extract_features(shape):
     feature_dict["diameter"]=calculate_diameter(shape.vertices)
     feature_dict["eccentricity"]=np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01) #also clamp
     #Histograms
-    feature_dict["angle_three_vertices"]=angle_three_vertices(shape.vertices)
-    feature_dict["barycenter_vertice"]=barycenter_vertice(shape.vertices, np.zeros(3,dtype=np.float32))
-    feature_dict["two_vertices"]=two_vertices(shape.vertices)
-    feature_dict["square_area_triangle"]=square_area_triangle(shape.vertices)
-    feature_dict["cube_volume_tetrahedron"]=cube_volume_tetrahedron(shape.vertices)
+    # feature_dict["angle_three_vertices"]=angle_three_vertices(shape.vertices)
+    # feature_dict["barycenter_vertice"]=barycenter_vertice(shape.vertices, np.zeros(3,dtype=np.float32))
+    # feature_dict["two_vertices"]=two_vertices(shape.vertices)
+    # feature_dict["square_area_triangle"]=square_area_triangle(shape.vertices)
+    # feature_dict["cube_volume_tetrahedron"]=cube_volume_tetrahedron(shape.vertices)
 
 
     return feature_dict

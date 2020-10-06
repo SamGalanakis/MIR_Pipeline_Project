@@ -13,9 +13,32 @@ from scipy.stats import wasserstein_distance
 from sklearn.impute import SimpleImputer
 
 
+def sample_normalizer(df,exclude,scaler,array_columns,array_lengths):
+    df= df.drop(exclude,axis=1)
+    x = df.select_dtypes(include=np.number)
+    if scaler == 'minmax':
+        scaler = preprocessing.MinMaxScaler()
+        scaler.fit(x)
+    elif scaler == 'standardize':
+        scaler = preprocessing.StandardScaler()
+        scaler.fit(x)
+    else:
+        print(f'Using provided scaler {scaler}')
+    
+    x_scaled=scaler.transform(x)
+    
+    df[x.columns] = x_scaled
+
+    for length , array_name in zip(array_lengths,array_columns):
+        for col in df.columns:
+            if is_array_col(array_columns,col)==array_name:
+                df[col] = df[col]/np.sqrt(length)
+    return df, scaler
+
+    
 
 
-def process_dataset_for_knn(data_path):
+def process_dataset_for_knn(data_path,scaler = 'minmax'):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
 
@@ -32,7 +55,6 @@ def process_dataset_for_knn(data_path):
 
 
 
-    df = df.drop(exclude,axis=1)
     array_columns = ["bounding_box",
                     "angle_three_vertices","barycenter_vertice", "two_vertices",
                     "square_area_triangle", "cube_volume_tetrahedron" ]
@@ -40,7 +62,7 @@ def process_dataset_for_knn(data_path):
 
  
     
-
+    
 
 
     #Get array lengths, replace...isdigit to make sure not to count things like bounding_box_volume as part of bounding_box array.
@@ -62,24 +84,13 @@ def process_dataset_for_knn(data_path):
     df = df[(df[single_numeric_columns]<=df[single_numeric_columns].quantile(0.999)).all(axis=1)]
     df = df[(df[single_numeric_columns]>=df[single_numeric_columns].quantile(0.001)).all(axis=1)]
     df.reset_index(inplace=True,drop=True) #Reset index after removing outliers
-    # Do min max scaling
-    x = df.select_dtypes(include=np.number) #Select single columns but keep order of df
 
-    min_max_scaler = preprocessing.MinMaxScaler()
-    x_scaled = min_max_scaler.fit_transform(x)
 
-    #df.select_dtypes(include=np.number)= x_scaled
-    df[x.columns] = x_scaled
-
-    #Divide array entries by length so they only contribute as a single entry in total when taking L2 norm
-
-    for length , array_name in zip(array_lengths,array_columns):
-        for col in df.columns:
-            if is_array_col(array_columns,col)==array_name:
-                df[col] = df[col]/np.sqrt(length)
+    #Pass through normalizer, so scale and divide arrays as needed for knn. Use same for query
+    df , scaler = sample_normalizer(df,exclude,scaler,array_columns,array_lengths)
 
     
-    return single_numeric_columns, min_max_scaler, df
+    return df, exclude, scaler, array_columns, array_lengths
 
 
 if __name__ == '__main__':
