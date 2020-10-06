@@ -1,6 +1,5 @@
 import numpy as np
 import faiss   
-from utils import parse_array_from_str
 from sklearn import datasets
 from pathlib import Path
 from sklearn.model_selection import train_test_split
@@ -52,6 +51,11 @@ class FaissKNeighbors:
 
 
         return distances, indices
+
+    def query_range(self, query1, query2, n_results):
+        #query = query.resha2pe((1,-1)).astype(np.float32)
+        self.index.range_search()
+        #return distances, indices
 
 
 if __name__ == '__main__':
