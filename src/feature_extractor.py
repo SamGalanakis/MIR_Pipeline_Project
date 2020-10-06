@@ -2,7 +2,7 @@
 from shape import Shape
 from file_reader import FileReader
 
-from utils import  angle_three_random_vertices, calculate_diameter,angle_three_vertices, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
+from utils import  align, angle_three_random_vertices, calculate_diameter,angle_three_vertices, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
 from pathlib import Path
 import numpy as np
 
@@ -36,7 +36,10 @@ def extract_features(shape):
     feature_dict["compactness"]=np.power(feature_dict["surface_area"],3) / (36 * np.pi * np.power(feature_dict["volume"],2))
     feature_dict["bounding_box_volume"]=np.prod(bounding_box_sides)
     feature_dict["diameter"]=calculate_diameter(shape.vertices)
-    feature_dict["eccentricity"]=np.max(shape.eigenvalues)/np.maximum(np.min(shape.eigenvalues),0.01) #also clamp
+    
+    *_, eigenvalues = align(shape.vertices)
+
+    feature_dict["eccentricity"]=np.max(eigenvalues)/np.maximum(np.min(eigenvalues),0.01) #also clamp
     #Histograms
     feature_dict["angle_three_vertices"]  = angle_three_random_vertices(shape.vertices)
     feature_dict["barycenter_vertice"]=barycenter_vertice(shape.vertices, np.zeros(3,dtype=np.float32))

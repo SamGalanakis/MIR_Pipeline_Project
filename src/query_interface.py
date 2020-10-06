@@ -8,6 +8,7 @@ from preprocessing import process
 from feature_extractor import extract_features
 from utils import is_array_col
 import numpy as np
+import cProfile
 
 class QueryInterface:
     def __init__(self,data_path):
@@ -75,14 +76,17 @@ class QueryInterface:
 
 
 if __name__ == '__main__':
+    profiler = cProfile.Profile()
     data_path = Path("processed_data/dataTest1000_new.csv")
     ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
     plane_path = Path(r"data/benchmark/db/12/m1204/m1204.off")
     model_path = Path(r"data/benchmark/db/1/m102/m102.off")
+    
     query_interface = QueryInterface(data_path)
-    query_interface.query(plane_path)
-    print("done")
-
+    path=plane_path
+    profiler.run('query_interface.query(path)')
+    profiler.dump_stats('query_profile_stats')
+  
 
 
 
