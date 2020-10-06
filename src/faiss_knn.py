@@ -45,6 +45,11 @@ class FaissKNeighbors:
 
         return distances, indices
 
+    def query_range(self, query1, query2, n_results):
+        #query = query.resha2pe((1,-1)).astype(np.float32)
+        self.index.range_search()
+        #return distances, indices
+
 
 if __name__ == '__main__':
     data_path = Path("processed_data/dataTest.csv")
