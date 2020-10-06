@@ -62,7 +62,7 @@ class QueryInterface:
             
             print(f'{path} -- {classification} -- {dist}\n')
 
-            #match_shape.view()
+            match_shape.view()
 
         print("Done")
 

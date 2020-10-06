@@ -4,7 +4,7 @@ from pathlib import Path
 class FileReader:
     def __init__(self):
         pass
-
+    
     def convert_ply_to_off(self, path):
         off_file = ["OFF\n"]
 

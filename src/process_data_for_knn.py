@@ -1,6 +1,4 @@
-from ast import parse
-import matplotlib.pyplot as plt
-from scipy.stats import distributions
+
 from utils import  is_array_col
 import pandas as pd
 from pathlib import Path
@@ -8,9 +6,8 @@ import numpy as np
 from shape import Shape
 from model_viewer import ModelViewer
 from sklearn import preprocessing
-from scipy.spatial.distance import euclidean,cosine
-from scipy.stats import wasserstein_distance
-from sklearn.impute import SimpleImputer
+
+
 
 
 def sample_normalizer(df,exclude,scaler,array_columns,array_lengths):
