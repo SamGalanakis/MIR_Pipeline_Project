@@ -134,10 +134,7 @@ def calculate_diameter(vertices):
     diam = distance_matrix(unique_hull_points,unique_hull_points).max()
 
 
-    
-   # Naive algorithm, quite inefficient can take ~ 3s for larger model
-   # diam = itertools.combinations(list(unique_hull_points),2).max()
-  #  diam = max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
+
    
     return diam
 

@@ -1,15 +1,7 @@
 import numpy as np
 import faiss   
-from utils import parse_array_from_str
-from sklearn import datasets
 from pathlib import Path
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from process_data_for_knn import process_dataset_for_knn
-import pandas as pd
-from shape import Shape
-from file_reader import FileReader
-from feature_extractor import extract_features
+
 
 """
     #Make new environmen with Python 3.7

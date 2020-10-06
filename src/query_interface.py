@@ -47,7 +47,7 @@ class QueryInterface:
         self.visualize_results(shape,resulting_paths,distances)
 
     def visualize_results(self,query_model,sorted_resulting_paths,distances):
-       # query_model.view()
+       
         print(f'Query resulted in results classified with following distances:')
         
 
@@ -56,7 +56,7 @@ class QueryInterface:
             match_path = path
             match_shape = Shape(*self.reader.read(match_path))
             classification = self.df[self.df['file_name']==path]['classification'].values[0]
-          #  resulting_classes = self.df[self.df.file_name.isin(sorted_resulting_paths)]['classification']
+            
             
             
             print(f'{path} -- {classification} -- {dist}\n')
@@ -75,11 +75,12 @@ class QueryInterface:
 
 
 if __name__ == '__main__':
-    data_path = Path("processed_data/dataTest1000.csv")
+    data_path = Path("processed_data/dataTest1000_new.csv")
     ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
+    plane_path = Path(r"data/benchmark/db/12/m1204/m1204.off")
     model_path = Path(r"data/benchmark/db/1/m102/m102.off")
     query_interface = QueryInterface(data_path)
-    query_interface.query(ant_path)
+    query_interface.query(plane_path)
     print("done")
 
 
