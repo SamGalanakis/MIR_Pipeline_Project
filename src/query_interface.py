@@ -54,7 +54,7 @@ class QueryInterface:
 
         for path, dist in zip(sorted_resulting_paths,list(distances.flatten())):
   
-            match_path = path
+            match_path = path.replace("\\","/")
             match_shape = Shape(*self.reader.read(match_path))
             classification = self.df[self.df['file_name']==path]['classification'].values[0]
             
@@ -62,7 +62,7 @@ class QueryInterface:
             
             print(f'{path} -- {classification} -- {dist}\n')
 
-            match_shape.view()
+         #   match_shape.view()
 
         print("Done")
 
