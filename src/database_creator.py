@@ -60,8 +60,7 @@ class Database:
         col_array = ["bounding_box","angle_three_vertices","barycenter_vertice", "two_vertices",
                 "square_area_triangle", "cube_volume_tetrahedron"]
 
-        col_array=[]
-            
+        
         # col_numeric = ["n_vertices","n_triangles","n_quads","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume","diameter","eccentricity"]
 
         data = {k:[] for k in columns+col_array}
@@ -141,7 +140,7 @@ class Database:
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
-    profiler.run('database.create_database("dataTest1000",apply_processing=True,n_faces_target=1000)')
+    profiler.run('database.create_database("dataTest1000_new",apply_processing=True,n_faces_target=1000)')
     profiler.dump_stats("profiler_stats")
     
 

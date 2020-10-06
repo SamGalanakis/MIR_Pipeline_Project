@@ -24,7 +24,7 @@ class FileReader:
 
         return off_file
 
-    def read(self, path):
+    def read(self, path,verbose=False):
         if type(path)==str:
             path = Path(path)
         lines=False
@@ -69,6 +69,6 @@ class FileReader:
         quads = np.array([x[1:] for x in elements if x[0]==4],dtype = np.uint32)
         assert triangles.size/3 +quads.size/4 == len(elements), "Non quad/triangle elements!"
         element_dict = {"triangles":triangles, "quads":quads}
-
-        print(f" File type: {path.suffix} Triangles: {triangles.size}, Quads: {quads.size}.")
+        if verbose:
+            print(f" File type: {path.suffix} Triangles: {triangles.size}, Quads: {quads.size}.")
         return vertices, element_dict, info

@@ -55,11 +55,11 @@ class QueryInterface:
   
             match_path = path
             match_shape = Shape(*self.reader.read(match_path))
-            classification = self.df[self.df['file_name']==path]['classification']
+            classification = self.df[self.df['file_name']==path]['classification'].values[0]
           #  resulting_classes = self.df[self.df.file_name.isin(sorted_resulting_paths)]['classification']
             
             
-            print(f'{path} -- {classification} -- {dist}')
+            print(f'{path} -- {classification} -- {dist}\n')
 
             #match_shape.view()
 

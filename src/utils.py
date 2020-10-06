@@ -140,7 +140,17 @@ def calculate_diameter(vertices):
   #  diam = max([np.linalg.norm(x[0]-x[1]) for x in point_pairs])
    
     return diam
-        
+
+def bin_count(input,n_bins):
+    
+    
+    bins = np.linspace(np.min(input),np.max(input), 10)
+    binned = np.digitize(input, bins)
+    count_collections= collections.Counter(binned)
+    counts = np.zeros(10)
+    for key, val in count_collections.items():
+        counts[key-1] = val
+    return counts
 
 def calculate_angle(a, b, c):
     """
@@ -154,9 +164,28 @@ def calculate_angle(a, b, c):
 
     return angle
 
-def angle_three_vertices(vertices):
+def angle_three_random_vertices(vertices,percentage_sample=0.2):
+    percentage_sample = min(percentage_sample,0.32)
+    vertices = vertices.reshape((-1,3))
+    n_samples = int(np.floor(3*percentage_sample*vertices.shape[0]))
+    
+    
+    sample = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
+    sample = sample[0:3*(sample.shape[0]//3)]
+    sample = np.split(sample,3)
+    vecs1 = sample[0]-sample[1]
+    vecs1 /= np.linalg.norm(vecs1,ord=2,axis=1,keepdims=True)
+    vecs2 = sample[0]-sample[2]
+    vecs2/= np.linalg.norm(vecs2,ord=2,axis=1,keepdims=True)
+    angles = np.arccos(vecs1*vecs2).sum(axis=1)
+    
+    counts = bin_count(angles,10)
+    return counts/sum(counts)
+
+
+def angle_three_vertices(vertices,sample_percentage=0.8):
     vertices = vertices.reshape(-1,3)
-    number_of_vertices = np.floor(len(vertices) * 0.8)
+    number_of_vertices = np.floor(len(vertices) * sample_percentage)
     while number_of_vertices % 3 != 0:
         number_of_vertices += 1
 
@@ -174,109 +203,75 @@ def angle_three_vertices(vertices):
     return counts/sum(counts)
 
 
-def barycenter_vertice(vertices, barycenter):
-    vertices = vertices.reshape(-1,3)
-    indices = np.random.choice(vertices.shape[0], int(len(vertices) * 0.8), replace=False)
-
-    barycenter_vertices = [np.linalg.norm(vertice - barycenter) for vertice in vertices[indices]]
-
-    bins = np.linspace(np.min(barycenter_vertices),np.max(barycenter_vertices), 10)
-    binned = np.digitize(barycenter_vertices, bins)
-    count_collections= collections.Counter(binned)
-    counts = np.zeros(10)
-    for key, val in count_collections.items():
-        counts[key-1] = val
-    return counts/sum(counts)
-
-
-
-
-def two_vertices(vertices):
-    vertices = vertices.reshape(-1,3)
-    number_of_vertices = np.ceil(len(vertices) * 0.8)
-    if number_of_vertices % 2 != 0:
-        number_of_vertices += 1
+def barycenter_vertice(vertices, barycenter,sample_percentage=0.8):
+    vertices = vertices.reshape((-1,3))
     
-    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
+    n_samples = int(np.floor(sample_percentage*vertices.shape[0]))
+    sample = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
+    distances = np.linalg.norm(sample-barycenter,axis=1)
+    
 
     
-    vertices_difference = [np.linalg.norm(a - b) for a, b in grouped(vertices, 2)]
 
-    bins = np.linspace(np.min(vertices_difference),np.max(vertices_difference), 10)
-    binned = np.digitize(vertices_difference, bins)
-    count_collections= collections.Counter(binned)
-    counts = np.zeros(10)
-    for key, val in count_collections.items():
-        counts[key-1] = val
-  
-        
+    counts = bin_count(distances,10)
+    return counts/sum(counts)
+ 
+
+
+
+
+def two_vertices(vertices,sample_percentage=0.8):
+    vertices = vertices.reshape((-1,3))
+    
+    n_samples = int(np.floor(sample_percentage*vertices.shape[0]))
+    sample1 = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
+    sample2= vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
+    distances = np.linalg.norm(sample1-sample2,axis=1)
+    
+
+    
+
+    counts = bin_count(distances,10)
     return counts/sum(counts)
 
-def square_area_triangle(vertices):
-    vertices = vertices.reshape(-1,3)
-    number_of_vertices = np.ceil(len(vertices) * 0.8)
-    while number_of_vertices % 3 != 0:
-        number_of_vertices += 1
-
-    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
-
-    areas = [1/2 * np.linalg.norm((a[0]-c[0])*(b[1]-a[1]) - (a[0] - b[0])*(c[1]-a[1])) for a,b ,c in grouped(vertices[indices], 3)]
-
-    bins = np.linspace(np.min(areas),np.max(areas), 10)
-    binned = np.digitize(areas, bins)
-    counts = np.zeros(10)
-    for bin_ in binned:
-        counts[bin_ -1] += 1
-        
+def square_area_triangle(vertices,sample_percentage=0.8):
+    sample_percentage = min(sample_percentage,0.32)
+    vertices = vertices.reshape((-1,3))
+    n_samples = int(np.floor(3*sample_percentage*vertices.shape[0]))
+    
+    
+    sample = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
+    sample = sample[0:3*(sample.shape[0]//3)]
+    sample = np.split(sample,3)
+    vecs1 = sample[0]-sample[1]
+    vecs2 = sample[0]-sample[2]
+    areas = np.sqrt(np.linalg.norm(np.cross(vecs1, vecs2),axis=1)/2)
+    counts = bin_count(areas,10)
     return counts/sum(counts)
 
-def cube_volume_tetrahedron(vertices):
-    vertices = vertices.reshape(-1,3)
-    number_of_vertices = np.ceil(len(vertices) * 0.8)
-    while number_of_vertices % 4 != 0:
-        number_of_vertices += 1
-
-    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
-
-    volumes = [np.cbrt(np.linalg.norm(np.dot(a-d, np.cross(b-d,c-d))) / 6) for a, b ,c, d in grouped(vertices[indices], 4)]
-
-    bins = np.linspace(np.min(volumes),np.max(volumes), 10)
-    binned = np.digitize(volumes, bins)
-    count_collections= collections.Counter(binned)
-    counts = np.zeros(10)
-    for key, val in count_collections.items():
-        counts[key-1] = val
-
+def cube_volume_tetrahedron(vertices,sample_percentage=0.8):
+    sample_percentage = min(sample_percentage,0.25)
+    vertices = vertices.reshape((-1,3))
+    n_samples = int(np.floor(4*sample_percentage*vertices.shape[0]))
+    
+    
+    sample = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
+    sample = sample[0:4*(sample.shape[0]//4)]
+    sample = np.split(sample,4)
+    vecs1 = sample[1]-sample[0]
+    vecs2 = sample[2]-sample[0]
+    vecs3 = sample[3]-sample[0]
+    areas = np.power(np.abs(np.linalg.det(np.stack([vecs1, vecs2,vecs3],axis=2)))/6,1/3)
+    counts = bin_count(areas,10)
     return counts/sum(counts)
 
 
 def grouped(iterable, n):
     return zip(*[iter(iterable)]*n)
 
-def parse_array_from_str(list_str):
-    if type(list_str)!=str:
-        print(f"{list_str} could not be parsed to an array, returning None")
-        return None
-    temp = np.array(list(map(lambda x: float(x),   list_str.replace("[","").replace("]","").split())))
-    return temp
-
-def model_feature_dist(comparison_model,df2,single_columns,array_columns,norm):
-    
-    single_dif = (comparison_model[single_columns].values - df2[single_columns].values).astype(np.float64)
 
 
-    if type(comparison_model)==pd.Series and type(df2)==pd.Series:
-        array_difs = (df2[array_columns] - comparison_model[array_columns] ).apply(lambda x: x.mean())
-        temp = np.linalg.norm(np.append(single_dif,array_difs.values,0),ord=2,axis=0)
-        return temp
-    else:
 
-        array_difs = (df2[array_columns] - comparison_model[array_columns] ).applymap(lambda x: x.mean())
-        array_difs2 = (df2[array_columns] - comparison_model[array_columns] ).applymap(lambda x: x/x.size)
-        temp = np.linalg.norm(np.append(single_dif,array_difs.values,1),ord=2,axis=1)
-
-        temp2 = np.linalg.norm(np.append(single_dif,array_difs2.values,1),ord=2,axis=1)
-        return temp
     
 
     
@@ -286,6 +281,10 @@ if __name__ == "__main__":
     reader= FileReader()
     path = path = Path(r"data/test.ply")
     vertices, element_dict, info = reader.read(path)
-    align(vertices)
+    angle_three_random_vertices(vertices)
+    barycenter_vertice(vertices,np.zeros(3))
+    two_vertices(vertices)
+    square_area_triangle(vertices)
+    cube_volume_tetrahedron(vertices)
 
 
