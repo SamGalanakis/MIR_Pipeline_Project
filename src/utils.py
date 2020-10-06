@@ -149,23 +149,10 @@ def bin_count(input,n_bins):
         counts[key-1] = val
     return counts
 
-def calculate_angle(a, b, c):
-    """
-        Calculates angle between three vertices
-    """
-    ba = a - b
-    bc = c - b
-
-    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-    angle = np.arccos(cosine_angle)
-
-    return angle
-
 def angle_three_random_vertices(vertices,percentage_sample=0.2):
     percentage_sample = min(percentage_sample,0.32)
     vertices = vertices.reshape((-1,3))
     n_samples = int(np.floor(3*percentage_sample*vertices.shape[0]))
-    
     
     sample = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
     sample = sample[0:3*(sample.shape[0]//3)]
@@ -180,41 +167,15 @@ def angle_three_random_vertices(vertices,percentage_sample=0.2):
     return counts/sum(counts)
 
 
-def angle_three_vertices(vertices,sample_percentage=0.8):
-    vertices = vertices.reshape(-1,3)
-    number_of_vertices = np.floor(len(vertices) * sample_percentage)
-    while number_of_vertices % 3 != 0:
-        number_of_vertices += 1
-
-    indices = np.random.choice(vertices.shape[0], int(number_of_vertices), replace=False)
-
-    angles_three_vertices = [calculate_angle(a, b, c) for a, b, c in grouped(vertices[indices], 3)]
-    
-    bins = np.linspace(np.min(angles_three_vertices),np.max(angles_three_vertices), 10)
-    binned = np.digitize(angles_three_vertices, bins)
-    count_collections= collections.Counter(binned)
-    counts = np.zeros(10)
-    for key, val in count_collections.items():
-        counts[key-1] = val
-    
-    return counts/sum(counts)
-
-
 def barycenter_vertice(vertices, barycenter,sample_percentage=0.8):
     vertices = vertices.reshape((-1,3))
     
     n_samples = int(np.floor(sample_percentage*vertices.shape[0]))
     sample = vertices[np.random.choice(vertices.shape[0],n_samples,replace=False)]
     distances = np.linalg.norm(sample-barycenter,axis=1)
-    
-
-    
 
     counts = bin_count(distances,10)
     return counts/sum(counts)
- 
-
-
 
 
 def two_vertices(vertices,sample_percentage=0.8):
