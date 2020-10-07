@@ -41,7 +41,9 @@ def data_dict_parser(data_dict):
 
 class Database:
     def __init__(self):
-        self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/coarse1/coarse1Train.cla"))
+        self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/base/train.cla"))
+        unique_classes = len(set(self.classification_dict.values()))
+        print(f'{unique_classes} unique classes')
         self.reader = FileReader()
         self.file_paths = []
 
