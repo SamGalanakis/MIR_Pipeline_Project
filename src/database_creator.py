@@ -2,13 +2,14 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from utils import cla_parser
+from utils import cla_parser, merge_dicts
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
 import cProfile
 from preprocessing import process
 from feature_extractor import extract_features
+
 
 
 def data_dict_parser(data_dict):
@@ -41,13 +42,16 @@ def data_dict_parser(data_dict):
 
 class Database:
     def __init__(self):
-        self.classification_dict, self.hierarchy_dict, self.cla_info =  cla_parser(Path(r"data/benchmark/classification/v1/base/train.cla"))
+        cla_path = 'data/benchmark/classification/v1/base/train.cla'
+        classification_dict_train, self.hierarchy_dict_train, self.cla_info_train =  cla_parser(Path(cla_path))
+        classification_dict_test, self.hierarchy_dict_test, self.cla_info_test = cla_parser(Path(cla_path.replace('train','test')))
+        self.classification_dict = merge_dicts(classification_dict_train,classification_dict_test)
         unique_classes = len(set(self.classification_dict.values()))
         print(f'{unique_classes} unique classes')
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, database_name, apply_processing = True,n_faces_target=False):
+    def create_database(self, database_name,n_samples,n_bins=10, apply_processing = True,n_faces_target=False):
 
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
@@ -99,7 +103,7 @@ class Database:
 
 
             #Get features
-            feature_dict = extract_features(shape)
+            feature_dict = extract_features(shape,n_bins=n_bins,n_samples=n_samples)
 
             #Add them to total data
 
@@ -111,23 +115,24 @@ class Database:
         #new
       
 
-        df = data_dict_parser(data)
+        df = data_dict_parser(data) 
 
 
 
 
         #new
-        n_classified_models = self.cla_info["n_models"]
-        print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
+        # n_classified_models = self.cla_info["n_models"]
+        # print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
         
         
         
-
- 
+       
+        processed = "processed" if apply_processing else ""
+        database_name = f"{database_name}_{processed}_{n_faces_target}_{n_samples}"
         
         path = f"processed_data/{database_name}.csv"
         
-        # df=df.drop(col_array,axis=1) #remove the col_arrays since they have single entries
+        
         df.to_csv(Path(path))
         print(f"Done making dataset and saved to {path}!")
 
@@ -135,8 +140,13 @@ class Database:
 if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
-    profiler.run('database.create_database("dataTest1000_processed",apply_processing=True,n_faces_target=1000)')
+    base_name = 'data'
+    n_samples = 1e+6
+    apply_processing = True
+    n_faces_target = 1000
+    profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_faces_target=n_faces_target)')
     profiler.dump_stats("profiler_stats")
+
     
 
 

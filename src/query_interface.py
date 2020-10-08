@@ -24,11 +24,11 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path):
+    def query(self,model_path,n_samples_query):
         vertices, element_dict, info = self.reader.read(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_faces_target=1000)
-        feature_dict = extract_features(shape)
+        feature_dict = extract_features(shape,n_samples=n_samples_query)
         feature_df = data_dict_parser(feature_dict)
         feature_df, _ = sample_normalizer(feature_df,*self.sample_normalization_parameters)
         feature_df_numeric = feature_df.select_dtypes(np.number)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     
     query_interface = QueryInterface(data_path)
     path=plane_path
-    profiler.run('query_interface.query(path)')
+    profiler.run('query_interface.query(path,n_samples_query=1000)')
     profiler.dump_stats('query_profile_stats')
   
 

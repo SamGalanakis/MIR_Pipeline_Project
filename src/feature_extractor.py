@@ -6,8 +6,9 @@ from pathlib import Path
 import numpy as np
 
 
-def extract_features(shape):
+def extract_features(shape,n_bins,n_samples):
     '''Input must be Shape or path'''
+  
     if isinstance(shape,Shape):
         pass
     elif isinstance(shape,Path) or isinstance(shape,str):
@@ -17,7 +18,9 @@ def extract_features(shape):
     else:
         raise Exception("Input must be Shape or path")
 
-    
+    #Make pyvista mesh if not already made
+    if not shape.pyvista_mesh:
+            shape.make_pyvista_mesh()
     feature_dict = {}
 
     
@@ -40,11 +43,11 @@ def extract_features(shape):
 
     feature_dict["eccentricity"]=np.max(eigenvalues)/np.maximum(np.min(eigenvalues),0.01) #also clamp
     #Histograms
-    feature_dict["angle_three_vertices"]  = angle_three_random_vertices(shape.vertices)
-    feature_dict["barycenter_vertice"]=barycenter_vertice(shape.vertices, np.zeros(3,dtype=np.float32))
-    feature_dict["two_vertices"]=two_vertices(shape.vertices)
-    feature_dict["square_area_triangle"]=square_area_triangle(shape.vertices)
-    feature_dict["cube_volume_tetrahedron"]=cube_volume_tetrahedron(shape.vertices)
+    feature_dict["angle_three_vertices"]  = angle_three_random_vertices(shape.vertices,n_bins=n_bins,n_samples=n_samples)
+    feature_dict["barycenter_vertice"]=barycenter_vertice(shape.vertices, np.zeros(3,dtype=np.float32),n_bins=n_bins,n_samples=n_samples)
+    feature_dict["two_vertices"]=two_vertices(shape.vertices,n_bins=n_bins,n_samples=n_samples)
+    feature_dict["square_area_triangle"]=square_area_triangle(shape.vertices,n_bins=n_bins,n_samples=n_samples)
+    feature_dict["cube_volume_tetrahedron"]=cube_volume_tetrahedron(shape.vertices,n_bins=n_bins,n_samples=n_samples)
 
 
     return feature_dict

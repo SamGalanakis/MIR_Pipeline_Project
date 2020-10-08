@@ -10,7 +10,7 @@ from sklearn import preprocessing
 
 
 
-def sample_normalizer(df,exclude,scaler,array_columns,array_lengths):
+def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distributions=True):
     df= df.drop(exclude,axis=1)
     x = df.select_dtypes(include=np.number)
     if scaler == 'minmax':
@@ -25,11 +25,11 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths):
     x_scaled=scaler.transform(x)
     
     df[x.columns] = x_scaled
-
-    for length , array_name in zip(array_lengths,array_columns):
-        for col in df.columns:
-            if is_array_col(array_columns,col)==array_name:
-                df[col] = df[col]/np.sqrt(length)
+    if divide_distributions:
+        for length , array_name in zip(array_lengths,array_columns):
+            for col in df.columns:
+                if is_array_col(array_columns,col)==array_name:
+                    df[col] = df[col]/np.sqrt(length)
     return df, scaler
 
     
