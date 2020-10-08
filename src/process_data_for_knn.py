@@ -10,7 +10,7 @@ from sklearn import preprocessing
 
 
 
-def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distributions=True):
+def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distributions):
     df= df.drop(exclude,axis=1)
     x = df.select_dtypes(include=np.number)
     if scaler == 'minmax':
@@ -35,11 +35,11 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
     
 
 
-def process_dataset_for_knn(data_path,scaler = 'minmax'):
+def process_dataset_for_knn(data_path,divide_distributions,n_faces_target,scaler = 'minmax'):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
 
-    df = df[abs(df.n_triangles-1000)<100] #Remove models that did not get properly subdivided
+    df = df[abs(df.n_triangles-n_faces_target)<100] #Remove models that did not get properly subdivided
     
 
 
@@ -84,7 +84,7 @@ def process_dataset_for_knn(data_path,scaler = 'minmax'):
 
 
     #Pass through normalizer, so scale and divide arrays as needed for knn. Use same for query
-    df , scaler = sample_normalizer(df,exclude,scaler,array_columns,array_lengths)
+    df , scaler = sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distributions=divide_distributions)
 
     
     return df, exclude, scaler, array_columns, array_lengths

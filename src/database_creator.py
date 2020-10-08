@@ -143,7 +143,7 @@ if __name__=="__main__":
     base_name = 'data'
     n_samples = 1e+6
     apply_processing = True
-    n_faces_target = 1000
+    n_faces_target = 5000
     profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_faces_target=n_faces_target)')
     profiler.dump_stats("profiler_stats")
 
