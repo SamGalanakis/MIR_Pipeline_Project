@@ -141,7 +141,7 @@ if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
     base_name = 'data'
-    n_samples = 1e+5
+    n_samples = 1e+6
     apply_processing = True
     n_faces_target = 10000
     profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_faces_target=n_faces_target)')
