@@ -21,11 +21,11 @@ def process(shape,n_faces_target=False):
         
         if n_subdiv>0:
             clus.subdivide(n_subdiv)
-        clus.cluster(15000)
+        clus.cluster(n_faces_target)
 
         new_mesh = clus.create_mesh()
         shape.pyvista_mesh = new_mesh
-        shape.decimate(target=n_faces_target)
+       # shape.decimate(target=n_faces_target)
         shape.pyvista_mesh_to_base(shape.pyvista_mesh)
 
         if np.abs(shape.pyvista_mesh.n_faces-n_faces_target)>200: 
