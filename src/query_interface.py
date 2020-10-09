@@ -94,7 +94,7 @@ if __name__ == '__main__':
     n_faces_target = 5000
     query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_faces_target = 5000)
     
-    path=man_path
+    path=pig_path
     profiler.run('query_interface.query(path,n_samples_query=1e+6)')
     profiler.dump_stats('query_profile_stats')
   
