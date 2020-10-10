@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from file_reader import FileReader
 from model_viewer import ModelViewer
 from shape import Shape
@@ -8,7 +9,7 @@ from pathlib import Path
 from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_random_vertices
 from utils import barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice, square_area_triangle
 from feature_extractor import extract_features
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 
 def test_volume(volume):
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     reader = FileReader()
     vertices, element_dict, info = reader.read(path)
     shape = Shape(vertices, element_dict, info)
-    feature_dict = extract_features(shape)
+    feature_dict = extract_features(shape,n_bins=10,n_samples=1e+6)
     test_volume(feature_dict['volume'])
     test_surface_area(feature_dict['surface_area'])
     test_bounding_box_volume(feature_dict['bounding_box_volume'])

@@ -110,7 +110,7 @@ class Database:
         print(f'{process_index} : Finished!')
         return data_subset
 
-    def create_database(self, database_name,n_samples,n_bins, apply_processing = True,n_faces_target=False,n_processes=10):
+    def create_database(self, database_name,n_samples,n_bins, apply_processing = True,n_vertices_target=False,n_processes=10):
         self.n_samples = n_samples
         self.file_paths=[]
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
@@ -127,10 +127,10 @@ class Database:
         subset_lengh  = math.ceil(len(self.file_paths)/n_processes)
         input_subsets = [self.file_paths[x*subset_lengh:(x+1)*subset_lengh] for x in range(n_processes)  ]
         assert sum([len(x) for x in input_subsets]) == len(self.file_paths)
-        f = lambda x: self.process_subset(x,apply_processing,n_faces_target,n_bins)
+        f = lambda x: self.process_subset(x,apply_processing,n_vertices_target,n_bins)
         with concurrent.futures.ProcessPoolExecutor() as executor:
            
-            result_subsets = [executor.submit(self.process_subset,*(file_list,apply_processing,n_faces_target,n_bins,process_index))
+            result_subsets = [executor.submit(self.process_subset,*(file_list,apply_processing,n_vertices_target,n_bins,process_index))
              for process_index,file_list in enumerate(input_subsets)]
             print('Starting!')
             for result_subset in concurrent.futures.as_completed(result_subsets):
@@ -140,7 +140,7 @@ class Database:
         df = data_dict_parser(data) 
 
         processed = "processed" if apply_processing else ""
-        database_name = f"{database_name}_{processed}_{n_faces_target}_{n_samples}"
+        database_name = f"{database_name}_{processed}_{n_vertices_target}_{n_samples}"
         
         path = f"processed_data/{database_name}.csv"
         
@@ -156,10 +156,10 @@ if __name__=="__main__":
     base_name = 'data'
     n_samples = 1e+6
     apply_processing = True
-    n_faces_target = 10000
+    n_vertices_target = 10000
     n_bins=10
     
-    profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_faces_target=n_faces_target,n_bins=10)')
+    profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_vertices_target=n_vertices_target,n_bins=10)')
     profiler.dump_stats("profiler_stats")
 
     

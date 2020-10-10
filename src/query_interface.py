@@ -6,16 +6,15 @@ from file_reader import FileReader
 from shape import Shape
 from preprocessing import process
 from feature_extractor import extract_features
-from utils import is_array_col
 import numpy as np
 import cProfile
 
 class QueryInterface:
-    def __init__(self,data_path,divide_distributions,n_bins,n_faces_target):
-        self.n_faces_target= n_faces_target
+    def __init__(self,data_path,divide_distributions,n_bins,n_vertices_target):
+        self.n_vertices_target= n_vertices_target
         self.divide_distributions = divide_distributions
         self.n_bins=n_bins
-        self.df, *self.sample_normalization_parameters = process_dataset_for_knn(data_path,divide_distributions=self.divide_distributions,n_faces_target = n_faces_target)
+        self.df, *self.sample_normalization_parameters = process_dataset_for_knn(data_path,divide_distributions=self.divide_distributions,n_vertices_target = n_vertices_target)
         self.df_numeric = self.df.select_dtypes(include=np.number)
         self.faiss_knn = FaissKNeighbors(self.df_numeric,metric='L2')
         self.faiss_knn.train()
@@ -30,7 +29,7 @@ class QueryInterface:
     def query(self,model_path,n_samples_query):
         vertices, element_dict, info = self.reader.read(model_path)
         shape = Shape(vertices,element_dict,info)
-        shape = process(shape,n_faces_target=self.n_faces_target)
+        shape = process(shape,n_vertices_target=self.n_vertices_target)
         feature_dict = extract_features(shape,self.n_bins,n_samples=n_samples_query)
         feature_df = data_dict_parser(feature_dict)
         feature_df, _ = sample_normalizer(feature_df,*self.sample_normalization_parameters,divide_distributions=self.divide_distributions)
@@ -40,7 +39,7 @@ class QueryInterface:
         query_vector = feature_df_numeric.iloc[0,:].values.astype(np.float32)
 
         
-        #manual = np.linalg.norm(self.df_numeric-query_vector,axis=1)
+     
 
       
 
@@ -91,8 +90,8 @@ if __name__ == '__main__':
     man_path = Path("data/benchmark/db/2/m201/m201.off")
 
 
-    n_faces_target = 5000
-    query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_faces_target = 5000)
+    n_vertices_target = 5000
+    query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_vertices_target = 5000)
     
     path=pig_path
     profiler.run('query_interface.query(path,n_samples_query=1e+6)')

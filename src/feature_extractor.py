@@ -67,6 +67,4 @@ def extract_features(shape,n_bins,n_samples):
     return feature_dict
 
 if __name__=='__main__':
-    path = Path(r"data/test.ply")
-    path = Path(r"data/benchmark/db/1/m102/m102.off")
-    extract_features(path)
+    pass

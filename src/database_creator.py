@@ -42,6 +42,7 @@ def data_dict_parser(data_dict):
 
 class Database:
     def __init__(self):
+        n_vertices_target
         cla_path = 'data/benchmark/classification/v1/base/train.cla'
         classification_dict_train, self.hierarchy_dict_train, self.cla_info_train =  cla_parser(Path(cla_path))
         classification_dict_test, self.hierarchy_dict_test, self.cla_info_test = cla_parser(Path(cla_path.replace('train','test')))
@@ -51,7 +52,7 @@ class Database:
         self.reader = FileReader()
         self.file_paths = []
 
-    def create_database(self, database_name,n_samples,n_bins=10, apply_processing = True,n_faces_target=False):
+    def create_database(self, database_name,n_samples,n_bins=10, apply_processing = True,n_vertices_target=False):
 
 
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
@@ -70,7 +71,7 @@ class Database:
         
         data = {k:[] for k in columns+col_array}
 
-        n_not_classified=0
+    
         
             
         for file in tqdm(self.file_paths):
@@ -80,7 +81,7 @@ class Database:
     
             if apply_processing:
                 
-                shape = process(shape,n_faces_target=n_faces_target)
+                shape = process(shape,n_vertices_target=n_vertices_target)
              
             else:
                 shape.make_pyvista_mesh()
@@ -128,7 +129,7 @@ class Database:
         
        
         processed = "processed" if apply_processing else ""
-        database_name = f"{database_name}_{processed}_{n_faces_target}_{n_samples}"
+        database_name = f"{database_name}_{processed}_{n_vertices_target}_{n_samples}"
         
         path = f"processed_data/{database_name}.csv"
         
@@ -143,8 +144,8 @@ if __name__=="__main__":
     base_name = 'data'
     n_samples = 1e+6
     apply_processing = True
-    n_faces_target = 10000
-    profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_faces_target=n_faces_target)')
+    n_vertices_target = 10000
+    profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_vertices_target=n_vertices_target)')
     profiler.dump_stats("profiler_stats")
 
     
