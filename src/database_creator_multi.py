@@ -12,6 +12,7 @@ from feature_extractor import extract_features
 import concurrent
 import math
 import warnings 
+import concurrent.futures
 def data_dict_parser(data_dict):
         if  isinstance(list(data_dict.values())[0],list):
             lengths  = {key:(val[0].size if isinstance(val[0],np.ndarray) else 1 ) for key,val  in data_dict.items() }
@@ -62,7 +63,7 @@ class Database:
 
 
 
-    def process_subset(self,file_list,apply_processing,n_faces_target,n_bins,process_index):
+    def process_subset(self,file_list,apply_processing,n_vertices_target,n_bins,process_index):
         print(f' {process_index} : Starting subset processor!')
         data_subset = {k:[] for k in self.columns+self.col_array}
         for index, file in enumerate(file_list):
@@ -77,7 +78,7 @@ class Database:
 
             if apply_processing:
                 
-                shape = process(shape,n_faces_target=n_faces_target)
+                shape = process(shape,n_vertices_target=n_vertices_target)
             
             else:
                 shape.make_pyvista_mesh()
@@ -110,7 +111,7 @@ class Database:
         print(f'{process_index} : Finished!')
         return data_subset
 
-    def create_database(self, database_name,n_samples,n_bins, apply_processing = True,n_vertices_target=False,n_processes=10):
+    def create_database(self, database_name,n_samples,n_bins, apply_processing = True,n_vertices_target=False,n_processes=4):
         self.n_samples = n_samples
         self.file_paths=[]
         for root, dirs, files in os.walk(Path(r"data/benchmark")):
@@ -155,7 +156,7 @@ if __name__=="__main__":
     profiler= cProfile.Profile()
     base_name = 'data'
     n_samples = 1e+6
-    apply_processing = True
+    apply_processing = False
     n_vertices_target = 10000
     n_bins=10
     

@@ -80,7 +80,7 @@ class QueryInterface:
 if __name__ == '__main__':
     profiler = cProfile.Profile()
     
-    data_path = Path("processed_data/data_processed_5000_1000000.0.csv")
+    data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
     ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
     plane_path = Path(r"data/benchmark/db/12/m1204/m1204.off")
     pig_path = Path(r"data/benchmark/db/1/m102/m102.off")
@@ -90,10 +90,10 @@ if __name__ == '__main__':
     man_path = Path("data/benchmark/db/2/m201/m201.off")
 
 
-    n_vertices_target = 5000
-    query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_vertices_target = 5000)
+    n_vertices_target = 10000
+    query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_vertices_target = n_vertices_target)
     
-    path=pig_path
+    path=man_path
     profiler.run('query_interface.query(path,n_samples_query=1e+6)')
     profiler.dump_stats('query_profile_stats')
   

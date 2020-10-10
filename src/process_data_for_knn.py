@@ -35,11 +35,11 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
     
 
 
-def process_dataset_for_knn(data_path,divide_distributions,n_faces_target,scaler = 'minmax'):
+def process_dataset_for_knn(data_path,divide_distributions,n_vertices_target,scaler = 'minmax'):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
 
-    df = df[abs(df.n_triangles-n_faces_target)<100] #Remove models that did not get properly subdivided
+   
     
 
 
