@@ -11,6 +11,17 @@ import collections
 import time
 import itertools
 import pandas as pd
+import os
+
+def get_all_file_paths(directory,extension):
+    '''Get all file paths of given extension for files under given directory '''
+    file_paths = []
+    for root, dirs, files in os.walk(Path(directory)):
+        for file in files:
+            if file.endswith(extension):
+                
+                file_paths.append(os.path.join(root, file))
+    return file_paths
 
 def merge_dicts(dict1, dict2):
     res = {**dict1, **dict2}

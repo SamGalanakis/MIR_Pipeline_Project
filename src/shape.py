@@ -74,49 +74,6 @@ class Shape:
         triangles = np.array(triangles,dtype=np.int)
         self.pyvista_mesh = pv.PolyData(self.vertices.reshape(-1,3),triangles)
 
-    
-
-
-    def subdivide(self,times=1,algo="linear",target=False,undercut=True):
-       
-        
-        if type(self.pyvista_mesh) == bool:
-            self.make_pyvista_mesh()
-        if undercut:
-            rounding = math.floor
-        else:
-            rounding = math.ceil
-        if target:
-            times = rounding(target/(self.pyvista_mesh.n_faces*4 ))
-            print(f"Subdividing {times} times")
-   
-        
-       
-        self.pyvista_mesh.subdivide(times,algo, inplace=True)
-        
-        
-    def decimate(self,reduction=0.5,algo="linear",target=False):
-            
-        
-        if type(self.pyvista_mesh)== bool:
-            self.make_pyvista_mesh()
-
-        if target:
-            reduction = 1- target/self.pyvista_mesh.n_faces
-        if reduction <= 0:
-            print("Nothing to reduce")
-            return
-        if algo=="pro":
-            self.pyvista_mesh.decimate_pro(reduction,inplace=True)
-        
-        else:
-            self.pyvista_mesh.decimate(reduction,inplace=True)
-
-        print(f"Decimating  {reduction}% ")
-            
-
-
-            
 
         
 

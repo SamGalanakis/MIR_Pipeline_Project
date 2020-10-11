@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from utils import cla_parser, merge_dicts
+from utils import cla_parser, merge_dicts, get_all_file_paths
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
@@ -42,7 +42,7 @@ def data_dict_parser(data_dict):
 
 class Database:
     def __init__(self):
-        n_vertices_target
+       
         cla_path = 'data/benchmark/classification/v1/base/train.cla'
         classification_dict_train, self.hierarchy_dict_train, self.cla_info_train =  cla_parser(Path(cla_path))
         classification_dict_test, self.hierarchy_dict_test, self.cla_info_test = cla_parser(Path(cla_path.replace('train','test')))
@@ -54,12 +54,8 @@ class Database:
 
     def create_database(self, database_name,n_samples,n_bins=10, apply_processing = True,n_vertices_target=False):
 
-
-        for root, dirs, files in os.walk(Path(r"data/benchmark")):
-            for file in files:
-                if file.endswith(".off"):
-                    
-                    self.file_paths.append(os.path.join(root, file))
+        self.file_paths = get_all_file_paths(r'data/benchmark','.off')
+       
 
         columns=["file_name","n_vertices","n_triangles","n_quads",
                 "classification","volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
@@ -91,7 +87,6 @@ class Database:
                 classification = self.classification_dict[id]
                 
             else:
-                n_not_classified +=1
                 classification = None
                 
 
@@ -113,7 +108,7 @@ class Database:
                 data[key].append(val)
             
             
-        #new
+        
       
 
         df = data_dict_parser(data) 
@@ -121,9 +116,7 @@ class Database:
 
 
 
-        #new
-        # n_classified_models = self.cla_info["n_models"]
-        # print(f"Missed/unclassified: {n_not_classified} of {len(self.file_paths)} of which {n_classified_models} are classified according to the cla.")
+      
         
         
         

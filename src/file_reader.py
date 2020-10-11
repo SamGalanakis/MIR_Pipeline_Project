@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 
+
 class FileReader:
     def __init__(self):
         pass

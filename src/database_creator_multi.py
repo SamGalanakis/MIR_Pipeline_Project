@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from utils import cla_parser, merge_dicts
+from utils import cla_parser, merge_dicts, get_all_file_paths
 from tqdm import tqdm
 from shape import Shape
 from file_reader import FileReader
@@ -113,12 +113,7 @@ class Database:
 
     def create_database(self, database_name,n_samples,n_bins, apply_processing = True,n_vertices_target=False,n_processes=4):
         self.n_samples = n_samples
-        self.file_paths=[]
-        for root, dirs, files in os.walk(Path(r"data/benchmark")):
-            for file in files:
-                if file.endswith(".off"):
-                    
-                    self.file_paths.append(os.path.join(root, file))
+        self.file_paths = get_all_file_paths(r'data/benchmark','.off')
 
      
 
