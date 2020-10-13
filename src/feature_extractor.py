@@ -27,6 +27,7 @@ def extract_features(shape,n_bins,n_samples):
     feature_dict["n_vertices"]=shape.n_vertices
     feature_dict["n_triangles"]=shape.n_triangles
     feature_dict["n_quads"]=shape.n_quads
+    shape.bounding_rect()
     feature_dict["bounding_box"]=shape.bounding_rect_vertices
 
     feature_dict["volume"]=np.maximum(shape.pyvista_mesh.volume,0.01)#clamp to avoid 0 volume for 2d models

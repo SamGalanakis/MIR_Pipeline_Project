@@ -6,13 +6,15 @@ from file_reader import FileReader
 from model_viewer import ModelViewer
 from shape import Shape
 from pathlib import Path
-from utils import bounding_box, cla_parser, calculate_diameter, align, angle_three_random_vertices
-from utils import barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice, square_area_triangle
+from utils import *
 from feature_extractor import extract_features
+import pyvista
 
 
 
-def test_volume(volume):
+def test_volume():
+    # Cube
+    volume = 
     assert np.abs(volume - 8) < 10e-3, "Volume test failed"
 
 

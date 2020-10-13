@@ -35,7 +35,7 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
     
 
 
-def process_dataset_for_knn(data_path,divide_distributions,n_vertices_target,scaler = 'minmax'):
+def process_dataset_for_knn(data_path,divide_distributions,scaler = 'minmax'):
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
 
@@ -44,7 +44,7 @@ def process_dataset_for_knn(data_path,divide_distributions,n_vertices_target,sca
 
 
     #Drop numerical features not relevant for similarity
-    exclude = ['n_quads','n_vertices','n_triangles']
+    exclude = ['n_quads','n_vertices']
    
 
    
@@ -91,8 +91,8 @@ def process_dataset_for_knn(data_path,divide_distributions,n_vertices_target,sca
 
 
 if __name__ == '__main__':
-    data_path = Path("processed_data/dataTest1000.csv")
-    a = process_dataset_for_knn(data_path)
+    data_path = Path("processed_data\data_processed_10000_1000000.0.csv")
+    a = process_dataset_for_knn(data_path,divide_distributions=True)
    
 
 

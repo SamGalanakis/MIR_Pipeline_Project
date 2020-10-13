@@ -43,9 +43,13 @@ def data_dict_parser(data_dict):
 
 class Database:
     def __init__(self):
+        
         cla_path = 'data/benchmark/classification/v1/base/train.cla'
+        cla_path = 'data/benchmark/classification/v1/coarse1/coarse1Train.cla'
         classification_dict_train, self.hierarchy_dict_train, self.cla_info_train =  cla_parser(Path(cla_path))
-        classification_dict_test, self.hierarchy_dict_test, self.cla_info_test = cla_parser(Path(cla_path.replace('train','test')))
+        test_path = cla_path.replace('train','test')
+        test_path = cla_path.replace('Train','Test')
+        classification_dict_test, self.hierarchy_dict_test, self.cla_info_test = cla_parser(Path(test_path))
         self.classification_dict = merge_dicts(classification_dict_train,classification_dict_test)
         unique_classes = len(set(self.classification_dict.values()))
         print(f'{unique_classes} unique classes')
@@ -149,9 +153,9 @@ if __name__=="__main__":
     warnings.filterwarnings('ignore')
     database = Database()
     profiler= cProfile.Profile()
-    base_name = 'data'
+    base_name = 'data_coarse1'
     n_samples = 1e+6
-    apply_processing = False
+    apply_processing = True
     n_vertices_target = 10000
     n_bins=10
     

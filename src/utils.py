@@ -13,6 +13,16 @@ import itertools
 import pandas as pd
 import os
 
+
+
+
+
+def normalize_verts(verts):
+    assert verts.shape[1]==3
+    max_val = np.max(verts)
+    min_val = np.min(verts)
+
+    return (verts-min_val)/(max_val-min_val)
 def get_all_file_paths(directory,extension):
     '''Get all file paths of given extension for files under given directory '''
     file_paths = []
@@ -42,7 +52,7 @@ def vertice_sampler(vertices,n_samples,times,replace=True):
     
     return [vertices[np.random.choice(vertices.shape[0],n_samples,replace=replace)] for x in range(times)]
 def bounding_box(vertices,indices):
-        as_points = vertices.reshape(-1, 3)
+        as_points = vertices.reshape((-1, 3))
 
         max_x, max_y, max_z = as_points.max(axis=0)
         min_x, min_y, min_z = as_points.min(axis=0)
