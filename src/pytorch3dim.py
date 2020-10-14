@@ -39,6 +39,14 @@ class princetonDataSet(Dataset):
         self.file_list = file_list
         self.reader = FileReader()
 
+    def load_dataset(self):
+        shapes = [Shape(*self.reader.read(path)) for path in self.file_list]
+        shapes = [process(x) for x in shapes]
+        [x.pyvista_mesh_to_base(x) for x in shapes]
+        faces = [x.element_dict['triangles'] for x in shapes]
+        vertices = [x.vertices for x in shapes]
+        self.meshes = Meshes(faces=faces,verts=verts)
+
     
     def __len__(self):
         return len(self.file_list)
@@ -57,6 +65,8 @@ class princetonDataSet(Dataset):
         mesh = Meshes(faces=[faces],verts=[verts.reshape((-1,3))])
 
         return mesh
+    def view(self,index):
+        plot_pointcloud(self.meshes[index])
 
 if __name__ == '__main__':
     dolphin_path = 'data/dolphin.obj'
