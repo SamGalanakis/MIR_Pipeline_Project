@@ -133,3 +133,4 @@ dmypy.json
 data/benchmark/
 .vscode/
 extras/
+wandb/
