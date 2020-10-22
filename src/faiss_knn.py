@@ -36,11 +36,11 @@ class FaissKNeighbors:
         query = query.reshape((1,-1)).astype(np.float32)
 
         if self.metric == "L2":
-            distances, indices = self.index.search(query,k=n_results)
+            distances, indices = self.index.search(query,k=int(n_results))
         
         else:
             faiss.normalize_L2(query)
-            distances, indices = self.index.search(query, k=n_results)
+            distances, indices = self.index.search(query, k=int(n_results))
 
 
         return distances, indices

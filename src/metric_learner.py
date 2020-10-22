@@ -22,13 +22,13 @@ df, *_ = process_dataset_for_knn(data_path,divide_distributions=False)
 classifications = df['classification'].to_list()
 classifications_unique = sorted(list(set(classifications)))
 classifications_indexer = {x:classifications_unique.index(x) for x in classifications_unique}
-classifciations_numeric = [classifications_indexer[x] for x in classifications]
+classifications_numeric = [classifications_indexer[x] for x in classifications]
 df_numeric = df.select_dtypes(include=np.number)
 
 
 
-labels = torch.tensor(classifciations_numeric).to(device)
-print('done')
+labels = torch.tensor(classifications_numeric).to(device)
+
 
 
 class Metric(nn.Module):
@@ -45,8 +45,10 @@ class Metric(nn.Module):
 
         # x=self.fc2(F.relu(x))
         # x = F.relu(x)
-        x = torch.mul(self.weights,x)
-        x = x / torch.norm(x)
+        normed_weigths = self.weights/torch.norm(self.weights)
+        x = torch.mul(normed_weigths,x)
+        x=x/torch.norm(x)
+        
         return x
 
 

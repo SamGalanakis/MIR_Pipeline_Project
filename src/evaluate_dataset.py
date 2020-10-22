@@ -1,9 +1,9 @@
 from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from sklearn.metrics import accuracy_score
 from faiss_knn import FaissKNeighbors
+from collections import defaultdict
 from pathlib import Path
 import pandas as pd
-from collections import Counter, defaultdict
 from tqdm import tqdm
 import cProfile
 import numpy as np
@@ -13,7 +13,7 @@ import pprint
 class Evaluater:
     def __init__(self,df_knn_processed):
 
-            
+
         self.df = df_knn_processed
         self.df_numeric = self.df.select_dtypes(include=np.number)
 
@@ -21,33 +21,31 @@ class Evaluater:
         self.faiss_knn.train()
         self.database_class_path = self.df[["classification","file_name"]]
         self.labels = {}
-       
         self.results = []
         
-        #self.df["classification"].nunique
-        self.models_per_class = Counter()
-        for classification in self.database_class_path["classification"].values:
-            self.models_per_class[classification] += 1
+    
+        self.class_counts = self.df['classification'].value_counts()
 
 
     def evaluate(self):
         for idx, (classification,model)  in tqdm(enumerate(self.database_class_path.values)):
             #Number of results is based on the number of shapes in a class 
-            n_results = self.models_per_class[classification]
+            n_results = self.class_counts[classification]
     
             _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
             self.results.append((classification, indices.flatten()))
 
 
     def analysis(self):
+        
         self.accuracy_per_class = defaultdict(list)
         self.overall_accuracy_per_class = 0
         self.overall_accuracy = 0
         
 
         for index, (classification, indices) in enumerate(self.results):
-            n_correct_returns = sum([1 if self.database_class_path["classification"].values[ind] == classification else 0 for ind in indices])
-            local_acc = n_correct_returns / self.models_per_class[classification]
+            n_correct_returns = sum([self.df["classification"][ind] == classification for ind in indices])
+            local_acc = n_correct_returns / self.class_counts[classification]
 
             self.accuracy_per_class[classification].append(local_acc)
             self.overall_accuracy += local_acc
