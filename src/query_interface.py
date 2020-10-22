@@ -14,7 +14,7 @@ class QueryInterface:
         self.n_vertices_target= n_vertices_target
         self.divide_distributions = divide_distributions
         self.n_bins=n_bins
-        self.df, *self.sample_normalization_parameters = process_dataset_for_knn(data_path,divide_distributions=self.divide_distributions,n_vertices_target = n_vertices_target)
+        self.df, *self.sample_normalization_parameters = process_dataset_for_knn(data_path,divide_distributions=self.divide_distributions)
         self.df_numeric = self.df.select_dtypes(include=np.number)
         self.faiss_knn = FaissKNeighbors(self.df_numeric,metric='L2')
         self.faiss_knn.train()
@@ -26,7 +26,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path,n_samples_query):
+    def query(self,model_path,n_samples_query,n_results):
         vertices, element_dict, info = self.reader.read(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -41,11 +41,9 @@ class QueryInterface:
         
      
 
-      
-
-        distances, indices = self.faiss_knn.query(query_vector,n_results=20)
+        distances, self.indices = self.faiss_knn.query(query_vector,n_results)
         
-        resulting_paths = [self.df['file_name'].to_list()[ind] for ind in indices.flatten()]
+        resulting_paths = [self.df['file_name'].to_list()[ind] for ind in self.indices.flatten()]
         #Send results for visualization
         self.visualize_results(shape,resulting_paths,distances)
 
