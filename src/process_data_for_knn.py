@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from shape import Shape
-from model_viewer import ModelViewer
+
 from sklearn import preprocessing
 
 

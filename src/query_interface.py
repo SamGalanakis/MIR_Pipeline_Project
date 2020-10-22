@@ -46,7 +46,7 @@ class QueryInterface:
         distances, indices = self.faiss_knn.query(query_vector,n_results=20)
         df_slice = self.df[self.df.index.isin(indices)]
         resulting_paths = df_slice['file_name'].tolist()
-        resulting_classifications = df_slice['classifications'].tolist()
+        resulting_classifications = df_slice['classification'].tolist()
         
         #Send results for visualization
         if vis:
