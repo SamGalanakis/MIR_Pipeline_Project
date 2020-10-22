@@ -26,7 +26,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path,n_samples_query,n_results):
+    def query(self,model_path,n_samples_query,vis=False):
         vertices, element_dict, info = self.reader.read(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -41,11 +41,18 @@ class QueryInterface:
         
      
 
-        distances, self.indices = self.faiss_knn.query(query_vector,n_results)
+      
+
+        distances, indices = self.faiss_knn.query(query_vector,n_results=20)
+        df_slice = self.df[self.df.index.isin(indices)]
+        resulting_paths = df_slice['file_name'].tolist()
+        resulting_classifications = df_slice['classification'].tolist()
         
-        resulting_paths = [self.df['file_name'].to_list()[ind] for ind in self.indices.flatten()]
         #Send results for visualization
-        self.visualize_results(shape,resulting_paths,distances)
+        if vis:
+            self.visualize_results(shape,resulting_paths,distances)
+        else:
+            return distances, indices
 
     def visualize_results(self,query_model,sorted_resulting_paths,distances):
        

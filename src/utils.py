@@ -2,7 +2,7 @@ from math import sin
 import numpy as np
 from pathlib import Path
 from numpy.compat.py3k import asstr
-import pyrr
+
 import math
 from file_reader import FileReader
 from scipy.spatial import ConvexHull, distance_matrix

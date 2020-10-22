@@ -5,6 +5,7 @@ import pandas as pd
 from collections import Counter, defaultdict
 from tqdm import tqdm
 
+
 class Evaluater:
     def __init__(self,data_path,n_vertices_target,n_samples_query):
         self.data_path = data_path
@@ -41,12 +42,15 @@ class Evaluater:
             self.accuracy_per_class = sum(all_accuracy) / len(all_accuracy)     
 
 if __name__ == '__main__':
+    profiler = cProfile.Profile()
+
     data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
     n_vertices_target = 10000
     n_samples_query = 1e+6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
     test = Evaluater(data_path,n_vertices_target,n_samples_query)
     test.evaluate()    
     test.analysis()
+    
     print()
     
 

@@ -8,7 +8,7 @@ from pathlib import Path
     #Install CUDA 10.0 
     #RUN on new environment: conda install faiss-gpu cudatoolkit=10.0 -c pytorch 
 """
-
+     
 
 class FaissKNeighbors:
     def __init__(self, dataset,  metric = "L2"):

@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 from shape import Shape
-from model_viewer import ModelViewer
+
 from sklearn import preprocessing
 
 
@@ -31,7 +31,7 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
                 if is_array_col(array_columns,col)==array_name:
                     df[col] = df[col]/np.sqrt(length)
     return df, scaler
-
+    
     
 
 
