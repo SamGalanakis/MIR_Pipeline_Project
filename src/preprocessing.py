@@ -21,11 +21,14 @@ def process(shape,n_vertices_target=False):
     if n_vertices_target:
             
         clus = pyacvd.Clustering(shape.pyvista_mesh)
-        target = 4 * n_vertices_target  #Suvdivide to some larger than target so we can cluster down
-        n_subdiv= int(np.ceil(np.log(target/clus.mesh.n_points)/np.log(4))) # Number of subdivisions to overshoot target
+       # target = 4 * n_vertices_target  #Suvdivide to some larger than target so we can cluster down
+     #   n_subdiv= int(np.ceil(np.log(target/clus.mesh.n_points)/np.log(4))) # Number of subdivisions to overshoot target
         
-        if n_subdiv>0:
-            clus.subdivide(n_subdiv)
+        try:
+            while len(clus.mesh.points) < 30000:
+                clus.subdivide(2)
+        except:
+            print("MEMERY!!!")
         clus.cluster(n_vertices_target)
 
         new_mesh = clus.create_mesh()
