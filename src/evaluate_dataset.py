@@ -11,17 +11,17 @@ import pprint
 
 
 class Evaluater:
-    def __init__(self,data_path,n_vertices_target,n_samples_query):
+    def __init__(self,df_knn_processed):
 
-
-        self.df, *_ = process_dataset_for_knn(data_path,divide_distributions=False)
+            
+        self.df = df_knn_processed
         self.df_numeric = self.df.select_dtypes(include=np.number)
 
         self.faiss_knn = FaissKNeighbors(self.df_numeric,metric='L2')
         self.faiss_knn.train()
         self.database_class_path = self.df[["classification","file_name"]]
         self.labels = {}
-        self.n_samples_query = n_samples_query
+       
         self.results = []
         
         #self.df["classification"].nunique
@@ -43,20 +43,21 @@ class Evaluater:
         self.accuracy_per_class = defaultdict(list)
         self.overall_accuracy_per_class = 0
         self.overall_accuracy = 0
-        wtf = 0
+        
 
-        for classification, indices in self.results:
+        for index, (classification, indices) in enumerate(self.results):
             n_correct_returns = sum([1 if self.database_class_path["classification"].values[ind] == classification else 0 for ind in indices])
             local_acc = n_correct_returns / self.models_per_class[classification]
 
             self.accuracy_per_class[classification].append(local_acc)
             self.overall_accuracy += local_acc
-            wtf += 1
+           
         for classification, all_accuracy in self.accuracy_per_class.items():
             self.accuracy_per_class[classification] = sum(all_accuracy) / len(all_accuracy)   
 
-        self.overall_accuracy = self.overall_accuracy /  wtf
-      #  self.overall_accuracy_per_class =  self.accuracy_per_class.values() /  len(self.accuracy_per_class.values())
+        self.overall_accuracy = self.overall_accuracy /  len(self.results)
+
+        
 
 
 

@@ -1,4 +1,4 @@
-#from faiss_knn import  FaissKNeighbors
+from evaluate_dataset import Evaluater
 from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from pathlib import Path
 import numpy as np
@@ -7,11 +7,12 @@ from torch import  nn, optim
 from online_triplet_loss.losses import *
 from tqdm import tqdm 
 import matplotlib.pyplot as plt
-
+import torch.nn.functional as F
 import wandb
 wandb.init(project="metriclearner")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+data_path = "processed_data/data_processed_10000_1000000.0.csv"
 
 
 
@@ -33,28 +34,40 @@ print('done')
 class Metric(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Parameter(torch.ones(df_numeric.shape[1],requires_grad=True))
+        self.weights = nn.Parameter(torch.rand(df_numeric.shape[1],requires_grad=True))
+        # self.fc1 = nn.Linear(df_numeric.shape[1],df_numeric.shape[1])
+        
+        # self.fc2 = nn.Linear(df_numeric.shape[1],df_numeric.shape[1])
         
 
     def forward(self,x):
-        return torch.mul(self.fc1,x)
+        # x = self.fc1(x)
+
+        # x=self.fc2(F.relu(x))
+        # x = F.relu(x)
+        x = torch.mul(self.weights,x)
+        x = x / torch.norm(x)
+        return x
+
 
 model = Metric().to(device)
+model = model.float()
 wandb.watch(model)
 print(list(model.parameters()))
-optimizer = optim.Adam(model.parameters(),lr=0.1)
-dataset_torch = torch.tensor(df_numeric.values).to(device)
+optimizer = optim.Adam(model.parameters(),lr=0.0001)
+dataset_torch = torch.tensor(df_numeric.values).to(device).float()
 
 loss_overall=0
 epoch_max = int(1e+6)
 losses = []
 
-for epoch in tqdm(range(epoch_max)):
+
+for epoch in range(epoch_max):
     optimizer.zero_grad()
     
     
     dotted_features = model(dataset_torch)
-    loss= batch_hard_triplet_loss(labels,dotted_features,margin=0.1,device='cuda')
+    loss=   batch_hard_triplet_loss(labels,dotted_features,margin =  0.1,device='cuda')
     loss.backward()
     
 
@@ -62,8 +75,17 @@ for epoch in tqdm(range(epoch_max)):
     losses.append(loss.item())
     optimizer.step()
     wandb.log({'Loss':loss.item()})
-    if epoch % 100 == 0 :
-        print(f"Loss: {loss.item()}")
+    if epoch % 2000 == 0 :
+        
+    
+        df_input = df.copy()
+        df_numeric_input = df_input.select_dtypes(np.number) 
+        df_input[df_numeric_input.columns] = dotted_features.cpu().detach().numpy()
+        evaluator = Evaluater(df_input)
+        evaluator.evaluate()
+        evaluator.analysis()
+        evaluator.overall_accuracy
+        print(f"Loss: {loss.item()}, Accuracy: {evaluator.overall_accuracy}")
 
     
     
