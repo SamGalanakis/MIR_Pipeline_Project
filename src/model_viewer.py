@@ -7,7 +7,7 @@ from OpenGL.GL.shaders import compileProgram, compileShader
 from glfw import PRESS
 import numpy as np
 import pyrr
-from file_reader import FileReader
+from file_reader import read_model
 from input_handler import InputHandler
 from cmath import pi
 from utils import bounding_box
@@ -15,7 +15,7 @@ import shader_loader
 class ModelViewer:
     def __init__(self):
 
-        self.reader = FileReader()
+        
     
 
  
@@ -34,7 +34,7 @@ class ModelViewer:
 
 
         if path:
-            vertices, element_dict, info = self.reader.read(path)
+            vertices, element_dict, info = read_model(path)
             indices = element_dict["triangles"] 
             print(f"Reading {path}")
         else:

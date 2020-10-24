@@ -4,13 +4,9 @@ from pathlib import Path
 from numpy.compat.py3k import asstr
 
 import math
-from file_reader import FileReader
+from file_reader import read_model
 from scipy.spatial import ConvexHull, distance_matrix
-from scipy.stats import binned_statistic
 import collections
-import time
-import itertools
-import pandas as pd
 import os
 
 
@@ -240,9 +236,9 @@ def cube_volume_tetrahedron(vertices,n_samples,n_bins=10):
 if __name__ == "__main__":
   
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
-    reader= FileReader()
+    
     path = path = Path(r"data/test.ply")
-    vertices, element_dict, info = reader.read(path)
+    vertices, element_dict, info = read_model(path)
     angle_three_random_vertices(vertices,n_samples=1e+6)
     barycenter_vertice(vertices,np.zeros(3),n_samples=1000)
     two_vertices(vertices,n_samples=1000)

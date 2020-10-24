@@ -2,7 +2,7 @@ from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from pathlib import Path
 from database_creator import data_dict_parser
 from faiss_knn import FaissKNeighbors
-from file_reader import FileReader
+from file_reader import read_model
 from shape import Shape
 from preprocessing import process
 from feature_extractor import extract_features
@@ -18,7 +18,7 @@ class QueryInterface:
         self.df_numeric = self.df.select_dtypes(include=np.number)
         self.faiss_knn = FaissKNeighbors(self.df_numeric,metric='L2')
         self.faiss_knn.train()
-        self.reader = FileReader()
+        
 
 
         self.array_col =  ["bounding_box",
@@ -27,7 +27,7 @@ class QueryInterface:
 
 
     def query(self,model_path,n_samples_query,n_results,vis=False ):
-        vertices, element_dict, info = self.reader.read(model_path)
+        vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
         feature_dict = extract_features(shape,self.n_bins,n_samples=n_samples_query)
@@ -62,7 +62,7 @@ class QueryInterface:
         for path, dist in zip(sorted_resulting_paths,list(distances.flatten())):
   
             match_path = path.replace("\\","/")
-            match_shape = Shape(*self.reader.read(match_path))
+            match_shape = Shape(*read_model(match_path))
             classification = self.df[self.df['file_name']==path]['classification'].values[0]
             
             

@@ -10,7 +10,7 @@ import numpy as np
 import pprint
 
 
-class Evaluater:
+class Evaluator:
     def __init__(self,df_knn_processed):
 
 
