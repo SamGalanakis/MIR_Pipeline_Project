@@ -2,10 +2,41 @@ import numpy as np
 from pathlib import Path
 
 
+
+
+def write_model_as_ply(verts,faces,path):
+    verts = verts.reshape((-1,3))
+    faces = faces.reshape((-1,3))
+    n_verts = verts.shape[0]
+    n_faces = faces.shape[0]
+
+    ply_lines = ['ply','format ascii 1.0',f'element vertex {n_verts}','property float x','property float y'
+    ,'property float z',f'element face {n_faces}', 'property list uchar int vertex_indices','end_header']
+    
+    faces = np.hstack((np.ones((faces.shape[0],1),dtype=np.int)*faces.shape[1],faces))
+    
+    faces = [[str(x) for x in y] for y in faces.tolist()]
+    faces = [' '.join(x) for x in faces]
+
+    verts = [[str(x) for x in y] for y in verts.tolist()]
+    verts = [' '.join(x) for x in verts]
+
+    ply_lines.extend(verts)
+    ply_lines.extend(faces)
+    with open(path,'w+') as f:
+        f.writelines(ply_lines)
+    
+
+
+
+
+
+
 class FileReader:
     def __init__(self):
         pass
-    
+  
+        
     def convert_ply_to_off(self, path):
         off_file = ["OFF\n"]
 
@@ -73,3 +104,9 @@ class FileReader:
         if verbose:
             print(f" File type: {path.suffix} Triangles: {triangles.size}, Quads: {quads.size}.")
         return vertices, element_dict, info
+
+if __name__ == '__main__':
+    reader = FileReader()
+    verts , faces , _ = reader.read('data/benchmark/db/1/m117/m117.off')
+    out = write_model_as_ply(verts,faces['triangles'],'new.ply')
+    print('')

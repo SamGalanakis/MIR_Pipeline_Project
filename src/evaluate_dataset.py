@@ -23,7 +23,7 @@ class Evaluater:
         self.labels = {}
         self.results = []
         
-    
+        
         self.class_counts = self.df['classification'].value_counts()
 
 

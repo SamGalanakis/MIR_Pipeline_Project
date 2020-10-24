@@ -77,6 +77,7 @@ for epoch in range(epoch_max):
     losses.append(loss.item())
     optimizer.step()
     wandb.log({'Loss':loss.item()})
+    
     if epoch % 2000 == 0 :
         
     

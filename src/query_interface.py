@@ -69,7 +69,7 @@ class QueryInterface:
             
             print(f'{path} -- {classification} -- {dist}\n')
 
-         #   match_shape.view()
+            #match_shape.view()
 
         print("Done")
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
 
     n_vertices_target = 10000
-    query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_vertices_target = n_vertices_target)
+    query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
     
     path=man_path
     profiler.run('query_interface.query(path,n_samples_query=1e+6)')
