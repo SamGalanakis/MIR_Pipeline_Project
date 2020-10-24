@@ -1,6 +1,8 @@
 import numpy as np
 from pathlib import Path
 
+from numpy.core.defchararray import endswith
+
 
 
 
@@ -23,6 +25,7 @@ def write_model_as_ply(verts,faces,path):
 
     ply_lines.extend(verts)
     ply_lines.extend(faces)
+    ply_lines = [ x+'\n' for x in ply_lines]
     with open(path,'w+') as f:
         f.writelines(ply_lines)
     
