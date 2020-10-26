@@ -25,7 +25,7 @@ class Evaluator:
         
         
         self.class_counts = self.df['classification'].value_counts()
-
+        print()
 
     def evaluate(self):
         for idx, (classification,model)  in tqdm(enumerate(self.database_class_path.values)):
@@ -38,39 +38,48 @@ class Evaluator:
 
     def analysis(self):
         
-        self.accuracy_per_class = defaultdict(list)
         self.overall_accuracy_per_class = 0
-        self.overall_accuracy = 0
-        
+        self.metrics = {"accuracy" : 0,"precision": 0, "recall" :0 ,"f1" :0}
+        self.metrics_per_class =  {"accuracy" : defaultdict(list),"precision": defaultdict(list), "recall" :defaultdict(list) ,"f1" :defaultdict(list)}
+        accuracy = []
+        precision = []
+        recall = []
+        f1 = []
 
         for index, (classification, indices) in enumerate(self.results):
-            n_correct_returns = sum([self.df["classification"][ind] == classification for ind in indices])
-            local_acc = n_correct_returns / self.class_counts[classification]
+            true_positives = sum([self.df["classification"][ind] == classification for ind in indices])
+            false_positives = len(indices) - true_positives
+            false_negatives = self.class_counts[classification] - true_positives
+            true_negatives =  len(self.df) - false_negatives - false_positives - true_positives
 
-            self.accuracy_per_class[classification].append(local_acc)
-            self.overall_accuracy += local_acc
-           
-        for classification, all_accuracy in self.accuracy_per_class.items():
-            self.accuracy_per_class[classification] = sum(all_accuracy) / len(all_accuracy)   
-
-        self.overall_accuracy = self.overall_accuracy /  len(self.results)
-
+            accuracy.append((true_positives + true_negatives) / len(self.results)) 
+            precision.append(true_positives / len(indices))
+            recall.append(true_positives / self.class_counts[classification])
+            f1.append(2 * ((recall[-1] * precision[-1]) / (recall[-1] + precision[-1])))
+            self.metrics_per_class["accuracy"][classification].append(accuracy[-1])
+            self.metrics_per_class["precision"][classification].append(precision[-1])
+            self.metrics_per_class["recall"][classification].append(recall[-1])
+            self.metrics_per_class["f1"][classification].append(f1[-1])
         
+        for metric_key, classes  in self.metrics_per_class.items():
+            for classification, metric in classes.items():
+                self.metrics_per_class[metric][classification] = sum(metric) / len(metric)
 
+        self.metrics["accuracy"] = sum(accuracy) / len(self.results)
+        self.metrics["precision"] = sum(precision) / len(self.results)
+        self.metrics["recall"] = sum(recall) / len(self.results)
+        self.metrics["f1"] = sum(f1) / len(self.results)
 
 
 if __name__ == '__main__':
-    profiler = cProfile.Profile()
     data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
-    n_vertices_target = 10000
-    n_samples_query = 1e+6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-    test = Evaluater(data_path,n_vertices_target,n_samples_query)
+    df, *_ = process_dataset_for_knn(data_path,divide_distributions=False)
+    classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+    test = Evaluator(df)
     test.evaluate()
     test.analysis()
+    print(test.metrics)
     #profiler.dump_stats('query_profile_stats')
-    print(test.accuracy_per_class)
-    print(test.overall_accuracy)
-    
     print()
     
 

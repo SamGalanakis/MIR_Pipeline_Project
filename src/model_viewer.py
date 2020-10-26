@@ -13,7 +13,7 @@ from cmath import pi
 from utils import bounding_box
 import shader_loader
 class ModelViewer:
-    def __init__(self):
+   # def __init__(self):
 
         
     
