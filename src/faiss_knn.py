@@ -1,6 +1,8 @@
 import numpy as np
 import faiss   
 from pathlib import Path
+import random
+import numpy as np
 
 
 """
@@ -44,6 +46,14 @@ class FaissKNeighbors:
 
 
         return distances, indices
+
+    def query_baseline(self,query,n_results):
+        indices = random.choices(np.arange(0, len(self.dataset),1), n_results)
+        distances = np.zeros(len(indices))
+
+        return distances, indices
+
+
 
     def query_range(self, query1, query2, n_results):
         #query = query.resha2pe((1,-1)).astype(np.float32)
