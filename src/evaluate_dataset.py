@@ -38,10 +38,9 @@ class Evaluator:
 
     def analysis(self):
         
-        self.accuracy_per_class = defaultdict(list)
         self.overall_accuracy_per_class = 0
         self.metrics = {"accuracy" : 0,"precision": 0, "recall" :0 ,"f1" :0}
-        
+        self.metrics_per_class =  {"accuracy" : defaultdict(list),"precision": defaultdict(list), "recall" :defaultdict(list) ,"f1" :defaultdict(list)}
         accuracy = []
         precision = []
         recall = []
@@ -57,11 +56,14 @@ class Evaluator:
             precision.append(true_positives / len(indices))
             recall.append(true_positives / self.class_counts[classification])
             f1.append(2 * ((recall[-1] * precision[-1]) / (recall[-1] + precision[-1])))
-            #self.accuracy_per_class[classification].append(true_positives /)
-            
-
-        #for classification, all_accuracy in self.accuracy_per_class.items():
-        #    self.accuracy_per_class[classification] = sum(all_accuracy) / len(all_accuracy)   
+            self.metrics_per_class["accuracy"][classification].append(accuracy[-1])
+            self.metrics_per_class["precision"][classification].append(precision[-1])
+            self.metrics_per_class["recall"][classification].append(recall[-1])
+            self.metrics_per_class["f1"][classification].append(f1[-1])
+        
+        for metric_key, classes  in self.metrics_per_class.items():
+            for classification, metric in classes.items():
+                self.metrics_per_class[metric][classification] = sum(metric) / len(metric)
 
         self.metrics["accuracy"] = sum(accuracy) / len(self.results)
         self.metrics["precision"] = sum(precision) / len(self.results)
