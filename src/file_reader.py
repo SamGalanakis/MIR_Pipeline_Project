@@ -56,17 +56,20 @@ def convert_ply_to_off(path):
     return off_file
 
 def read_model(path,verbose=False):
-    if type(path)==str:
-        path = Path(path)
-    lines=False
-    if path.suffix == ".ply":
-        lines = convert_ply_to_off(path)
-    elif path.suffix != ".off":
-        raise Exception("Invalid file type, can only process .off and .ply")
+    if not type(path)==list:
+        if type(path)==str:
+            path = Path(path)
+        lines=False
+        if path.suffix == ".ply":
+            lines = convert_ply_to_off(path)
+        elif path.suffix != ".off":
+            raise Exception("Invalid file type, can only process .off and .ply")
 
-    if not lines:
-        with path.open() as f:
-            lines = f.readlines()
+        if not lines:
+            with path.open() as f:
+                lines = f.readlines()
+    else:
+        lines = path
         lines = [x for x in lines if x[0] != "#"]
     if "OFF" in lines[0]:
         lines = lines[1:]

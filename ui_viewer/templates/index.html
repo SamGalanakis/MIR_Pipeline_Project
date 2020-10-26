@@ -1,3 +1,5 @@
+{% extends base %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,7 +14,9 @@
   <body>
     {{ plot_div|indent(8) }}
     {{ plot_script|indent(8) }}
-   
+    {{ embed(roots.file_input) }}
+   <div id = "model_window"> 
     {% include 'webgl_loader_ply.html' %}
+  </div>
   </body>
 </html>
