@@ -25,7 +25,7 @@ class Evaluator:
         
         
         self.class_counts = self.df['classification'].value_counts()
-        print()
+       
 
     def evaluate(self):
         for idx, (classification,model)  in tqdm(enumerate(self.database_class_path.values)):
@@ -40,7 +40,8 @@ class Evaluator:
         
         self.overall_accuracy_per_class = 0
         self.metrics = {"accuracy" : 0,"precision": 0, "recall" :0 ,"f1" :0}
-        self.metrics_per_class =  {"accuracy" : defaultdict(list),"precision": defaultdict(list), "recall" :defaultdict(list) ,"f1" :defaultdict(list)}
+        
+        self.metrics_per_class = {key:defaultdict(list) for key in self.metrics.keys()}
         accuracy = []
         precision = []
         recall = []
