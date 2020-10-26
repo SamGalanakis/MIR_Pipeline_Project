@@ -24,10 +24,6 @@ class Evaluator:
         self.results = []
         
         self.class_counts = self.df['classification'].value_counts()
-<<<<<<< HEAD
-=======
-       
->>>>>>> 7178b00875ee5b1cc56145706e85fa05b3b25759
 
     def evaluate(self, baseline = False):
         for idx, (classification,model)  in tqdm(enumerate(self.database_class_path.values)):
@@ -38,7 +34,7 @@ class Evaluator:
                 _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
             else:
                 _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
-            git
+            
             self.results.append((classification, indices.flatten()))
 
         self.analysis()
@@ -47,8 +43,7 @@ class Evaluator:
     def analysis(self):   
         self.overall_accuracy_per_class = 0
         self.metrics = {"accuracy" : 0,"precision": 0, "recall" :0 ,"f1" :0}
-        
-        self.metrics_per_class = {key:defaultdict(list) for key in self.metrics.keys()}
+        self.metrics_per_class =  {"accuracy" : defaultdict(list),"precision": defaultdict(list), "recall" :defaultdict(list) ,"f1" :defaultdict(list)}
         accuracy = []
         precision = []
         recall = []
