@@ -88,14 +88,12 @@ class Evaluator:
         self.metrics["f1"] = sum(f1) / len(self.results)
 
 
-def make_graphs(test):
+def make_graphs(test,file_name):
     
     sns.set_theme(style="whitegrid")
     df = pd.DataFrame.from_dict(test.metrics,orient="index")
     df.columns = ["metric"]
     ax = sns.barplot(x=df.index, y="metric", data=df)
-    
-    #ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
     plt.xticks(
         rotation=45, 
         horizontalalignment='right',
@@ -103,15 +101,14 @@ def make_graphs(test):
         fontsize='x-large'  
     )
     ax.tick_params(axis='x', labelsize=11)
-    plt.show()
-    print()
 
+    file_name = file_name.replace(".","")
+    plt.tight_layout()
+    plt.savefig(fr"graphs/evaluations/{file_name}_all_metrics",dpi=150)
+    plt.clf()
 
-    for metric, classes in test.metrics.items():
+    for metric, classes in test.metrics_per_class.items():
         
-        sns.set_theme(style="whitegrid")
-        tips = sns.load_dataset("tips")
-
         df = pd.DataFrame.from_dict(classes,orient="index")
         df.columns = [metric]
         ax = sns.barplot(x=df.index, y=metric, data=df)
@@ -123,23 +120,22 @@ def make_graphs(test):
             fontsize='x-small'  
         )
         ax.tick_params(axis='x', labelsize=7)
+        
+        plt.tight_layout()
+        plt.savefig(fr"graphs/evaluations/{file_name}_{metric}",dpi=150)
+        plt.clf()
 
-        plt.show()
-        print()
+    print(f"{file_name} is done")
+
 
 if __name__ == '__main__':
     #data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
     data_path = Path("processed_data")
 
-    df, *_ = process_dataset_for_knn(data_path,divide_distributions=False)
-    classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-    test = Evaluator(df)
-    test.evaluate()
-
     for subdir, dirs, files in os.walk(data_path):
-        for file in files:
-            df, *_ = process_dataset_for_knn(os.path.join(subdir, file),divide_distributions=False)
+        for file_name in files:
+            df, *_ = process_dataset_for_knn(os.path.join(subdir, file_name),divide_distributions=False)
             classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
             test = Evaluator(df)
             test.evaluate()
-            make_graphs(test)
+            make_graphs(test,file_name)
