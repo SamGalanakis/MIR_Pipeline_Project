@@ -37,7 +37,7 @@
 
 		var ambientLight, light;
 
-
+		var draw_color;
 		
 
 		
@@ -78,7 +78,7 @@
 		}
 
 
-		function add_model_to_scene(path, position) {
+		function add_model_to_scene(path, position,draw_color) {
 				var loader = new PLYLoader();
 				console.log('putting ${path} on scene!');
 				loader.load(path, function (geometry) {
@@ -91,7 +91,7 @@
 
 				
 					
-					var material = new THREE.MeshStandardMaterial({ color: 0x0000FF, flatShading: true });
+					var material = new THREE.MeshStandardMaterial({ color: draw_color, flatShading: true });
 					var mesh = new THREE.Mesh(easy_geom, material);
 
 					
@@ -102,7 +102,7 @@
 					mesh.receiveShadow = true;
 
 
-					let material_points = new THREE.PointsMaterial({ color: 0x0055ff, size: 0.1 });
+					let material_points = new THREE.PointsMaterial({ color: draw_color, size: 0.1 });
 					var mesh_points = new THREE.Points(easy_geom, material_points);
 					var wireframe = new THREE.WireframeGeometry(easy_geom);
 
@@ -215,8 +215,8 @@
 
 			// stats
 
-			stats = new Stats();
-			container.appendChild(stats.dom);
+			// stats = new Stats();
+			// container.appendChild(stats.dom);
 
 			// resize
 
@@ -265,7 +265,7 @@
 			requestAnimationFrame(animate);
 			
 			render();
-			stats.update();
+		//	stats.update();
 
 		}
 
@@ -285,11 +285,13 @@
 
 		function initGUI() {
 			
-			gui = new GUI({ width: 200 });
+			gui = new GUI({ width: 200 ,autoPlace: true});
+			gui.domElement.id = 'gui';
 			
 			var layersControl = gui.addFolder('render modes');
 			
 			layersControl.open();
+			
 
 			
 		
@@ -325,16 +327,17 @@
 			remove_later = [];
 			// Add main model ( from inputted query) to scene
 			
-			
-			add_model_to_scene("ui_viewer/static/models/input_model.ply",[0.0,0.0,0.0]);
+			draw_color = new THREE.Color('red');
+			add_model_to_scene("ui_viewer/static/models/input_model.ply",[0.0,0.0,0.0],draw_color);
 
 			
 			//Add rest of models 
-			// for (let index = 0; index < model_paths.length; index++) {
-			// 	const model_path = model_paths[index];
-			// 	add_model_to_scene(model_path,[(index+1)*2.0,0.0,0.0],query_return_model_color);
+			draw_color = new THREE.Color('blue');
+			for (let index = 0; index < model_paths.length; index++) {
+				const model_path = model_paths[index];
+				add_model_to_scene(model_path,[(index+1)*2.0,0.0,0.0],draw_color);
 				
-			// }
+			}
 		
 
 

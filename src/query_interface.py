@@ -26,7 +26,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path,n_samples_query,n_results,vis=False,write_path=False):
+    def query(self,model_path,n_samples_query,n_results,vis=False):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -48,18 +48,17 @@ class QueryInterface:
         resulting_paths = df_slice['file_name'].tolist()
         resulting_classifications = df_slice['classification'].tolist()
         
-        if write_path:
-            for index, query_path in enumerate(resulting_paths):
-                vertices,faces_dict, _ = read_model(query_path)
-                write_model_as_ply(vertices,faces_dict['triangles'],write_path+index+'.ply')
-
-
+        #Add missing data to query df
+        feature_df['path'] = model_path
+        feature_df['classification'] = 'query_input'
+        # Put it at top of slice
+        df_slice.loc[0] = feature_df
 
         #Send results for visualization
         if vis:
             self.visualize_results(shape,resulting_paths,distances)
         else:
-            return distances, indices, resulting_paths, resulting_classifications
+            return distances, indices, resulting_paths, resulting_classifications, df_slice
 
         
 

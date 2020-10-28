@@ -7,13 +7,20 @@
 }
 
 #side_menu {
-    background-color: black;
-    color: red;
+    
+    height:150px;
+    width:100vw;
 }
 
 #container {
     max-width: 500px;
     max-height: 500px;
+}
+
+#data_table {
+    position: absolute;
+    top:0;
+    left:300px;
 }
 
 #container canvas {
@@ -22,3 +29,9 @@
 }
  
 
+#gui {
+    position: absolute!important;
+     top: 200px!important; 
+     left: 700px !important;
+     z-index: 10000!important;
+}
