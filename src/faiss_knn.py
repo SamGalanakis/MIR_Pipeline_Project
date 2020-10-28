@@ -48,7 +48,7 @@ class FaissKNeighbors:
         return distances, indices
 
     def query_baseline(self,query,n_results):
-        indices = random.choices(np.arange(0, len(self.dataset),1), n_results)
+        indices = random.choices(np.arange(0, len(self.dataset),1), k = n_results)
         distances = np.zeros(len(indices))
 
         return distances, indices
