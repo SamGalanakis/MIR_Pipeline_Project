@@ -1,0 +1,24 @@
+
+
+#model_window {
+    width:100px;
+    max-width: 500px;
+    max-height: 500px;
+}
+
+#side_menu {
+    background-color: black;
+    color: red;
+}
+
+#container {
+    max-width: 500px;
+    max-height: 500px;
+}
+
+#container canvas {
+    width:500px;
+    height:100px;
+}
+ 
+

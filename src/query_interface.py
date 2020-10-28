@@ -2,7 +2,7 @@ from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from pathlib import Path
 from database_creator import data_dict_parser
 from faiss_knn import FaissKNeighbors
-from file_reader import read_model
+from file_reader import read_model, write_model_as_ply
 from shape import Shape
 from preprocessing import process
 from feature_extractor import extract_features
@@ -26,7 +26,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path,n_samples_query,n_results,vis=False ):
+    def query(self,model_path,n_samples_query,n_results,vis=False,write_path=False):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -48,11 +48,20 @@ class QueryInterface:
         resulting_paths = df_slice['file_name'].tolist()
         resulting_classifications = df_slice['classification'].tolist()
         
+        if write_path:
+            for index, query_path in enumerate(resulting_paths):
+                vertices,faces_dict, _ = read_model(query_path)
+                write_model_as_ply(vertices,faces_dict['triangles'],write_path+index+'.ply')
+
+
+
         #Send results for visualization
         if vis:
             self.visualize_results(shape,resulting_paths,distances)
         else:
-            return distances, indices
+            return distances, indices, resulting_paths, resulting_classifications
+
+        
 
     def visualize_results(self,query_model,sorted_resulting_paths,distances):
        

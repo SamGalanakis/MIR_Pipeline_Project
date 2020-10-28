@@ -31,9 +31,9 @@ class Evaluator:
             n_results = self.class_counts[classification]
     
             if baseline():
-                _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
+                _, indices, *_ = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
             else:
-                _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
+                _, indices, *_ = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
             
             self.results.append((classification, indices.flatten()))
 

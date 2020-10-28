@@ -1,0 +1,28 @@
+{% extends base %}
+
+<!-- <!DOCTYPE html> -->
+<!-- <html lang="en"> -->
+  {% block preamble %}
+  
+ 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+ 
+  
+
+
+    <style type="text/css">{% include 'css/my_css.css' %}</style>
+
+  {% endblock %}
+  {% block contents %}
+
+    
+    <div id="side_menu">
+      {{ embed(roots.run_button) }}
+      {{ embed(roots.file_input) }}
+    </div>
+ 
+   <div id = "model_window"> 
+    {% include 'webgl_loader_ply.html' %}
+  </div>
+  {{ super() }}
+  {% endblock %}
