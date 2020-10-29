@@ -91,7 +91,7 @@ def empty_directory(dir_path):
 def path_callback(attr, old, new):
     print(f"New path {new}")
     global rand_base
-    rand_base =random.randint(0,100000)
+    rand_base =random.randint(0,10000000)
     js_update_models_callback.code = CODE % (initial_n_neighbours,rand_base)
 
     empty_directory(pathlib.Path("ui_viewer/static/models/*"))
