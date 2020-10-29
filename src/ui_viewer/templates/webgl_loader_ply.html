@@ -80,7 +80,7 @@
 
 		function add_model_to_scene(path, position,draw_color) {
 				var loader = new PLYLoader();
-				console.log('putting ${path} on scene!');
+				console.log(`putting ${path} on scene!`);
 				loader.load(path, function (geometry) {
 
 					geometry.computeVertexNormals();
@@ -151,7 +151,7 @@
 			container.setAttribute("id", "container");
 			document.body.appendChild(container);
 
-			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 15);
+			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.5, 50);
 
 			camera.position.set(3, 0.15, 3);
 
@@ -164,7 +164,7 @@
 			scene.background = new THREE.Color(0x72645b);
 
 
-			scene.fog = new THREE.Fog(0x72645b, 2, 15);
+			//scene.fog = new THREE.Fog(0x72645b, 2, 15);
 
 
 
@@ -173,7 +173,7 @@
 			// Ground
 
 			var plane = new THREE.Mesh(
-				new THREE.PlaneBufferGeometry(40, 40),
+				new THREE.PlaneBufferGeometry(100, 100),
 				new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
 			);
 
@@ -182,7 +182,7 @@
 			plane.position.y = - 1.0;
 			scene.add(plane);
 
-			plane.receiveShadow = true;
+			//plane.receiveShadow = true;
 
 			
 			
@@ -211,6 +211,7 @@
 
 			// CONTROLS
 			cameraControls = new OrbitControls(camera, renderer.domElement);
+			cameraControls.enableKeys = true;
 			cameraControls.addEventListener('change', render);
 
 			// stats
@@ -301,14 +302,18 @@
 			gui.add(visible_settings, "points").onChange(vis_updater);
 		}
 
+		function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
 
-
-		window.update_everything = function (n_models) {
+		window.update_everything = function (n_models,rand_base) {
+			console.log(rand_base);
 			console.log('running update all!');
 
 			
-
-			var base_path = "ui_viewer/static/models/closest_model_";
+			rand_base = String(rand_base);
+			var base_path = `ui_viewer/static/models/${rand_base}closest_model_`;
+			console.log(base_path);
 			var model_paths = [];
 
 
@@ -327,8 +332,11 @@
 			remove_later = [];
 			// Add main model ( from inputted query) to scene
 			
+
+			var rand_query = getRndInteger(0,1000);
+			console.log(rand_query);
 			draw_color = new THREE.Color('red');
-			add_model_to_scene("ui_viewer/static/models/input_model.ply",[0.0,0.0,0.0],draw_color);
+			add_model_to_scene(`ui_viewer/static/models/${rand_base}input_model.ply`,[0.0,0.0,0.0],draw_color);
 
 			
 			//Add rest of models 

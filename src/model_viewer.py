@@ -38,7 +38,7 @@ class ModelViewer:
             indices = element_dict["triangles"] 
             print(f"Reading {path}")
         else:
-            assert(type(vertices) ==np.ndarray and type(indices) ==np.ndarray, "Define path or both vertices and indices")
+            assert (type(vertices) ==np.ndarray and type(indices) ==np.ndarray), "Define path or both vertices and indices"
         
         pre_box = indices.size
         

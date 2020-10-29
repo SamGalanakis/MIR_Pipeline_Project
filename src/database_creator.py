@@ -5,7 +5,7 @@ from pathlib import Path
 from utils import cla_parser, merge_dicts, get_all_file_paths
 from tqdm import tqdm
 from shape import Shape
-from file_reader import FileReader
+from file_reader import read_model
 import cProfile
 from preprocessing import process
 from feature_extractor import extract_features
@@ -49,7 +49,7 @@ class Database:
         self.classification_dict = merge_dicts(classification_dict_train,classification_dict_test)
         unique_classes = len(set(self.classification_dict.values()))
         print(f'{unique_classes} unique classes')
-        self.reader = FileReader()
+        
         self.file_paths = []
 
     def create_database(self, database_name,n_samples,n_bins=10, apply_processing = True,n_vertices_target=False):
@@ -71,7 +71,7 @@ class Database:
         
             
         for file in tqdm(self.file_paths):
-            vertices, element_dict, info = self.reader.read(Path(file))
+            vertices, element_dict, info =read_model(Path(file))
             shape = Shape(vertices,element_dict,info)
 
     

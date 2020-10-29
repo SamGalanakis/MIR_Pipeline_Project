@@ -2,7 +2,7 @@ import pyvista
 from shape import Shape
 import pyacvd
 import numpy as np
-from file_reader import FileReader
+from file_reader import read_model
 from pathlib import Path
 
 from model_viewer import ModelViewer
@@ -60,9 +60,9 @@ if __name__=='__main__':
     problem_path = "data/benchmark/db/2/m201/m201.off"
     pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
     path = path
-    reader = FileReader()
+ 
   
-    vertices, element_dict, info = reader.read(path)
+    vertices, element_dict, info = read_model(path)
     shape = Shape(vertices,element_dict,info)
 
     #shape.view()

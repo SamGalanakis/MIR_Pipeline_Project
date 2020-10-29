@@ -1,6 +1,6 @@
 
 from shape import Shape
-from file_reader import FileReader
+from file_reader import read_model
 from utils import  align, angle_three_random_vertices, calculate_diameter, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
 from pathlib import Path
 import numpy as np
@@ -13,8 +13,8 @@ def extract_features(shape,n_bins,n_samples):
         pass
     elif isinstance(shape,Path) or isinstance(shape,str):
         shape = Path(shape)
-        reader = FileReader()
-        shape = Shape(*reader.read(shape))
+       
+        shape = Shape(*read_model(shape))
     else:
         raise Exception("Input must be Shape or path")
 
