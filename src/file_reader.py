@@ -1,7 +1,6 @@
 import numpy as np
 from pathlib import Path
 
-from numpy.core.defchararray import endswith
 
 
 

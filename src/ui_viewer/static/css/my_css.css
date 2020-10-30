@@ -1,0 +1,8 @@
+#model_window {
+    max-width: 80vw;
+    max-height: 80vh;
+}
+
+#side_menu {
+    background-color: black;
+}

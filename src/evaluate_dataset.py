@@ -41,9 +41,15 @@ class Evaluator:
                 self.results.append((classification, indices))
 
             else:
+<<<<<<< HEAD
                 _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
                 self.results.append((classification, indices.flatten()))
 
+=======
+                _, indices, *_ = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
+            
+            self.results.append((classification, indices.flatten()))
+>>>>>>> 78993cd7a51ec27a5f3095e1780ba13aabee4500
 
         self.analysis()
 

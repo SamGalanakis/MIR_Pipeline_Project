@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - PLY</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<!-- <link type="text/css" rel="stylesheet" href="css/three_styles.css"> -->
+</head>
+<style>
+	{
+		% include 'css/three_styles.css'%
+	}
+</style>
+
+<body>
+
+
+	<script type="module">
+
+
+
+
+		import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.module.min.js'
+		import { GUI } from 'https://unpkg.com/three@0.121.0/examples/jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from 'https://unpkg.com/three@0.121.0/examples/jsm/controls/OrbitControls.js';
+		import Stats from 'https://unpkg.com/three@0.121.0/examples/jsm/libs/stats.module.js';
+
+		import { PLYLoader } from 'https://unpkg.com/three@0.121.0/examples/jsm/loaders/PLYLoader.js';
+
+		var container, stats;
+
+		var camera, cameraTarget, scene, renderer;
+		var gui;
+		var cameraControls;
+		var effectController;
+
+		var ambientLight, light;
+
+		var draw_color;
+		
+
+		
+
+		var remove_later = [];
+
+		var visible_settings =  {
+				base: true,
+				wireframe: false,
+				points: false
+			};
+
+
+		init();
+		animate();
+	
+
+		function vis_updater() {
+			
+			for (var i = 0; i < scene.children.length; i++) {
+				var child = scene.children[i];
+
+				if (child.name == 'base') {
+					child.visible = visible_settings['base'];
+
+				}
+				else if (child.name == 'points') {
+					child.visible = visible_settings['points'];
+
+				}
+				else if (child.name == 'wireframe') {
+					child.visible = visible_settings['wireframe'];
+				
+
+
+				}
+			}
+		}
+
+
+		function add_model_to_scene(path, position,draw_color) {
+				var loader = new PLYLoader();
+				console.log(`putting ${path} on scene!`);
+				loader.load(path, function (geometry) {
+
+					geometry.computeVertexNormals();
+					var easy_geom = new THREE.Geometry();
+					easy_geom.fromBufferGeometry(geometry);
+					easy_geom.normalize();
+					
+
+				
+					
+					var material = new THREE.MeshStandardMaterial({ color: draw_color, flatShading: true });
+					var mesh = new THREE.Mesh(easy_geom, material);
+
+					
+
+					mesh.position.set(position[0],position[1],position[2]);
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+
+					let material_points = new THREE.PointsMaterial({ color: draw_color, size: 0.1 });
+					var mesh_points = new THREE.Points(easy_geom, material_points);
+					var wireframe = new THREE.WireframeGeometry(easy_geom);
+
+					var line = new THREE.LineSegments(wireframe);
+					line.material.depthTest = false;
+					line.material.opacity = 0.25;
+					line.material.transparent = true;
+					line.name = 'wireframe';
+					line.position.set(position[0],position[1],position[2]);
+					scene.add(line);
+					
+					mesh.name = 'base';
+					scene.add(mesh);
+					mesh_points.name = 'points';
+					mesh_points.position.set(position[0],position[1],position[2]);
+					scene.add(mesh_points);
+					line.visible = false;
+					mesh_points.visible = false;
+
+					let mesh_names = ['base', 'wireframe', 'pointcloud'];
+
+					let meshes = [mesh, line, mesh_points];
+					for (let index = 0; index < meshes.length; index++) {
+
+						remove_later.push(meshes[index]);
+					console.log('Added model!');
+					}
+
+
+
+				});
+			}
+
+
+
+
+
+
+
+
+
+
+		function init() {
+
+			container = document.createElement('div');
+			container.setAttribute("id", "container");
+			document.body.appendChild(container);
+
+			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.5, 50);
+
+			camera.position.set(3, 0.15, 3);
+
+
+
+
+			cameraTarget = new THREE.Vector3(0, - 0.1, 0);
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color(0x72645b);
+
+
+			//scene.fog = new THREE.Fog(0x72645b, 2, 15);
+
+
+
+
+
+			// Ground
+
+			var plane = new THREE.Mesh(
+				new THREE.PlaneBufferGeometry(100, 100),
+				new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
+			);
+
+
+			plane.rotation.x = - Math.PI / 2;
+			plane.position.y = - 1.0;
+			scene.add(plane);
+
+			//plane.receiveShadow = true;
+
+			
+			
+
+			initGUI();
+
+			// Lights
+			var light_hemisphere = new THREE.HemisphereLight(0x443333, 0x111122);
+			scene.add(light_hemisphere);
+
+
+			addShadowedLight(1, 1, 1, 0xffffff, 1.35);
+			addShadowedLight(0.5, 1, - 1, 0xffaa00, 1);
+
+			// renderer
+
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth/2, window.innerHeight);
+			
+			renderer.outputEncoding = THREE.sRGBEncoding;
+
+			renderer.shadowMap.enabled = true;
+
+			container.appendChild(renderer.domElement);
+
+			// CONTROLS
+			cameraControls = new OrbitControls(camera, renderer.domElement);
+			cameraControls.enableKeys = true;
+			cameraControls.addEventListener('change', render);
+
+			// stats
+
+			// stats = new Stats();
+			// container.appendChild(stats.dom);
+
+			// resize
+
+			window.addEventListener('resize', onWindowResize, false);
+
+
+
+		}
+
+		function addShadowedLight(x, y, z, color, intensity) {
+
+			var directionalLight = new THREE.DirectionalLight(color, intensity);
+			directionalLight.position.set(x, y, z);
+			scene.add(directionalLight);
+
+			directionalLight.castShadow = true;
+
+			var d = 1;
+			directionalLight.shadow.camera.left = - d;
+			directionalLight.shadow.camera.right = d;
+			directionalLight.shadow.camera.top = d;
+			directionalLight.shadow.camera.bottom = - d;
+
+			directionalLight.shadow.camera.near = 1;
+			directionalLight.shadow.camera.far = 4;
+
+			directionalLight.shadow.mapSize.width = 1024;
+			directionalLight.shadow.mapSize.height = 1024;
+
+			directionalLight.shadow.bias = - 0.001;
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			
+			renderer.setSize(window.innerWidth/2, window.innerHeight);
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+			
+			render();
+		//	stats.update();
+
+		}
+
+		function render() {
+
+			var timer = Date.now() * 0.0005;
+
+			//camera.position.x = Math.sin( timer ) * 2.5;
+			//camera.position.z = Math.cos( timer ) * 2.5;
+
+			//camera.lookAt(cameraTarget);
+
+			renderer.render(scene, camera);
+
+		}
+		
+
+		function initGUI() {
+			
+			gui = new GUI({ width: 200 ,autoPlace: true});
+			gui.domElement.id = 'gui';
+			
+			var layersControl = gui.addFolder('render modes');
+			
+			layersControl.open();
+			
+
+			
+		
+
+			gui.add(visible_settings, "base").onChange(vis_updater);
+			gui.add(visible_settings, "wireframe").onChange(vis_updater);
+			gui.add(visible_settings, "points").onChange(vis_updater);
+		}
+
+		function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
+
+		window.update_everything = function (n_models,rand_base) {
+			console.log(rand_base);
+			console.log('running update all!');
+
+			
+			rand_base = String(rand_base);
+			var base_path = `ui_viewer/static/models/${rand_base}closest_model_`;
+			console.log(base_path);
+			var model_paths = [];
+
+
+			for (let index = 0; index < n_models; index++) {
+				model_paths.push(base_path+index+".ply");
+				
+			}
+		
+			
+
+			for (var i = 0; i < remove_later.length; i++) {
+				scene.remove(remove_later[i]);
+
+			}
+			//Empty remove list
+			remove_later = [];
+			// Add main model ( from inputted query) to scene
+			
+
+			var rand_query = getRndInteger(0,1000);
+			console.log(rand_query);
+			draw_color = new THREE.Color('red');
+			add_model_to_scene(`ui_viewer/static/models/${rand_base}input_model.ply`,[0.0,0.0,0.0],draw_color);
+
+			
+			//Add rest of models 
+			draw_color = new THREE.Color('blue');
+			for (let index = 0; index < model_paths.length; index++) {
+				const model_path = model_paths[index];
+				add_model_to_scene(model_path,[(index+1)*2.0,0.0,0.0],draw_color);
+				
+			}
+		
+
+
+
+		};
+
+
+
+
+
+
+
+	</script>
+</body>
+
+</html>

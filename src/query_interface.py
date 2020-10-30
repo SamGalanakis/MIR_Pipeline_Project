@@ -2,12 +2,13 @@ from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from pathlib import Path
 from database_creator import data_dict_parser
 from faiss_knn import FaissKNeighbors
-from file_reader import read_model
+from file_reader import read_model, write_model_as_ply
 from shape import Shape
 from preprocessing import process
 from feature_extractor import extract_features
 import numpy as np
 import cProfile
+import pandas as pd
 
 class QueryInterface:
     def __init__(self,data_path,divide_distributions,n_bins,n_vertices_target):
@@ -26,7 +27,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path,n_samples_query,n_results,vis=False ):
+    def query(self,model_path,n_samples_query,n_results,vis=False):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -44,15 +45,24 @@ class QueryInterface:
       
 
         distances, indices = self.faiss_knn.query(query_vector,n_results)
+        distances = distances.flatten() #Flatten batch dimension
         df_slice = self.df[self.df.index.isin(indices.flatten())]
         resulting_paths = df_slice['file_name'].tolist()
         resulting_classifications = df_slice['classification'].tolist()
         
+        #Add missing data to query df
+        feature_df['file_name'] = str(model_path)
+        feature_df['classification'] = 'query_input'
+        # Put it at top of slice
+        df_slice = pd.concat([df_slice,feature_df])
+
         #Send results for visualization
         if vis:
             self.visualize_results(shape,resulting_paths,distances)
         else:
-            return distances, indices
+            return distances, indices, resulting_paths, resulting_classifications, df_slice
+
+        
 
     def visualize_results(self,query_model,sorted_resulting_paths,distances):
        
@@ -99,7 +109,7 @@ if __name__ == '__main__':
     query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
     
     path=man_path
-    profiler.run('query_interface.query(path,n_samples_query=1e+6)')
+    profiler.run('query_interface.query(path,n_samples_query=1e+6,n_results=2)')
     profiler.dump_stats('query_profile_stats')
   
 
