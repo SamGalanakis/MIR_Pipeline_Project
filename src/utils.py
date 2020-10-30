@@ -226,18 +226,22 @@ def cube_volume_tetrahedron(vertices,n_samples,n_bins=10):
     counts = bin_count(areas,n_bins)
     return counts/sum(counts)
 
-def volume(vertices):
-    vertices = vertices.reshape(-1,3)
+def volume(vertices,triangles):
+    vertices = vertices.reshape((-1,3))
+    triangle_vertices = []
+    for idx, (p1 ,p2, p3) in enumerate(triangles):
+        triangle_vertices.append(np.array([vertices[p1],vertices[p2],vertices[p3]]))
+    
+    vertices_used = np.array(triangle_vertices).reshape(-1,3)
+    
     # https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
-    p1 =  vertices[0::3]
-    p2 =  vertices[1::3]
-    p3 =  vertices[2::3]
+    p1 =  vertices_used[0::3]
+    p2 =  vertices_used[1::3]
+    p3 =  vertices_used[2::3]
+    
     volume = sum(np.diagonal((np.dot(p1, np.transpose(np.cross(p2, p3))) / 6)))
     return volume
 
-
-
-    
 
     
 if __name__ == "__main__":
@@ -246,7 +250,7 @@ if __name__ == "__main__":
     
     path = path = Path(r"data/sphere.ply")
     vertices, element_dict, info = read_model(path)
-    print(volume(vertices))
+    print(volume(vertices,element_dict["triangles"]))
     #angle_three_random_vertices(vertices,n_samples=1e+6)
     #barycenter_vertice(vertices,np.zeros(3),n_samples=1000)
     #two_vertices(vertices,n_samples=1000)
