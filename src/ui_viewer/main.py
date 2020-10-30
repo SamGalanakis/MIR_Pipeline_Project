@@ -2,9 +2,10 @@ from os.path import abspath, dirname, isdir, join, normpath, realpath
 import os
 import sys
 import pathlib
+from bokeh.models.widgets.widget import Widget
 import numpy as np
 import glob
-
+from bokeh.models.annotations import Title
 from numpy.lib.utils import source
 src_dir = dirname(dirname(__file__)) # for import stuff from main project
 sys.path.append(src_dir)
@@ -13,8 +14,7 @@ import shutil
 import random
 from bokeh.layouts import column , row
 from bokeh.io import output_file,show
-from bokeh.plotting import figure
-from bokeh.plotting import curdoc
+from bokeh.plotting import figure, output_file, show,curdoc
 from bokeh.embed import file_html
 from tornado.web import StaticFileHandler
 import os.path as op
@@ -30,6 +30,7 @@ import pandas as pd
 from bokeh.models import ColumnDataSource, DataTable, DateFormatter, TableColumn
 from file_reader import read_model,write_model_as_ply
 from query_interface import QueryInterface
+from utils import  is_array_col
 
 
 data_path = op.join(dirname(src_dir),"processed_data/data_processed_10000_1000000.0.csv")
@@ -46,11 +47,61 @@ var rand_base = %d;
 
 #Data table
 
+def make_data_sources_distributions(distribution_columns,df):
+    data_list = {x:[] for x in distribution_columns}
+    for distribution_feature in distribution_columns:
+        relevant_cols = [x for x in df.columns if is_array_col(distribution_columns,x)==distribution_feature ]
+        for index , row in df.iterrows():
+            classification = row['classification']
+            name = op.basename(row['file_name'].replace('\\','/'))
+            y= row[relevant_cols].values
+            x = range(0,len(y))
+            data_list[distribution_feature].append({f"x_values":x,
+            f"y_values":y,'name':name,'classification':classification})
+    return data_list
+            
+def make_vacant_col(plot_col,df,distribution_columns):
+   
+    rows = [figure(plot_height=100) for x in range(df.shape[0])]
+    for index,row_fig in enumerate(rows):
+        row = df.iloc[index,:]
+        name = op.basename(row['file_name'].replace('\\','/'))
+        classification = row['classification']
+        source = ColumnDataSource({'x_values':[],'y_values':[]})
+        title = Title()
+        title.text = f'{name} ({classification})'
+        row_fig.title = title
+        row_fig.line(x='x_values', y='y_values', source=source,name='lineplot')
+    plot_col.children.extend(rows)
 
+    return  plot_col
+
+
+def updade_plot_col(plot_col,data_list,distribution_name):
+    new_data_list = data_list[distribution_name]
+    for index,child in enumerate(plot_col.children):
+        print(child.renderers)
+        line_plot = child.select(name='lineplot')
+        print(new_data_list[index]['x_values'])
+        data_for_plot = {'x_values':new_data_list[index]['x_values'],'y_values':new_data_list[index]['y_values']}
+        
+        line_plot.data_source.data = data_for_plot
+    return plot_col
+
+
+
+
+
+
+
+    
 
 columns_include=["file_name","distance","classification","n_triangles",
                 "volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
                 "diameter","eccentricity" ]
+
+distribution_columns = ['bounding_box', 'angle_three_vertices', 'barycenter_vertice',
+ 'two_vertices', 'square_area_triangle', 'cube_volume_tetrahedron']              
 df = pd.DataFrame(columns=columns_include)
 
 
@@ -86,7 +137,7 @@ def empty_directory(dir_path):
     files = glob.glob(str(dir_path))
     for f in files:
         os.remove(f)
-
+empty_directory(pathlib.Path("ui_viewer/static/models/*"))
 
 def path_callback(attr, old, new):
     print(f"New path {new}")
@@ -94,13 +145,12 @@ def path_callback(attr, old, new):
     rand_base =random.randint(0,10000000)
     js_update_models_callback.code = CODE % (initial_n_neighbours,rand_base)
 
-    empty_directory(pathlib.Path("ui_viewer/static/models/*"))
+    
     input_model_static_path= pathlib.Path(f"ui_viewer/static/models/{rand_base}input_model.ply")
     query_return_path = input_model_static_path.parents[0] / f'{rand_base}closest_model_'
     input_path = pathlib.Path(new)
 
-    # if os.path.exists(input_model_static_path):
-    #     os.remove(input_model_static_path)
+   
     if input_path.suffix == 'ply':
         shutil.copyfile(input_path, input_model_static_path)
     else:
@@ -118,11 +168,15 @@ def path_callback(attr, old, new):
     global data_table
     global data_table_source
     global columns_include
+    df_slice['file_name'] = df_slice['file_name'].apply(lambda x:op.basename(x.replace('\\','/')))
     update_dict = {col:df_slice[col].tolist() for col in columns_include}
-    update_dict['file_name'] = [op.basename(x.replace('\\','/')) for x in update_dict['file_name']]
+    # update_dict['file_name'] = [op.basename(x.replace('\\','/')) for x in update_dict['file_name']]
     
+    global plot_col
+    plot_col_template = make_vacant_col(plot_col,df_slice,distribution_columns)
+    data_list = make_data_sources_distributions(distribution_columns,df_slice)
     
-    
+    plot_col = updade_plot_col(plot_col_template,data_list,'barycenter_vertice')
     
  
     data_table.source.data = update_dict
@@ -174,6 +228,9 @@ full_row = row(options_col,data_table,name= 'full_row')
 # doc.add_root(data_table)
 # doc.add_root(slider_n_neighbours)
 doc.add_root(full_row)
+plot_col = column(name='plot_col')
+
+doc.add_root(plot_col)
 
 
 
