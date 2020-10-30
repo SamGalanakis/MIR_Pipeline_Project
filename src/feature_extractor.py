@@ -1,12 +1,7 @@
 
 from shape import Shape
-<<<<<<< HEAD
 from file_reader import FileReader
 from utils import  volume, align, angle_three_random_vertices, calculate_diameter, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
-=======
-from file_reader import read_model
-from utils import  align, angle_three_random_vertices, calculate_diameter, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
->>>>>>> 78993cd7a51ec27a5f3095e1780ba13aabee4500
 from pathlib import Path
 import numpy as np
 
