@@ -47,6 +47,7 @@ def vertice_sampler(vertices,n_samples,times,replace=True):
     n_samples=int(n_samples)
     
     return [vertices[np.random.choice(vertices.shape[0],n_samples,replace=replace)] for x in range(times)]
+
 def bounding_box(vertices,indices):
         as_points = vertices.reshape((-1, 3))
 
@@ -225,8 +226,14 @@ def cube_volume_tetrahedron(vertices,n_samples,n_bins=10):
     counts = bin_count(areas,n_bins)
     return counts/sum(counts)
 
-
-
+def volume(vertices):
+    vertices = vertices.reshape(-1,3)
+    
+    p1 =  vertices[0::3]
+    p2 =  vertices[1::3]
+    p3 =  vertices[2::3]
+    volume = sum(np.diagonal((np.dot(p1, np.transpose(np.cross(p2, p3))) / 6)))
+    return volume
 
 
 
@@ -237,12 +244,13 @@ if __name__ == "__main__":
   
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
     
-    path = path = Path(r"data/test.ply")
+    path = path = Path(r"data/sphere.ply")
     vertices, element_dict, info = read_model(path)
-    angle_three_random_vertices(vertices,n_samples=1e+6)
-    barycenter_vertice(vertices,np.zeros(3),n_samples=1000)
-    two_vertices(vertices,n_samples=1000)
-    square_area_triangle(vertices,n_samples=1000)
-    cube_volume_tetrahedron(vertices,n_samples=1000)
+    print(volume(vertices))
+    #angle_three_random_vertices(vertices,n_samples=1e+6)
+    #barycenter_vertice(vertices,np.zeros(3),n_samples=1000)
+    #two_vertices(vertices,n_samples=1000)
+    #square_area_triangle(vertices,n_samples=1000)
+    #cube_volume_tetrahedron(vertices,n_samples=1000)
 
 

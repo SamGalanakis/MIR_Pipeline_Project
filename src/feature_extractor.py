@@ -1,7 +1,7 @@
 
 from shape import Shape
 from file_reader import FileReader
-from utils import  align, angle_three_random_vertices, calculate_diameter, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
+from utils import  volume, align, angle_three_random_vertices, calculate_diameter, barycenter_vertice, two_vertices, cube_volume_tetrahedron, barycenter_vertice,square_area_triangle
 from pathlib import Path
 import numpy as np
 
@@ -30,6 +30,7 @@ def extract_features(shape,n_bins,n_samples):
     shape.bounding_rect()
     feature_dict["bounding_box"]=shape.bounding_rect_vertices
 
+    volume(shape.vertices)
     feature_dict["volume"]=np.maximum(shape.pyvista_mesh.volume,0.01)#clamp to avoid 0 volume for 2d models
 
     feature_dict["surface_area"]=shape.pyvista_mesh.area
@@ -49,20 +50,6 @@ def extract_features(shape,n_bins,n_samples):
     feature_dict["two_vertices"]=two_vertices(shape.vertices,n_bins=n_bins,n_samples=n_samples)
     feature_dict["square_area_triangle"]=square_area_triangle(shape.vertices,n_bins=n_bins,n_samples=n_samples)
     feature_dict["cube_volume_tetrahedron"]=cube_volume_tetrahedron(shape.vertices,n_bins=n_bins,n_samples=n_samples)
-
-
-    return feature_dict
-
-
-
-
-
-
-
-
-
-
-
 
 
     return feature_dict
