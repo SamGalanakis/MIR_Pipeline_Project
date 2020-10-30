@@ -228,7 +228,7 @@ def cube_volume_tetrahedron(vertices,n_samples,n_bins=10):
 
 def volume(vertices):
     vertices = vertices.reshape(-1,3)
-    
+    # https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
     p1 =  vertices[0::3]
     p2 =  vertices[1::3]
     p3 =  vertices[2::3]
