@@ -55,6 +55,7 @@ class QueryInterface:
         feature_df['classification'] = 'query_input'
         # Put it at top of slice
         df_slice = pd.concat([df_slice,feature_df])
+        print(df_slice['file_name'])
 
         #Send results for visualization
         if vis:

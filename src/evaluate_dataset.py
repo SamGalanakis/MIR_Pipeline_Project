@@ -114,7 +114,7 @@ class Evaluator:
                 classes_indices = list(map(classifications.__getitem__, indices[0]))
                 
                 for clas__ in set(classifications):
-                    a = sum(list(map(distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == clas__])))
+                    a = sum(list(map(git distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == clas__])))
                     print()
 
               #  a, b = [(sum(list(map(distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == class__]))),class__) for class__ in set(classifications)]
@@ -286,14 +286,14 @@ if __name__ == '__main__':
             test = Evaluator(df)
             test.heatmap(classifications)
             test.evaluate()
-           # test.analysis()
-           # make_graphs(test,file_name)
+            test.analysis()
+            make_graphs(test,file_name)
 
-            temp = test.analysis_big()
-            make_accu_graphs(temp)
+            #temp = test.analysis_big()
+            #make_accu_graphs(temp)
 
 
     
-    #baseline_test = Evaluator(df)
-    #baseline_test.evaluate(baseline = True)
-    #make_graphs(baseline_test,"baseline")
+    baseline_test = Evaluator(df)
+    baseline_test.evaluate(baseline = True)
+    make_graphs(baseline_test,"baseline")

@@ -154,8 +154,8 @@ if __name__=="__main__":
     database = Database()
     profiler= cProfile.Profile()
     base_name = 'data_coarse1'
-    n_samples = 1e+6
-    apply_processing = False
+    n_samples = 10e+6
+    apply_processing = True
     n_vertices_target = 10000
     n_bins=10
     
