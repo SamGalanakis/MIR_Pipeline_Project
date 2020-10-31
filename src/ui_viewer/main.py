@@ -6,17 +6,14 @@ from bokeh.models.widgets.widget import Widget
 import numpy as np
 import glob
 from bokeh.models.annotations import Title
-from numpy.lib.utils import source
 src_dir = dirname(dirname(__file__)) # for import stuff from main project
 sys.path.append(src_dir)
 src_dir = pathlib.Path(src_dir)
 import shutil
 import random
 from bokeh.layouts import column , row
-from bokeh.io import output_file,show
-from bokeh.plotting import figure, output_file, show,curdoc
-from bokeh.embed import file_html
-from tornado.web import StaticFileHandler
+
+from bokeh.plotting import figure,curdoc
 import os.path as op
 import pathlib
 import random
@@ -85,7 +82,7 @@ def updade_plot_col(plot_col,data_list,distribution_name):
     for index,child in enumerate(plot_col.children):
         
         line_plot = child.select(name='lineplot')
-        print(index)
+      
         
         data_for_plot = {'x_values':new_data_list[index]['x_values'],'y_values':new_data_list[index]['y_values']}
         
@@ -182,9 +179,11 @@ def path_callback(attr, old, new):
 
     distances, indices, resulting_paths, resulting_classifications,df_slice = query_interface.query(input_path,n_samples_query=1e+6,n_results=initial_n_neighbours)
     
+   
     distances=distances.tolist()
-    distances.insert(0,0)
-    distances.reverse()
+    distances.append(0)
+   
+   
     
     df_slice['distance'] = distances
     df_slice = df_slice[::-1].round(4)
@@ -192,8 +191,9 @@ def path_callback(attr, old, new):
     global data_table_source
     global columns_include
     df_slice['file_name'] = df_slice['file_name'].apply(lambda x:op.basename(x.replace('\\','/')))
+    df_slice=df_slice.sort_values('distance')
     update_dict = {col:df_slice[col].tolist() for col in columns_include}
-    # update_dict['file_name'] = [op.basename(x.replace('\\','/')) for x in update_dict['file_name']]
+   
     
     global plot_col
     plot_col.children = []
@@ -214,7 +214,7 @@ def path_callback(attr, old, new):
     resulting_paths = [x.replace('.off','.ply') for x in resulting_paths]
     #copy files to static
    
-    for index, model_match_path in enumerate(resulting_paths[::-1]):
+    for index, model_match_path in enumerate(resulting_paths):
    
 
         
