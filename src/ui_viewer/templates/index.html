@@ -16,14 +16,15 @@
   {% block contents %}
 
     
-    <div id="side_menu">
+    
    
       {{ embed(roots.full_row) }}
-    </div>
-
-    <div id = 'plot_col'>
-  {{embed(roots.plot_col)}}
-    </div>
+   
+ 
+    
+  
+  {{embed(roots.plot_dropdown_col)}}
+  
  
    <div id = "model_window"> 
     {% include 'webgl_loader_ply.html' %}

@@ -1,21 +1,36 @@
-
-
-#model_window {
+/* #plot_col {
+    position:absolute;
+    width:300px;
+    top:150px;
+    left:0px;
+    z-index: 1;
+} */
+.dropdown {
+    z-index: 100000;
+}
+.bk-btn-warning {
+    z-index: 100000!important;
+}
+.full_row {
+    z-index: 100000;
+}
+/* #model_window {
     width:100px;
     max-width: 500px;
     max-height: 500px;
-}
+} */
 
 #side_menu {
-    
+    z-index: 100000;
     height:150px;
     width:100vw;
 }
 
-#container {
+/* #container {
     max-width: 500px;
     max-height: 500px;
-}
+} */
+
 
 #data_table {
     position: absolute;
@@ -24,14 +39,18 @@
 }
 
 #container canvas {
-    width:500px;
-    height:100px;
+    position: absolute;
+    width:calc(100vw-300px);
+    height:calc(100vh-250px);
+    top:150px;
+    left:300px;
+
 }
  
 
 #gui {
     position: absolute!important;
-     top: 200px!important; 
-     left: 700px !important;
+     top: 150px!important; 
+     left: 300px !important;
      z-index: 10000!important;
 }

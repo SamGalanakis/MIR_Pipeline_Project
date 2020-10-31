@@ -201,7 +201,7 @@
 
 			renderer = new THREE.WebGLRenderer({ antialias: true });
 			renderer.setPixelRatio(window.devicePixelRatio);
-			renderer.setSize(window.innerWidth/2, window.innerHeight);
+			renderer.setSize(window.innerWidth-310, window.innerHeight-150)
 			
 			renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -257,7 +257,7 @@
 			camera.updateProjectionMatrix();
 
 			
-			renderer.setSize(window.innerWidth/2, window.innerHeight);
+			renderer.setSize(window.innerWidth-310, window.innerHeight-150);
 
 		}
 
@@ -287,11 +287,13 @@
 		function initGUI() {
 			
 			gui = new GUI({ width: 200 ,autoPlace: true});
+			gui.closed = true;
 			gui.domElement.id = 'gui';
 			
 			var layersControl = gui.addFolder('render modes');
 			
 			layersControl.open();
+			
 			
 
 			

@@ -22,7 +22,7 @@ import pathlib
 import random
 import sys
 import bokeh.util.paths as bokeh_paths
-from bokeh.models import Button, Slider
+from bokeh.models import Button, Slider, Dropdown
 from bokeh.models.callbacks import CustomJS
 from bokeh.models.widgets.inputs import FileInput, TextInput
 from bokeh.themes import built_in_themes
@@ -62,7 +62,7 @@ def make_data_sources_distributions(distribution_columns,df):
             
 def make_vacant_col(plot_col,df,distribution_columns):
    
-    rows = [figure(plot_height=100) for x in range(df.shape[0])]
+    rows = [figure(plot_height=100,plot_width=300,tools=[]) for x in range(df.shape[0])]
     for index,row_fig in enumerate(rows):
         row = df.iloc[index,:]
         name = op.basename(row['file_name'].replace('\\','/'))
@@ -71,7 +71,10 @@ def make_vacant_col(plot_col,df,distribution_columns):
         title = Title()
         title.text = f'{name} ({classification})'
         row_fig.title = title
-        row_fig.line(x='x_values', y='y_values', source=source,name='lineplot')
+
+        l=row_fig.line(x='x_values', y='y_values', source=source,name='lineplot')
+        row_fig.toolbar.logo =None
+        
     plot_col.children.extend(rows)
 
     return  plot_col
@@ -80,9 +83,10 @@ def make_vacant_col(plot_col,df,distribution_columns):
 def updade_plot_col(plot_col,data_list,distribution_name):
     new_data_list = data_list[distribution_name]
     for index,child in enumerate(plot_col.children):
-        print(child.renderers)
+        
         line_plot = child.select(name='lineplot')
-        print(new_data_list[index]['x_values'])
+        print(index)
+        
         data_for_plot = {'x_values':new_data_list[index]['x_values'],'y_values':new_data_list[index]['y_values']}
         
         line_plot.data_source.data = data_for_plot
@@ -100,8 +104,13 @@ columns_include=["file_name","distance","classification","n_triangles",
                 "volume","surface_area","bounding_box_ratio","compactness","bounding_box_volume",
                 "diameter","eccentricity" ]
 
-distribution_columns = ['bounding_box', 'angle_three_vertices', 'barycenter_vertice',
- 'two_vertices', 'square_area_triangle', 'cube_volume_tetrahedron']              
+distribution_columns = [ 'angle_three_vertices', 'barycenter_vertice',
+ 'two_vertices', 'square_area_triangle', 'cube_volume_tetrahedron']      
+
+menu = list(zip(distribution_columns,distribution_columns))
+distribution_dropdown = Dropdown(label="Distribution to plot", button_type="warning", 
+menu=menu,name="distribution_dropdown",css_classes=['dropdown'])
+        
 df = pd.DataFrame(columns=columns_include)
 
 
@@ -117,19 +126,29 @@ data_table = DataTable(columns=columns, source=data_table_source,height = 150,si
 doc = curdoc()
 
 
-slider_n_neighbours = Slider(start=1, end=15, value=initial_n_neighbours, step=1, title="Number of neighbours ",name="slider_n_neighbours")
-run_button = Button(name = 'run_button',label="Run query!", button_type="success")
+slider_n_neighbours = Slider(start=1, end=15, value=initial_n_neighbours, step=1,
+ title="Number of neighbours ",name="slider_n_neighbours")
+run_button = Button(name = 'run_button',label="Visualize results!", button_type="success")
 rand_base=123
 js_update_models_callback = CustomJS(code = (CODE % (initial_n_neighbours,rand_base)))
 
 path_input = TextInput(name='path_input')
 
+def distribution_dropdown_callback(event):
+    global plot_col
+    if not 'data_list' in globals():
+        print('No query set soo...')
+        return
+
+   
+    plot_col = updade_plot_col(plot_col,data_list,event.item)
+distribution_dropdown.on_click(distribution_dropdown_callback)
 def slider_n_neighbours_callback(attr,old,new):
     global initial_n_neighbours 
     initial_n_neighbours = int(new)
     global rand_base
     js_update_models_callback.code = CODE % (initial_n_neighbours,rand_base)
-    print(js_update_models_callback.code)
+    
     
 def empty_directory(dir_path):
     print('deleting files!')
@@ -150,12 +169,16 @@ def path_callback(attr, old, new):
     query_return_path = input_model_static_path.parents[0] / f'{rand_base}closest_model_'
     input_path = pathlib.Path(new)
 
-   
-    if input_path.suffix == 'ply':
+    suffix = input_path.suffix 
+    
+    if suffix == '.ply':
         shutil.copyfile(input_path, input_model_static_path)
-    else:
+    elif suffix == '.off':
         vertices , faces_dict , _ = read_model(input_path)
         write_model_as_ply(vertices,faces_dict['triangles'],input_model_static_path)
+    else:
+        print('Invalid file type!')
+        return
 
     distances, indices, resulting_paths, resulting_classifications,df_slice = query_interface.query(input_path,n_samples_query=1e+6,n_results=initial_n_neighbours)
     
@@ -173,10 +196,13 @@ def path_callback(attr, old, new):
     # update_dict['file_name'] = [op.basename(x.replace('\\','/')) for x in update_dict['file_name']]
     
     global plot_col
+    plot_col.children = []
+    doc.add_root(plot_col)
     plot_col_template = make_vacant_col(plot_col,df_slice,distribution_columns)
+    global data_list
     data_list = make_data_sources_distributions(distribution_columns,df_slice)
     
-    plot_col = updade_plot_col(plot_col_template,data_list,'barycenter_vertice')
+    plot_col = updade_plot_col(plot_col_template,data_list,distribution_columns[0])
     
  
     data_table.source.data = update_dict
@@ -198,11 +224,10 @@ def path_callback(attr, old, new):
         model_match_path = src_dir.parents[0] / model_match_path.__str__().replace('\\','/')
         
         write_to_path = op.join(src_dir,f"{str(query_return_path)}{index}.ply")
-        # if os.path.exists(write_to_path):
-        #     os.remove(write_to_path)
+        
        
         new_path = shutil.copyfile(model_match_path,write_to_path)
-        print(f"NEW PATH : {new_path}")
+        print(f"Querying: {new_path}")
 
 
 
@@ -221,16 +246,19 @@ slider_n_neighbours.on_change('value',slider_n_neighbours_callback)
 run_button.js_on_click(js_update_models_callback)
 
 
-options_col = column(path_input,slider_n_neighbours,run_button,name = 'options_col')
-full_row = row(options_col,data_table,name= 'full_row')
+options_col = column(path_input,slider_n_neighbours,run_button,name = 'options_col',height=150,width= 300)
+full_row = row(options_col,data_table,name= 'full_row',css_classes=['full_row'],height= 150)
+
 # doc.add_root(run_button)
 # doc.add_root(path_input)
 # doc.add_root(data_table)
 # doc.add_root(slider_n_neighbours)
 doc.add_root(full_row)
 plot_col = column(name='plot_col')
-
-doc.add_root(plot_col)
+plot_dropdown_col = column(distribution_dropdown,plot_col,name= 'plot_dropdown_col',width =300)
+doc.add_root(plot_dropdown_col)
+# doc.add_root(distribution_dropdown)
+# doc.add_root(plot_col)
 
 
 
