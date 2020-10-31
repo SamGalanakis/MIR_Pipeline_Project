@@ -8,6 +8,8 @@ from file_reader import read_model
 from scipy.spatial import ConvexHull, distance_matrix
 import collections
 import os
+from opt_einsum import contract
+
 
 
 
@@ -235,9 +237,7 @@ def volume(vertices,triangles):
     p1 =  vertices_used[0::3]
     p2 =  vertices_used[1::3]
     p3 =  vertices_used[2::3]
-    
-    volume = sum(np.diagonal((np.dot(p1, np.transpose(np.cross(p2, p3))) / 6)))
-    return volume
+    return sum(np.einsum('ij,ji->i', p1, np.transpose(np.cross(p2, p3))) / 6)
 
 
     

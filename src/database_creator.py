@@ -136,7 +136,7 @@ if __name__=="__main__":
     profiler= cProfile.Profile()
     base_name = 'data'
     n_samples = 1e+6
-    apply_processing = True
+    apply_processing = False
     n_vertices_target = 10000
     profiler.run('database.create_database(base_name,n_samples=n_samples,apply_processing=apply_processing,n_vertices_target=n_vertices_target)')
     profiler.dump_stats("profiler_stats")
