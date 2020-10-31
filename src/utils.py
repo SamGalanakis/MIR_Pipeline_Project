@@ -228,11 +228,8 @@ def cube_volume_tetrahedron(vertices,n_samples,n_bins=10):
 
 def volume(vertices,triangles):
     vertices = vertices.reshape((-1,3))
-    triangle_vertices = []
-    for idx, (p1 ,p2, p3) in enumerate(triangles):
-        triangle_vertices.append(np.array([vertices[p1],vertices[p2],vertices[p3]]))
     
-    vertices_used = np.array(triangle_vertices).reshape(-1,3)
+    vertices_used = vertices[triangles].reshape(-1,3)
     
     # https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
     p1 =  vertices_used[0::3]
@@ -248,7 +245,7 @@ if __name__ == "__main__":
   
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
     
-    path = path = Path(r"data/sphere.ply")
+    path = path = Path(r"data/cube2.off")
     vertices, element_dict, info = read_model(path)
     print(volume(vertices,element_dict["triangles"]))
     #angle_three_random_vertices(vertices,n_samples=1e+6)
