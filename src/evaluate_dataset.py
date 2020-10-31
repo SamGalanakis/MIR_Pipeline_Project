@@ -35,9 +35,38 @@ class Evaluator:
         self.big_results = defaultdict(dict)
         for idx, (classification,model)  in enumerate(self.database_class_path.values):
             #Number of results is based on the number of shapes in a class 
-            to_query = np.arange(5,205,5)
-            results = []
-            for n_results in to_query:
+            n_results = self.class_counts[classification]
+
+            if self.baseline:
+                _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
+                self.results.append((classification, indices))
+            else:
+                _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
+                self.results.append((classification, indices.flatten()))
+
+
+    def evaluate_big(self, baseline = False):
+            self.baseline = baseline
+            self.big_results = defaultdict(dict)
+            for idx, (classification,model)  in enumerate(self.database_class_path.values):
+                #Number of results is based on the number of shapes in a class 
+                to_query = np.arange(5,205,5)
+                results = []
+                for n_results in to_query:
+                    if self.baseline:
+                        _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
+                        results.append((classification, indices))
+
+                    else:
+                        _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
+                        results.append((classification, indices.flatten()))
+
+
+                    self.big_results[n_results] = results
+                    results = []
+
+                n_results = self.class_counts[classification]
+
                 if self.baseline:
                     _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
                     results.append((classification, indices))
@@ -47,22 +76,7 @@ class Evaluator:
                     results.append((classification, indices.flatten()))
 
 
-                self.big_results[n_results] = results
-                results = []
-
-            n_results = self.class_counts[classification]
-
-            if self.baseline:
-                _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
-                results.append((classification, indices))
-
-            else:
-                _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
-                results.append((classification, indices.flatten()))
-
-
-            self.big_results[0] = results
-
+                self.big_results[0] = results
 
 
     def analysis_big(self):   
@@ -103,23 +117,23 @@ class Evaluator:
 
         return temp
 
-    def heatmap(self,classifications):
-        values = []
+    # def heatmap(self,classifications):
+    #     values = []
 
-        for class_ in set(classifications):
+    #     for class_ in set(classifications):
 
-            #ALl queries of a partcular class
-            for model_idx in np.where(self.database_class_path["classification"].values == class_)[0]:
-                distances, indices = self.faiss_knn.query(self.df_numeric.iloc[model_idx].values, len(self.df))
-                classes_indices = list(map(classifications.__getitem__, indices[0]))
+    #         #ALl queries of a partcular class
+    #         for model_idx in np.where(self.database_class_path["classification"].values == class_)[0]:
+    #             distances, indices = self.faiss_knn.query(self.df_numeric.iloc[model_idx].values, len(self.df))
+    #             classes_indices = list(map(classifications.__getitem__, indices[0]))
                 
-                for clas__ in set(classifications):
-                    a = sum(list(map(git distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == clas__])))
-                    print()
+    #             for clas__ in set(classifications):
+    #                 a = sum(list(map(git distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == clas__])))
+    #                 print()
 
-              #  a, b = [(sum(list(map(distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == class__]))),class__) for class__ in set(classifications)]
+    #           #  a, b = [(sum(list(map(distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == class__]))),class__) for class__ in set(classifications)]
 
-                print()
+    #             print()
 
 
     
@@ -284,7 +298,7 @@ if __name__ == '__main__':
             df, *_ = process_dataset_for_knn(os.path.join(subdir, file_name),divide_distributions=False)
             classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
             test = Evaluator(df)
-            test.heatmap(classifications)
+           # test.heatmap(classifications)
             test.evaluate()
             test.analysis()
             make_graphs(test,file_name)
@@ -296,4 +310,5 @@ if __name__ == '__main__':
     
     baseline_test = Evaluator(df)
     baseline_test.evaluate(baseline = True)
+    baseline_test.analysis()
     make_graphs(baseline_test,"baseline")
