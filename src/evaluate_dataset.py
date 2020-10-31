@@ -140,7 +140,7 @@ def make_graphs(test,file_name):
 
         if file_name == "baseline":
             plt.title(f"{metric} per class metrics baseline")
-        elif "coarse" and "processed" in file_name:
+        elif "coarse" in file_name and "processed" in file_name:
             plt.title(f"{metric} per class for preprocessed coarse shapes")
         elif "processed" in file_name:
             plt.title(f"{metric} pe5r class for preprocessed shapes")
