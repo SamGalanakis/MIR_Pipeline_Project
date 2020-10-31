@@ -155,7 +155,7 @@ if __name__=="__main__":
     profiler= cProfile.Profile()
     base_name = 'data_coarse1'
     n_samples = 1e+6
-    apply_processing = True
+    apply_processing = False
     n_vertices_target = 10000
     n_bins=10
     
