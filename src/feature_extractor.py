@@ -31,7 +31,7 @@ def extract_features(shape,n_bins,n_samples):
     feature_dict["bounding_box"]=shape.bounding_rect_vertices
 
     feature_dict["volume"]=np.maximum(volume(shape.vertices, shape.element_dict["triangles"]),0.01)#clamp to avoid 0 volume for 2d models
-
+    
     feature_dict["surface_area"]=shape.pyvista_mesh.area
     bounding_box_sides = shape.bounding_rect_vertices.reshape((-1 ,3)).max(axis=0)-shape.bounding_rect_vertices.reshape((-1 ,3)).min(axis=0)
     bounding_box_sides = np.maximum(bounding_box_sides,0.01) #clamp above so no zero division for essentially 2d models

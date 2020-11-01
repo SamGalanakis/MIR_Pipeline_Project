@@ -6,13 +6,14 @@ from bokeh.models.widgets.widget import Widget
 import numpy as np
 import glob
 from bokeh.models.annotations import Title
+from bokeh.models import ColumnDataSource, HoverTool, LinearColorMapper
 src_dir = dirname(dirname(__file__)) # for import stuff from main project
 sys.path.append(src_dir)
 src_dir = pathlib.Path(src_dir)
 import shutil
 import random
 from bokeh.layouts import column , row
-
+import matplotlib.pyplot as plt
 from bokeh.plotting import figure,curdoc
 import os.path as op
 import pathlib
@@ -28,12 +29,16 @@ from bokeh.models import ColumnDataSource, DataTable, DateFormatter, TableColumn
 from file_reader import read_model,write_model_as_ply
 from query_interface import QueryInterface
 from utils import  is_array_col
+import matplotlib as mpl
+from bokeh.transform import factor_cmap
+from bokeh.palettes import Spectral6
+import colorcet as cc
 
-
-data_path = op.join(dirname(src_dir),"processed_data/data_processed_10000_1000000.0.csv")
+data_path = op.join(dirname(src_dir),"processed_data/data_coarse1_processed_10000_10000000.0.csv")
 n_vertices_target = 10000
 query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
 initial_n_neighbours = 3
+tsne_path = op.join(dirname(src_dir),'processed_data/tsne_data.csv')
 
 CODE = """
 var n_models = %d;
@@ -43,7 +48,38 @@ var rand_base = %d;
 """
 
 #Data table
+def make_tsne(tsne_csv_path):
+    df = pd.read_csv(tsne_csv_path)
+    df['x_data']
+   
+    unique_classes = sorted(list(set(df['classification'])))
+    classification_indexes = [unique_classes.index(x) for x in df['classification']]
+    
+    
+    colors =cc.b_glasbey_bw[0:len(unique_classes)]
+    draw_colors = [colors[classification_indexes[x]] for x in range(df.shape[0])]
+    
 
+    #colors_rgb = mpl.colors.hsv_to_rgb(colors)
+    
+    hover = HoverTool(tooltips=[
+    ("(x,y)", "(@x, @y)"),
+    ('name', '@name'),
+    ('class', '@classification'),
+    ])
+    colors = [tuple(x) for x in colors]
+    
+    
+    data = dict(x=df['x_data'],y=df['y_data'],classification=df['classification'],name=df['name'],colors=draw_colors)
+    source = ColumnDataSource(data)
+    p = figure(plot_width=1000, plot_height=1000, tools=[hover], title="TSNE",
+    name='tsne_figure')
+    p.circle('x', 'y', size=10, source=source,
+         color='colors',alpha=255)
+    
+    return p
+    
+tsne_figure = make_tsne(tsne_path)
 def make_data_sources_distributions(distribution_columns,df):
     data_list = {x:[] for x in distribution_columns}
     for distribution_feature in distribution_columns:
@@ -177,21 +213,17 @@ def path_callback(attr, old, new):
         print('Invalid file type!')
         return
 
-    distances, indices, resulting_paths, resulting_classifications,df_slice = query_interface.query(input_path,n_samples_query=1e+6,n_results=initial_n_neighbours)
+    _, _ , df_slice = query_interface.query(input_path,n_samples_query=10e+6,n_results=initial_n_neighbours)
+    
     
    
-    distances=distances.tolist()
-    distances.append(0)
-   
-   
-    
-    df_slice['distance'] = distances
-    df_slice = df_slice[::-1].round(4)
+    df_slice = df_slice.round(4)
     global data_table
     global data_table_source
     global columns_include
+    # Store paths for js, remove first as it is query path and dealing with it seperately
+    paths_for_js = [x.replace('.off','.ply') for x in df_slice['file_name']][1:]
     df_slice['file_name'] = df_slice['file_name'].apply(lambda x:op.basename(x.replace('\\','/')))
-    df_slice=df_slice.sort_values('distance')
     update_dict = {col:df_slice[col].tolist() for col in columns_include}
    
     
@@ -211,10 +243,10 @@ def path_callback(attr, old, new):
     
     #change to ply target
     
-    resulting_paths = [x.replace('.off','.ply') for x in resulting_paths]
+    
     #copy files to static
    
-    for index, model_match_path in enumerate(resulting_paths):
+    for index, model_match_path in enumerate(paths_for_js):
    
 
         
@@ -257,6 +289,7 @@ doc.add_root(full_row)
 plot_col = column(name='plot_col')
 plot_dropdown_col = column(distribution_dropdown,plot_col,name= 'plot_dropdown_col',width =300)
 doc.add_root(plot_dropdown_col)
+doc.add_root(tsne_figure)
 # doc.add_root(distribution_dropdown)
 # doc.add_root(plot_col)
 

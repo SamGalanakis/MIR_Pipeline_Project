@@ -11,7 +11,14 @@ import os
 from opt_einsum import contract
 
 
+def get_princeton_classifications(cla_path_train):
+    classification_dict_train, hierarchy_dict_train, cla_info_train =  cla_parser(Path(cla_path_train))
+    test_path = cla_path_train.replace('train','test')
+    test_path = cla_path_train.replace('Train','Test')
+    classification_dict_test, hierarchy_dict_test, cla_info_test = cla_parser(Path(test_path))
+    classification_dict = merge_dicts(classification_dict_train,classification_dict_test)
 
+    return classification_dict
 
 
 
@@ -228,7 +235,7 @@ def cube_volume_tetrahedron(vertices,n_samples,n_bins=10):
     counts = bin_count(areas,n_bins)
     return counts/sum(counts)
 
-def volume(vertices,triangles):
+def volume_original(vertices,triangles):
     vertices = vertices.reshape((-1,3))
     
     vertices_used = vertices[triangles].reshape(-1,3)
@@ -237,15 +244,24 @@ def volume(vertices,triangles):
     p1 =  vertices_used[0::3]
     p2 =  vertices_used[1::3]
     p3 =  vertices_used[2::3]
-    return sum(np.einsum('ij,ji->i', p1, np.transpose(np.cross(p2, p3))) / 6)
+    
+    return (p1*np.cross(p2,p3)).sum()/6
 
-
+def volume(vertices,triangles):
+    try:
+        hull = ConvexHull(vertices)
+    
+    except:
+        print("Could not calculate hull for diameter")
+        return 0.1
+    return hull.volume
     
 if __name__ == "__main__":
   
     #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
     
-    path = path = Path(r"data/cube2.off")
+    path  = Path(r"data/cube2.off")
+    path = Path('data/benchmark/db/0/m0/m0.ply')
     vertices, element_dict, info = read_model(path)
     print(volume(vertices,element_dict["triangles"]))
     #angle_three_random_vertices(vertices,n_samples=1e+6)

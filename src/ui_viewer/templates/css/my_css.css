@@ -37,19 +37,31 @@
     top:0;
     left:300px;
 }
+#tsne_figure {
+    
+    height:1000px;
+    width:calc(100vw-300px);
+    left:300px;
+    display:block;
+    top:600px;
+    position: absolute;
+}
 
 #container canvas {
+    display:block;
     position: absolute;
     width:calc(100vw-300px);
-    height:calc(100vh-250px);
-    top:150px;
+    /* height:calc(100vh-250px); */
+    height:1000px;
+    top:165px;
     left:300px;
 
 }
  
 
 #gui {
-    position: absolute!important;
+    position: sticky;
+
      top: 150px!important; 
      left: 300px !important;
      z-index: 10000!important;

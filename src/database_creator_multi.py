@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from utils import cla_parser, merge_dicts, get_all_file_paths
+from utils import cla_parser, merge_dicts, get_all_file_paths, get_princeton_classifications
 from tqdm import tqdm
 from shape import Shape
 from file_reader import read_model
@@ -46,11 +46,8 @@ class Database:
         
         cla_path = 'data/benchmark/classification/v1/base/train.cla'
         cla_path = 'data/benchmark/classification/v1/coarse1/coarse1Train.cla'
-        classification_dict_train, self.hierarchy_dict_train, self.cla_info_train =  cla_parser(Path(cla_path))
-        test_path = cla_path.replace('train','test')
-        test_path = cla_path.replace('Train','Test')
-        classification_dict_test, self.hierarchy_dict_test, self.cla_info_test = cla_parser(Path(test_path))
-        self.classification_dict = merge_dicts(classification_dict_train,classification_dict_test)
+        
+        self.classification_dict = get_princeton_classifications(cla_path)
         unique_classes = len(set(self.classification_dict.values()))
         print(f'{unique_classes} unique classes')
         

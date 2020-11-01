@@ -29,5 +29,9 @@
    <div id = "model_window"> 
     {% include 'webgl_loader_ply.html' %}
   </div>
+  <div id='tsne_figure'>
+    {{embed(roots.tsne_figure)}}
+  </div>
+  
   {{ super() }}
   {% endblock %}

@@ -27,7 +27,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
 
 
-    def query(self,model_path,n_samples_query,n_results,vis=False):
+    def query(self,model_path,n_samples_query,n_results):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -45,44 +45,29 @@ class QueryInterface:
       
 
         distances, indices = self.faiss_knn.query(query_vector,n_results)
-        distances = distances.flatten() #Flatten batch dimension
-        df_slice = self.df[self.df.index.isin(indices.flatten())]
-        resulting_paths = df_slice['file_name'].tolist()
-        resulting_classifications = df_slice['classification'].tolist()
+        
+        distances = distances.flatten().tolist() #Flatten batch dimension
+        indices = indices.flatten().tolist()
+        df_slice = self.df[self.df.index.isin(indices)]
+        df_slice['distance'] = df_slice.index.map(lambda x:distances[indices.index(x)])
+        
         
         #Add missing data to query df
         feature_df['file_name'] = str(model_path)
         feature_df['classification'] = 'query_input'
+        feature_df['distance'] = 0
         # Put it at top of slice
         df_slice = pd.concat([df_slice,feature_df])
-        print(df_slice['file_name'])
+        df_slice = df_slice.sort_values('distance')
 
         #Send results for visualization
-        if vis:
-            self.visualize_results(shape,resulting_paths,distances)
-        else:
-            return distances, indices, resulting_paths, resulting_classifications, df_slice
 
-        
-
-    def visualize_results(self,query_model,sorted_resulting_paths,distances):
        
-        print(f'Query resulted in results classified with following distances:')
+        return distances, indices, df_slice
+
         
 
-        for path, dist in zip(sorted_resulting_paths,list(distances.flatten())):
   
-            match_path = path.replace("\\","/")
-            match_shape = Shape(*read_model(match_path))
-            classification = self.df[self.df['file_name']==path]['classification'].values[0]
-            
-            
-            
-            print(f'{path} -- {classification} -- {dist}\n')
-
-            #match_shape.view()
-
-        print("Done")
 
 
 
@@ -96,7 +81,7 @@ class QueryInterface:
 if __name__ == '__main__':
     profiler = cProfile.Profile()
     
-    data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
+    data_path = Path("processed_data/data_coarse1_processed_10000_10000000.0.csv")
     ant_path = Path(r"data/benchmark/db/0/m0/m0.off")
     plane_path = Path(r"data/benchmark/db/12/m1204/m1204.off")
     pig_path = Path(r"data/benchmark/db/1/m102/m102.off")
@@ -109,8 +94,8 @@ if __name__ == '__main__':
     n_vertices_target = 10000
     query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
     
-    path=man_path
-    profiler.run('query_interface.query(path,n_samples_query=1e+6,n_results=2)')
+    path=pig_path
+    profiler.run('query_interface.query(path,n_samples_query=1e+6,n_results=5)')
     profiler.dump_stats('query_profile_stats')
   
 
