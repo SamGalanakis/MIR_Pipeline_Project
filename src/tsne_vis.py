@@ -26,7 +26,8 @@ def make_tsne(data_path,save_path):
     df['x_data']=tsne_em[:,0]
     df['y_data']=tsne_em[:,1]
     df['classification'] = df_knn['classification']
-    df['name'] = df_knn['file_name'].map(lambda x : os.path.basename(x.replace('\\','/')))
+    df['name'] = df_knn['file_name'].map(lambda x : os.path.basename(x.replace('\\','/')).split('.')[0])
+    df['file_name'] = df_knn['file_name']
     df.to_csv(save_path)
     colors = np.array([hsv(np.linspace(0, 1.0, len(unique_classes)))[x] for x in classification_indexes])
     plt.scatter(tsne_em[:,0],tsne_em[:,1],color=colors)

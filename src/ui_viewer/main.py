@@ -33,7 +33,8 @@ import matplotlib as mpl
 from bokeh.transform import factor_cmap
 from bokeh.palettes import Spectral6
 import colorcet as cc
-
+import PIL
+from tqdm import tqdm
 data_path = op.join(dirname(src_dir),"processed_data/data_coarse1_processed_10000_10000000.0.csv")
 n_vertices_target = 10000
 query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
@@ -61,16 +62,40 @@ def make_tsne(tsne_csv_path):
     
 
     #colors_rgb = mpl.colors.hsv_to_rgb(colors)
+    tooltips =  """
+    <div>
+        <div>
+            <img
+                src="@thumbnails" height="42" width="42"
+                style="float: left; margin: 0px 15px 15px 0px;"
+                border="2"
+            ></img>
+        </div>
+        <div>
+            <span style="font-size: 17px; font-weight: bold;">@name</span>
+            <span style="font-size: 15px; color: #966;">[@classification]</span>
+        </div>
     
-    hover = HoverTool(tooltips=[
-    ("(x,y)", "(@x, @y)"),
-    ('name', '@name'),
-    ('class', '@classification'),
-    ])
+        <div>
+            
+            <span style="font-size: 10px; color: #696;">($x, $y)</span>
+        </div>
+    </div>
+"""
+  
+    hover = HoverTool(tooltips=tooltips)
+
+
+
+
     colors = [tuple(x) for x in colors]
+
+
+   
+    thumbnails = [f'ui_viewer/static/thumbnails/{name}_thumb.jpg' for name in tqdm(df['name'])]
     
-    
-    data = dict(x=df['x_data'],y=df['y_data'],classification=df['classification'],name=df['name'],colors=draw_colors)
+    data = dict(x=df['x_data'],y=df['y_data'],thumbnails=thumbnails,
+    classification=df['classification'],name=df['name'],colors=draw_colors)
     source = ColumnDataSource(data)
     p = figure(plot_width=1000, plot_height=1000, tools=[hover], title="TSNE",
     name='tsne_figure')
