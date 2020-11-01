@@ -92,7 +92,7 @@ def make_tsne(tsne_csv_path):
 
 
    
-    thumbnails = [f'ui_viewer/static/thumbnails/{name}_thumb.jpg' for name in tqdm(df['name'])]
+    thumbnails = [f'ui_viewer/static/thumbnails/{name}_thumb.jpg' for name in df['name']]
     
     data = dict(x=df['x_data'],y=df['y_data'],thumbnails=thumbnails,
     classification=df['classification'],name=df['name'],colors=draw_colors)
@@ -119,7 +119,7 @@ def make_data_sources_distributions(distribution_columns,df):
     return data_list
             
 def make_vacant_col(plot_col,df,distribution_columns):
-   
+    print(f"Df shape{df.shape}]")
     rows = [figure(plot_height=100,plot_width=300,tools=[]) for x in range(df.shape[0])]
     for index,row_fig in enumerate(rows):
         row = df.iloc[index,:]
@@ -143,6 +143,7 @@ def updade_plot_col(plot_col,data_list,distribution_name):
     for index,child in enumerate(plot_col.children):
         
         line_plot = child.select(name='lineplot')
+        print(f"index: {index}, children: {line_plot}")
       
         
         data_for_plot = {'x_values':new_data_list[index]['x_values'],'y_values':new_data_list[index]['y_values']}
@@ -254,13 +255,13 @@ def path_callback(attr, old, new):
     
     global plot_col
     plot_col.children = []
-    doc.add_root(plot_col)
     plot_col_template = make_vacant_col(plot_col,df_slice,distribution_columns)
+    print(plot_col_template.children)
     global data_list
     data_list = make_data_sources_distributions(distribution_columns,df_slice)
     
     plot_col = updade_plot_col(plot_col_template,data_list,distribution_columns[0])
-    
+    print(plot_col.children)
  
     data_table.source.data = update_dict
     
@@ -285,6 +286,7 @@ def path_callback(attr, old, new):
        
         new_path = shutil.copyfile(model_match_path,write_to_path)
         print(f"Querying: {new_path}")
+    
 
 
 
@@ -315,8 +317,8 @@ plot_col = column(name='plot_col')
 plot_dropdown_col = column(distribution_dropdown,plot_col,name= 'plot_dropdown_col',width =300)
 doc.add_root(plot_dropdown_col)
 doc.add_root(tsne_figure)
-# doc.add_root(distribution_dropdown)
-# doc.add_root(plot_col)
+
+
 
 
 
