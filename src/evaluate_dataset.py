@@ -52,7 +52,7 @@ class Evaluator:
                 to_query = np.arange(5,205,5)
                 results = []
 
-                
+
                 for n_results in to_query:
                     if self.baseline:
                         _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
@@ -280,9 +280,11 @@ if __name__ == '__main__':
             df, *_ = process_dataset_for_knn(os.path.join(subdir, file_name),divide_distributions=False)
             classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
             test = Evaluator(df)
-            #test.evaluate()
-            #test.analysis()
-            #make_graphs(test,file_name)
+            test.evaluate()
+            test.analysis()
+            make_graphs(test,file_name)
+            
+            test = Evaluator(df)
 
             test.evaluate_big()
             temp = test.analysis_big()
@@ -290,7 +292,7 @@ if __name__ == '__main__':
 
 
     
-   # baseline_test = Evaluator(df)
-   # baseline_test.evaluate(baseline = True)
-   # baseline_test.analysis()
-   # make_graphs(baseline_test,"baseline")
+   baseline_test = Evaluator(df)
+   baseline_test.evaluate(baseline = True)
+   baseline_test.analysis()
+   make_graphs(baseline_test,"baseline")
