@@ -44,7 +44,6 @@ class Evaluator:
                 _, indices = self.faiss_knn.query(self.df_numeric.iloc[idx].values, n_results)
                 self.results.append((classification, indices.flatten()))
 
-
     def evaluate_big(self, baseline = False):
             self.baseline = baseline
             self.big_results = defaultdict(dict)
@@ -52,6 +51,8 @@ class Evaluator:
                 #Number of results is based on the number of shapes in a class 
                 to_query = np.arange(5,205,5)
                 results = []
+
+                
                 for n_results in to_query:
                     if self.baseline:
                         _, indices = self.faiss_knn.query_baseline(self.df_numeric.iloc[idx].values, n_results)
@@ -77,7 +78,6 @@ class Evaluator:
 
 
                 self.big_results[0] = results
-
 
     def analysis_big(self):   
         self.overall_accuracy_per_class = 0
@@ -116,28 +116,6 @@ class Evaluator:
             temp[n_results] = metrics
 
         return temp
-
-    # def heatmap(self,classifications):
-    #     values = []
-
-    #     for class_ in set(classifications):
-
-    #         #ALl queries of a partcular class
-    #         for model_idx in np.where(self.database_class_path["classification"].values == class_)[0]:
-    #             distances, indices = self.faiss_knn.query(self.df_numeric.iloc[model_idx].values, len(self.df))
-    #             classes_indices = list(map(classifications.__getitem__, indices[0]))
-                
-    #             for clas__ in set(classifications):
-    #                 a = sum(list(map(git distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == clas__])))
-    #                 print()
-
-    #           #  a, b = [(sum(list(map(distances.__getitem__,[i for i, x in enumerate(classes_indices) if x == class__]))),class__) for class__ in set(classifications)]
-
-    #             print()
-
-
-    
-
 
     def analysis(self):   
         self.overall_accuracy_per_class = 0
@@ -189,6 +167,8 @@ class Evaluator:
         self.metrics["recall"] = sum(recall) / len(self.results)
         self.metrics["f1"] = sum(f1) / len(self.results)
         del self.metrics["accuracy"]
+
+
 
 def make_graphs(test,file_name):
     
@@ -295,20 +275,22 @@ if __name__ == '__main__':
 
     for subdir, dirs, files in os.walk(data_path):
         for file_name in files:
+            if file_name == "tsne_data.csv":
+                continue
             df, *_ = process_dataset_for_knn(os.path.join(subdir, file_name),divide_distributions=False)
             classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
             test = Evaluator(df)
-           # test.heatmap(classifications)
-            test.evaluate()
-            test.analysis()
-            make_graphs(test,file_name)
+            #test.evaluate()
+            #test.analysis()
+            #make_graphs(test,file_name)
 
-            #temp = test.analysis_big()
-            #make_accu_graphs(temp)
+            test.evaluate_big()
+            temp = test.analysis_big()
+            make_accu_graphs(temp)
 
 
     
-    baseline_test = Evaluator(df)
-    baseline_test.evaluate(baseline = True)
-    baseline_test.analysis()
-    make_graphs(baseline_test,"baseline")
+   # baseline_test = Evaluator(df)
+   # baseline_test.evaluate(baseline = True)
+   # baseline_test.analysis()
+   # make_graphs(baseline_test,"baseline")
