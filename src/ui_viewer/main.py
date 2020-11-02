@@ -37,7 +37,7 @@ import PIL
 from tqdm import tqdm
 data_path = op.join(dirname(src_dir),"processed_data/data_coarse1_processed_10000_10000000.0.csv")
 n_vertices_target = 10000
-query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
+query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_vertices_target = n_vertices_target)
 initial_n_neighbours = 3
 tsne_path = op.join(dirname(src_dir),'processed_data/tsne_data.csv')
 
@@ -185,7 +185,7 @@ data_table = DataTable(columns=columns, source=data_table_source,height = 150,si
 doc = curdoc()
 
 
-slider_n_neighbours = Slider(start=1, end=15, value=initial_n_neighbours, step=1,
+slider_n_neighbours = Slider(start=0, end=30, value=initial_n_neighbours, step=1,
  title="Number of neighbours ",name="slider_n_neighbours")
 run_button = Button(name = 'run_button',label="Visualize results!", button_type="success")
 rand_base=123

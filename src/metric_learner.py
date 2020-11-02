@@ -1,4 +1,4 @@
-from evaluate_dataset import Evaluater
+from evaluate_dataset import Evaluator
 from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from pathlib import Path
 import numpy as np
@@ -12,13 +12,13 @@ import wandb
 wandb.init(project="metriclearner")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-data_path = "processed_data/data_processed_10000_1000000.0.csv"
+data_path = "processed_data/data_coarse1_processed_10000_10000000.0.csv"
 
 
 
 
-data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
-df, *_ = process_dataset_for_knn(data_path,divide_distributions=False)
+data_path = Path("processed_data/data_coarse1_processed_10000_10000000.0.csv")
+df, *_ = process_dataset_for_knn(data_path,divide_distributions=True)
 classifications = df['classification'].to_list()
 classifications_unique = sorted(list(set(classifications)))
 classifications_indexer = {x:classifications_unique.index(x) for x in classifications_unique}
@@ -84,11 +84,14 @@ for epoch in range(epoch_max):
         df_input = df.copy()
         df_numeric_input = df_input.select_dtypes(np.number) 
         df_input[df_numeric_input.columns] = dotted_features.cpu().detach().numpy()
-        evaluator = Evaluater(df_input)
+        evaluator = Evaluator(df_input)
         evaluator.evaluate()
-        evaluator.analysis()
-        evaluator.overall_accuracy
-        print(f"Loss: {loss.item()}, Accuracy: {evaluator.overall_accuracy}")
+        metrics_dict = evaluator.analysis()
+        precision = metrics_dict['precision']
+        f1 = metrics_dict['precision']
+        recall = metrics_dict['f1']
+        
+        print(f"Loss: {loss.item()}, Precision: {precision}, Recall: {recall}")
 
     
     
