@@ -240,6 +240,8 @@ def make_graphs(test,file_name):
     print(f"{file_name} is done")
 
 def make_accu_graphs(metrics,file_name):
+    file_name = file_name.replace(".","")
+
     sns.set_style('darkgrid')
    # del test.metrics["accuracy"]
     df = pd.DataFrame.from_dict(metrics,orient="index")
@@ -262,7 +264,7 @@ def make_accu_graphs(metrics,file_name):
     plt.title(f"Metrics across different results per query")
 
     plt.tight_layout()
-    plt.savefig(fr"graphs/evaluations/metrics_across_queries",dpi=150)
+    plt.savefig(fr"graphs/evaluations/{file_name}metrics_across_queries",dpi=150)
 
 
 
