@@ -263,9 +263,7 @@ def make_accu_graphs(metrics):
 
     plt.tight_layout()
     plt.savefig(fr"graphs/evaluations/metrics_across_queries",dpi=150)
-    plt.show
 
-    print()
 
 
 
@@ -292,7 +290,7 @@ if __name__ == '__main__':
 
 
     
-   baseline_test = Evaluator(df)
-   baseline_test.evaluate(baseline = True)
-   baseline_test.analysis()
-   make_graphs(baseline_test,"baseline")
+    baseline_test = Evaluator(df)
+    baseline_test.evaluate(baseline = True)
+    baseline_test.analysis()
+    make_graphs(baseline_test,"baseline")
