@@ -29,7 +29,7 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
         for length , array_name in zip(array_lengths,array_columns):
             for col in df.columns:
                 if is_array_col(array_columns,col)==array_name:
-                    df[col] = df[col]/np.sqrt(length)
+                    df[col] = df[col]/length
     return df, scaler
     
     
@@ -91,8 +91,8 @@ def process_dataset_for_knn(data_path,divide_distributions,scaler = 'minmax'):
 
 
 if __name__ == '__main__':
-    data_path = Path("processed_data\data_processed_10000_1000000.0.csv")
-    a = process_dataset_for_knn(data_path,divide_distributions=True)
+    data_path = Path("processed_data/data_coarse1_processed_10000_10000000.0.csv")
+    a = process_dataset_for_knn(data_path,divide_distributions=False)
    
 
 
