@@ -239,7 +239,7 @@ def make_graphs(test,file_name):
 
     print(f"{file_name} is done")
 
-def make_accu_graphs(metrics):
+def make_accu_graphs(metrics,file_name):
     sns.set_style('darkgrid')
    # del test.metrics["accuracy"]
     df = pd.DataFrame.from_dict(metrics,orient="index")
@@ -286,7 +286,7 @@ if __name__ == '__main__':
 
             test.evaluate_big()
             temp = test.analysis_big()
-            make_accu_graphs(temp)
+            make_accu_graphs(temp,file_name)
 
 
     
