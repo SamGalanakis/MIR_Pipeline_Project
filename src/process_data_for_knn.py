@@ -92,7 +92,7 @@ def process_dataset_for_knn(data_path,divide_distributions,scaler = 'minmax'):
 
 if __name__ == '__main__':
     data_path = Path("processed_data/data_coarse1_processed_10000_10000000.0.csv")
-    a = process_dataset_for_knn(data_path,divide_distributions=False)
+    a = process_dataset_for_knn(data_path,divide_distributions=True)
    
 
 

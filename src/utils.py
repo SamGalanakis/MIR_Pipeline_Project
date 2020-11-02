@@ -8,7 +8,7 @@ from file_reader import read_model
 from scipy.spatial import ConvexHull, distance_matrix
 import collections
 import os
-from opt_einsum import contract
+
 
 
 def get_princeton_classifications(cla_path_train):
