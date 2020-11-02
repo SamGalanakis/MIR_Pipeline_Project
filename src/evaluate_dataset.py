@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 import cProfile
 import numpy as np
-
+from utils import get_princeton_classifications
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -167,10 +167,10 @@ class Evaluator:
         self.metrics["recall"] = sum(recall) / len(self.results)
         self.metrics["f1"] = sum(f1) / len(self.results)
         del self.metrics["accuracy"]
+        return self.metrics
 
 
-
-def make_graphs(test,file_name):
+def make_graphs(test,file_name,devided):
     
     sns.set_style('darkgrid')
    # del test.metrics["accuracy"]
@@ -198,7 +198,10 @@ def make_graphs(test,file_name):
         plt.title(f"Average metrics for unprocessed shapes")
 
     plt.tight_layout()
-    plt.savefig(fr"graphs/evaluations/{file_name}_all_metrics",dpi=150)
+    if devided:
+        plt.savefig(fr"graphs/evaluations/devided_{file_name}_all_metrics",dpi=150)
+    else:
+        plt.savefig(fr"graphs/evaluations/{file_name}_all_metrics",dpi=150)
     plt.clf()
 
     for metric, classes in test.metrics_per_class.items():
@@ -211,10 +214,8 @@ def make_graphs(test,file_name):
 
         if file_name == "baseline":
             plt.title(f"{metric} per class metrics baseline")
-        elif "coarse" in file_name and "processed" in file_name:
-            plt.title(f"{metric} per class for preprocessed coarse shapes")
         elif "processed" in file_name:
-            plt.title(f"{metric} pe5r class for preprocessed shapes")
+            plt.title(f"{metric} per class for preprocessed shapes")
         else:
             plt.title(f"{metric} per class for unprocessed shapes")
 
@@ -234,24 +235,32 @@ def make_graphs(test,file_name):
 
 
         plt.tight_layout()
-        plt.savefig(fr"graphs/evaluations/{file_name}_{metric}",dpi=150)
+        if devided:
+            plt.savefig(fr"graphs/evaluations/devided_{file_name}_{metric}",dpi=150)
+        else:
+            plt.savefig(fr"graphs/evaluations/{file_name}_{metric}",dpi=150)
         plt.clf()
 
     print(f"{file_name} is done")
 
-def make_accu_graphs(metrics,file_name):
+def make_accu_graphs(metrics,file_name,devided):
     file_name = file_name.replace(".","")
 
     sns.set_style('darkgrid')
    # del test.metrics["accuracy"]
     df = pd.DataFrame.from_dict(metrics,orient="index")
     #sns.scatterplot(data=df, x=df.index, y="precision",)
+    plt.clf()
 
-    ax = sns.scatterplot(x=df.index, y="precision", data=df)
-    ax = sns.scatterplot(x=df.index, y="recall", data=df)
-    ax = sns.scatterplot(x=df.index, y="f1", data=df)
+    ticks = df.index.tolist()
+    idx = ticks.index(0)
+    ticks[idx] = 'Class Count'
+    df.index = ticks
+
+    ax = sns.scatterplot(x= df.index, y="precision", data=df)
+    ax = sns.scatterplot(x= df.index, y="recall", data=df)
+    ax = sns.scatterplot(x= df.index, y="f1", data=df)
     ax.set(xlabel='Results per query', ylabel='Metrics')
-
     plt.xticks(
         rotation=45, 
         horizontalalignment='right',
@@ -264,35 +273,39 @@ def make_accu_graphs(metrics,file_name):
     plt.title(f"Metrics across different results per query")
 
     plt.tight_layout()
-    plt.savefig(fr"graphs/evaluations/{file_name}metrics_across_queries",dpi=150)
+    if devided:
+        plt.savefig(fr"graphs/evaluations/devided_{file_name}metrics_across_queries",dpi=150)
+    else:
+        plt.savefig(fr"graphs/evaluations/{file_name}metrics_across_queries",dpi=150)
+    plt.clf()
 
 
 
 
 if __name__ == '__main__':
     #data_path = Path("processed_data/data_processed_10000_1000000.0.csv")
-    data_path = Path("processed_data")
-
-    for subdir, dirs, files in os.walk(data_path):
-        for file_name in files:
-            if file_name == "tsne_data.csv":
-                continue
-            df, *_ = process_dataset_for_knn(os.path.join(subdir, file_name),divide_distributions=False)
-            classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-            test = Evaluator(df)
-            test.evaluate()
-            test.analysis()
-            make_graphs(test,file_name)
-            
-            test = Evaluator(df)
-
-            test.evaluate_big()
-            temp = test.analysis_big()
-            make_accu_graphs(temp,file_name)
-
-
+                
+    divide_distributions=True
+    cla_paths = ["data/benchmark/classification/v1/coarse1/coarse1Train.cla","data/benchmark/classification/v1/coarse2/coarse2Train.cla"]
+    class_dicts = [get_princeton_classifications(cla_path) for cla_path in cla_paths]
+    df, *_ = process_dataset_for_knn("processed_data/data_coarse1_processed_10000_10000000.0.csv",divide_distributions)
+   
     
-    baseline_test = Evaluator(df)
-    baseline_test.evaluate(baseline = True)
-    baseline_test.analysis()
-    make_graphs(baseline_test,"baseline")
+    for idx, class_dict in enumerate(class_dicts):
+        df['classification'] = df.file_name.map(lambda x: class_dict[os.path.basename(x).split(".")[0].replace("m","")])
+
+        classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+        test = Evaluator(df)
+        test.evaluate()
+        test.analysis()
+        make_graphs(test,f"data_coarse{idx+1}_processed",divide_distributions)
+
+        test = Evaluator(df)
+        test.evaluate_big()
+        temp = test.analysis_big()
+        make_accu_graphs(temp,f"data_coarse{idx+1}_processed",divide_distributions)
+
+    #baseline_test = Evaluator(df)
+    #baseline_test.evaluate(baseline = True)
+    #baseline_test.analysis()
+    #make_graphs(baseline_test,"baseline",True)
