@@ -252,22 +252,35 @@ def make_accu_graphs(metrics,file_name,devided):
     #sns.scatterplot(data=df, x=df.index, y="precision",)
     plt.clf()
 
-    ticks = df.index.tolist()
-    idx = ticks.index(0)
-    ticks[idx] = 'Class Count'
-    df.index = ticks
+    
+    labels = df.index.tolist()
+    idx = labels.index(0)
+    labels[idx] = 'class counts'
+    ticks = np.arange(5,205,5)
+    ticks = np.append(0,ticks)
+    
+    ax = sns.scatterplot(x = df.index, y="precision", data=df)
+    ax = sns.scatterplot(x = df.index, y="recall", data=df)
+    ax = sns.scatterplot(x = df.index, y="f1", data=df)
 
-    ax = sns.scatterplot(x= df.index, y="precision", data=df)
-    ax = sns.scatterplot(x= df.index, y="recall", data=df)
-    ax = sns.scatterplot(x= df.index, y="f1", data=df)
-    ax.set(xlabel='Results per query', ylabel='Metrics')
-    plt.xticks(
+    plt.xticks([])
+    labels = [ "class counts", 5,  10,  15,  20,  25,  30,  35,  40,  45,  50,  55,  60,  65,
+        70,  75,  80,  85,  90,  95, 100, 105, 110, 115, 120, 125, 130,
+       135, 140, 145, 150, 155, 160, 165, 170, 175, 180, 185, 190, 195,
+       200]
+       
+    ax.get_xaxis().set_ticks([])
+    plt.xticks(ticks, labels=labels,
         rotation=45, 
         horizontalalignment='right',
         fontweight='light',
-        fontsize='x-large'  
+        fontsize='x-small'  
     )
-    ax.tick_params(axis='x', labelsize=11)
+    ax.tick_params(axis='x', labelsize=7)
+
+
+    ax.set(xlabel='Results per query', ylabel='Metrics')
+
     ax.legend(["precision","recall","f1"])
 
     plt.title(f"Metrics across different results per query")
@@ -294,11 +307,11 @@ if __name__ == '__main__':
     for idx, class_dict in enumerate(class_dicts):
         df['classification'] = df.file_name.map(lambda x: class_dict[os.path.basename(x).split(".")[0].replace("m","")])
 
-        classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-        test = Evaluator(df)
-        test.evaluate()
-        test.analysis()
-        make_graphs(test,f"data_coarse{idx+1}_processed",divide_distributions)
+        # classifications = df['classification'].to_list()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+        # test = Evaluator(df)
+        # test.evaluate()
+        # test.analysis()
+        # make_graphs(test,f"data_coarse{idx+1}_processed",divide_distributions)
 
         test = Evaluator(df)
         test.evaluate_big()
