@@ -14,7 +14,7 @@ import shutil
 import random
 from bokeh.layouts import column , row
 import matplotlib.pyplot as plt
-from bokeh.plotting import figure,curdoc
+from bokeh.plotting import figure,curdoc,show,save
 import os.path as op
 import pathlib
 import random
@@ -33,8 +33,8 @@ import matplotlib as mpl
 from bokeh.transform import factor_cmap
 from bokeh.palettes import Spectral6
 import colorcet as cc
-import PIL
-from tqdm import tqdm
+from make_tsne import make_tsne
+
 data_path = op.join(dirname(src_dir),"processed_data/data_coarse1_processed_10000_10000000.0.csv")
 n_vertices_target = 10000
 query_interface = QueryInterface(data_path,divide_distributions=True,n_bins=10,n_vertices_target = n_vertices_target)
@@ -48,62 +48,6 @@ var rand_base = %d;
     window.update_everything(n_models,rand_base);
 """
 
-#Data table
-def make_tsne(tsne_csv_path):
-    df = pd.read_csv(tsne_csv_path)
-    df['x_data']
-   
-    unique_classes = sorted(list(set(df['classification'])))
-    classification_indexes = [unique_classes.index(x) for x in df['classification']]
-    
-    
-    colors =cc.b_glasbey_bw[0:len(unique_classes)]
-    draw_colors = [colors[classification_indexes[x]] for x in range(df.shape[0])]
-    
-
-    #colors_rgb = mpl.colors.hsv_to_rgb(colors)
-    tooltips =  """
-    <div>
-        <div>
-            <img
-                src="@thumbnails" height="42" width="42"
-                style="float: left; margin: 0px 15px 15px 0px;"
-                border="2"
-            ></img>
-        </div>
-        <div>
-            <span style="font-size: 17px; font-weight: bold;">@name</span>
-            <span style="font-size: 15px; color: #966;">[@classification]</span>
-        </div>
-    
-        <div>
-            
-            <span style="font-size: 10px; color: #696;">($x, $y)</span>
-        </div>
-    </div>
-"""
-  
-    hover = HoverTool(tooltips=tooltips)
-
-
-
-
-    colors = [tuple(x) for x in colors]
-
-
-   
-    thumbnails = [f'ui_viewer/static/thumbnails/{name}_thumb.jpg' for name in df['name']]
-    
-    data = dict(x=df['x_data'],y=df['y_data'],thumbnails=thumbnails,
-    classification=df['classification'],name=df['name'],colors=draw_colors)
-    source = ColumnDataSource(data)
-    p = figure(plot_width=1000, plot_height=1000, tools=[hover], title="TSNE",
-    name='tsne_figure')
-    p.circle('x', 'y', size=10, source=source,
-         color='colors',alpha=255)
-    
-    return p
-    
 tsne_figure = make_tsne(tsne_path)
 def make_data_sources_distributions(distribution_columns,df):
     data_list = {x:[] for x in distribution_columns}
@@ -119,7 +63,7 @@ def make_data_sources_distributions(distribution_columns,df):
     return data_list
             
 def make_vacant_col(plot_col,df,distribution_columns):
-    print(f"Df shape{df.shape}]")
+    
     rows = [figure(plot_height=100,plot_width=300,tools=[]) for x in range(df.shape[0])]
     for index,row_fig in enumerate(rows):
         row = df.iloc[index,:]
@@ -143,7 +87,7 @@ def updade_plot_col(plot_col,data_list,distribution_name):
     for index,child in enumerate(plot_col.children):
         
         line_plot = child.select(name='lineplot')
-        print(f"index: {index}, children: {line_plot}")
+        
       
         
         data_for_plot = {'x_values':new_data_list[index]['x_values'],'y_values':new_data_list[index]['y_values']}
@@ -256,12 +200,12 @@ def path_callback(attr, old, new):
     global plot_col
     plot_col.children = []
     plot_col_template = make_vacant_col(plot_col,df_slice,distribution_columns)
-    print(plot_col_template.children)
+    
     global data_list
     data_list = make_data_sources_distributions(distribution_columns,df_slice)
     
     plot_col = updade_plot_col(plot_col_template,data_list,distribution_columns[0])
-    print(plot_col.children)
+    
  
     data_table.source.data = update_dict
     
