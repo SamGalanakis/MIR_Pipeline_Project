@@ -59,8 +59,8 @@ if __name__=='__main__':
     max_path = Path('data/benchmark/db/17/m1755/m1755.off')
     problem_path = "data/benchmark/db/2/m201/m201.off"
     pig_path = Path(r"data\benchmark\db\1\m102\m102.off")
-    path = path
- 
+    path = pig_path
+    
   
     vertices, element_dict, info = read_model(path)
     shape = Shape(vertices,element_dict,info)
