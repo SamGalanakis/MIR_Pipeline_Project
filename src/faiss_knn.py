@@ -14,15 +14,14 @@ import numpy as np
 
 class FaissKNeighbors:
     def __init__(self, dataset,  metric = "L2"):
-       # self.index = None
+     
         self.metric = metric
    
         self.dataset = dataset
 
     def train(self):
         
-        #to test it out
-        #self.test_query = x_train[0]
+      
 
         if self.metric == "L2":
             self.index = faiss.IndexFlatL2(self.dataset.shape[1])
@@ -47,7 +46,7 @@ class FaissKNeighbors:
 
         return distances, indices
 
-    def query_baseline(self,query,n_results):
+    def query_baseline(self,n_results):
         indices = random.choices(np.arange(0, len(self.dataset),1), k = n_results)
         distances = np.zeros(len(indices))
 
@@ -55,10 +54,7 @@ class FaissKNeighbors:
 
 
 
-    def query_range(self, query1, query2, n_results):
-        #query = query.resha2pe((1,-1)).astype(np.float32)
-        self.index.range_search()
-        #return distances, indices
+  
 
 
 if __name__ == '__main__':

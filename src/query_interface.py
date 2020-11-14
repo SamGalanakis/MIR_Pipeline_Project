@@ -9,6 +9,7 @@ from feature_extractor import extract_features
 import numpy as np
 import cProfile
 import pandas as pd
+from custom_knn import CustomNeighbors
 
 class QueryInterface:
     def __init__(self,data_path,divide_distributions,n_bins,n_vertices_target):
@@ -19,15 +20,16 @@ class QueryInterface:
         self.df_numeric = self.df.select_dtypes(include=np.number)
         self.faiss_knn = FaissKNeighbors(self.df_numeric,metric='L2')
         self.faiss_knn.train()
+        self.custom_knn = CustomNeighbors(data_path)
         
 
 
         self.array_col =  ["bounding_box",
                     "angle_three_vertices","barycenter_vertice", "two_vertices",
                     "square_area_triangle", "cube_volume_tetrahedron" ]
+    
 
-
-    def query(self,model_path,n_samples_query,n_results):
+    def query(self,model_path,n_samples_query,n_results,custom = False):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -42,9 +44,12 @@ class QueryInterface:
         
      
 
-      
+        if not custom:
 
-        distances, indices = self.faiss_knn.query(query_vector,n_results)
+            distances, indices = self.faiss_knn.query(query_vector,n_results)
+        else:
+            distances, indices = self.custom_knn.query(query_vector,n_results)
+
         
         distances = distances.flatten().tolist() #Flatten batch dimension
         indices = indices.flatten().tolist()

@@ -34,7 +34,7 @@ from bokeh.transform import factor_cmap
 from bokeh.palettes import Spectral6
 import colorcet as cc
 from make_tsne import make_tsne
-#bokeh serve --show ui_viewer --address 0.0.0.0 --port=8000 --allow-websocket-origin=35.204.195.143:8000 --allow-websocket-origin=localhost:8000
+#--allow-websocket-originbokeh serve --show ui_viewer --address 0.0.0.0 --port=8000 =35.204.195.143:8000 --allow-websocket-origin=localhost:8000
 
 
 data_path = op.join(dirname(src_dir),"processed_data/data_coarse1_processed_10000_10000000.0.csv")
