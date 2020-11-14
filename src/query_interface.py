@@ -95,11 +95,12 @@ if __name__ == '__main__':
     chess_piece_path = Path('data/benchmark/db/16/m1601/m1601.off')
     man_path = Path("data/benchmark/db/2/m201/m201.off")
 
-
+    
     n_vertices_target = 10000
     query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
     
     path=pig_path
+    query_interface.query(man_path,1000,3,custom=True)
     profiler.run('query_interface.query(path,n_samples_query=1e+6,n_results=5)')
     profiler.dump_stats('query_profile_stats')
   
