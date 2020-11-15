@@ -1,6 +1,7 @@
 from process_data_for_knn import process_dataset_for_knn,sample_normalizer
 from sklearn.metrics import accuracy_score
 from faiss_knn import FaissKNeighbors
+from custom_knn import CustomNeighbors
 from collections import defaultdict
 from pathlib import Path
 import pandas as pd
@@ -16,12 +17,13 @@ import seaborn as sns
 
 
 class Evaluator:
-    def __init__(self,df_knn_processed):
-
-
+    def __init__(self,df_knn_processed,weights=False,data_path = False):
+        self.data_path = data_path
+        self.weights=weights
         self.df = df_knn_processed
         self.df_numeric = self.df.select_dtypes(include=np.number)
-
+        if self.data_path:
+            self.custom_knn = CustomNeighbors(data_path)
         self.faiss_knn = FaissKNeighbors(self.df_numeric,metric='L2')
         self.faiss_knn.train()
         self.database_class_path = self.df[["classification","file_name"]]
@@ -37,7 +39,12 @@ class Evaluator:
             #Number of results is based on the number of shapes in a class 
             n_results = self.class_counts[classification]
 
-            if self.baseline:
+            if self.data_path:
+                _, indices = self.custom_knn.query(self.df_numeric.iloc[idx].values, n_results,self.weights)
+                self.results.append((classification, indices.flatten()))
+
+
+            elif self.baseline:
                 _, indices = self.faiss_knn.query_baseline(n_results)
                 self.results.append((classification, indices))
             else:

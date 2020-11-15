@@ -29,7 +29,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
     
 
-    def query(self,model_path,n_samples_query,n_results,custom = False):
+    def query(self,model_path,n_samples_query,n_results,custom = False,weights = False):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -48,7 +48,7 @@ class QueryInterface:
 
             distances, indices = self.faiss_knn.query(query_vector,n_results)
         else:
-            distances, indices = self.custom_knn.query(query_vector,n_results)
+            distances, indices = self.custom_knn.query(query_vector,n_results,weights=weights)
 
         
         distances = distances.flatten().tolist() #Flatten batch dimension

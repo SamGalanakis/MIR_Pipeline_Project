@@ -2,6 +2,7 @@ from file_reader import read_model, write_model_as_ply
 from utils import get_all_file_paths
 from tqdm import tqdm
 
+# Script that makes ply copy of each model in dataset, for three.js viewing 
 dataset_path = 'data/benchmark'
 
 
