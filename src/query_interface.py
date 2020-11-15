@@ -100,8 +100,12 @@ if __name__ == '__main__':
     query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
     
     path=pig_path
+<<<<<<< Updated upstream
     query_interface.query(man_path,1000,3,custom=True)
     profiler.run('query_interface.query(path,n_samples_query=1e+6,n_results=5)')
+=======
+    profiler.run('query_interface.query(path,n_samples_query=10e+6,n_results=5)')
+>>>>>>> Stashed changes
     profiler.dump_stats('query_profile_stats')
   
 
