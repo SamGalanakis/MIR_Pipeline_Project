@@ -29,7 +29,7 @@ class QueryInterface:
                     "square_area_triangle", "cube_volume_tetrahedron" ]
     
 
-    def query(self,model_path,n_samples_query,n_results,custom = False):
+    def query(self,model_path,n_samples_query,n_results,custom = False,weights = False):
         vertices, element_dict, info = read_model(model_path)
         shape = Shape(vertices,element_dict,info)
         shape = process(shape,n_vertices_target=self.n_vertices_target)
@@ -48,7 +48,7 @@ class QueryInterface:
 
             distances, indices = self.faiss_knn.query(query_vector,n_results)
         else:
-            distances, indices = self.custom_knn.query(query_vector,n_results)
+            distances, indices = self.custom_knn.query(query_vector,n_results,weights=weights)
 
         
         distances = distances.flatten().tolist() #Flatten batch dimension
@@ -100,8 +100,12 @@ if __name__ == '__main__':
     query_interface = QueryInterface(data_path,divide_distributions=False,n_bins=10,n_vertices_target = n_vertices_target)
     
     path=pig_path
+<<<<<<< Updated upstream
     query_interface.query(man_path,1000,3,custom=True)
     profiler.run('query_interface.query(path,n_samples_query=1e+6,n_results=5)')
+=======
+    profiler.run('query_interface.query(path,n_samples_query=10e+6,n_results=5)')
+>>>>>>> Stashed changes
     profiler.dump_stats('query_profile_stats')
   
 

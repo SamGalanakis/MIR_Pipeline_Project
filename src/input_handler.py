@@ -9,6 +9,7 @@ import pyrr
 
 
 class InputHandler:
+    ''' Handle input to open gl model viewer  '''
     
     def __init__(self, window):
         self.mode_list = ["default", "wireframe","point_cloud","bounding_box"]

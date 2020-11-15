@@ -34,7 +34,7 @@ labels = torch.tensor(classifications_numeric).to(device)
 class Metric(nn.Module):
     def __init__(self):
         super().__init__()
-        self.weights = nn.Parameter(torch.rand(df_numeric.shape[1],requires_grad=True))
+        self.weights = nn.Parameter(torch.rand(14,requires_grad=True))
         # self.fc1 = nn.Linear(df_numeric.shape[1],df_numeric.shape[1])
         
         # self.fc2 = nn.Linear(df_numeric.shape[1],df_numeric.shape[1])
@@ -84,7 +84,7 @@ for epoch in range(epoch_max):
         df_input = df.copy()
         df_numeric_input = df_input.select_dtypes(np.number) 
         df_input[df_numeric_input.columns] = dotted_features.cpu().detach().numpy()
-        evaluator = Evaluator(df_input)
+        evaluator = Evaluator(df_input,data_,data_path)
         evaluator.evaluate()
         metrics_dict = evaluator.analysis()
         precision = metrics_dict['precision']

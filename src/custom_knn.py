@@ -30,8 +30,7 @@ class CustomNeighbors:
         self.scalar_cols = [x for x in self.df_numeric.columns if not is_array_col(self.array_columns,x)]
         self.scalar_col_ind = [self.df_numeric.columns.tolist().index(x) for x in self.scalar_cols]
         self.metric = self.weighted_wasserstein
-        
-    def weighted_wasserstein(self,query):
+    def weighted_wasserstein(self,query,weights):
         query = query.flatten()
         distances = np.zeros((self.df.shape[0],len(self.array_columns)))
         for index,  array_name in enumerate(self.array_columns):
@@ -40,7 +39,7 @@ class CustomNeighbors:
                 distances[row_ind,index]=wasserstein_distance(self.df_numeric.values[row_ind,relevant_indices],query[relevant_indices])
         scalar_distances = (self.df_numeric.values[:,self.scalar_col_ind] - query[self.scalar_col_ind])**2
         distances = np.concatenate([distances,scalar_distances],axis=1)
-        weights = np.ones(distances.shape[1])
+        
         distances = np.matmul(distances,weights.reshape(-1,1))
         return distances
         
@@ -49,11 +48,13 @@ class CustomNeighbors:
         
 
 
-    def query(self, query, n_results):
+    def query(self, query, n_results,weights = False):
         query = query.reshape((1,-1)).astype(np.float32)
 
+        if isinstance(weights,bool):
+            weights =  np.ones(14)
        
-        distances = self.metric(query)
+        distances = self.metric(query,weights)
         indices = np.argsort(distances,axis=0)[0:n_results]
         distances = distances.squeeze()[indices]
 
