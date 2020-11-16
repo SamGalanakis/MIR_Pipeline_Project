@@ -14,7 +14,7 @@ import os
 def get_princeton_classifications(cla_path_train):
     classification_dict_train, hierarchy_dict_train, cla_info_train =  cla_parser(Path(cla_path_train))
     test_path = cla_path_train.replace('train','test')
-    test_path = cla_path_train.replace('Train','Test')
+    test_path = test_path.replace('Train','Test')
     classification_dict_test, hierarchy_dict_test, cla_info_test = cla_parser(Path(test_path))
     classification_dict = merge_dicts(classification_dict_train,classification_dict_test)
 
@@ -258,7 +258,8 @@ def volume(vertices,triangles):
     
 if __name__ == "__main__":
   
-    #cla_parser(Path(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla"))
+   # coarse_1 = get_princeton_classifications(r"data\benchmark\classification\v1\coarse1\coarse1Train.cla")
+    base = get_princeton_classifications(r"data\benchmark\classification\v1\base\train.cla")
     
     path  = Path(r"data/cube2.off")
     path = Path('data/benchmark/db/0/m0/m0.ply')
