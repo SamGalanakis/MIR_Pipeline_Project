@@ -10,6 +10,8 @@ import math
 from pyacvd import Clustering
 
 class Shape:
+    '''Class collecting shape properties and basic viewing functionality'''
+    
     def __init__(self,vertices, element_dict, info):
         self.vertices=vertices.reshape((-1,3))
         self.element_dict = element_dict

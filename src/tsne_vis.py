@@ -10,8 +10,9 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from utils import get_princeton_classifications
 def make_tsne(data_path,save_path):
+    '''Produce tsne data from processed data and store for visualization by bokeh'''
 
-    # df = pd.read_csv(data_path)
+    
     cla_path = 'data/benchmark/classification/v1/coarse1/coarse1Train.cla'
     # cla_path = 'data/benchmark/classification/v1/base/train.cla'
     classification_dict = get_princeton_classifications(cla_path)

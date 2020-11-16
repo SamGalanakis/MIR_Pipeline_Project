@@ -13,14 +13,7 @@ from cmath import pi
 from utils import bounding_box
 import shader_loader
 class ModelViewer:
-   # def __init__(self):
-
-        
-    
-
- 
-
-#out_color = vec4(v_color, 1.0);
+    '''Viewer interface, not really necessary anymore due to the bokeh interface'''
 
     def window_resize(self, window, width, height):
         glViewport(0, 0, width, height)

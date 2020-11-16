@@ -7,7 +7,7 @@ import numpy as np
 
 
 def extract_features(shape,n_bins,n_samples):
-    '''Input must be Shape or path'''
+    '''Extract relevant features, input must be Shape or path'''
   
     if isinstance(shape,Shape):
         pass
@@ -53,5 +53,3 @@ def extract_features(shape,n_bins,n_samples):
 
     return feature_dict
 
-if __name__=='__main__':
-    pass

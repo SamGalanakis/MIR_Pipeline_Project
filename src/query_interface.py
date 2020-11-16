@@ -65,7 +65,7 @@ class QueryInterface:
         df_slice = pd.concat([df_slice,feature_df])
         df_slice = df_slice.sort_values('distance')
 
-        #Send results for visualization
+        
 
        
         return distances, indices, df_slice

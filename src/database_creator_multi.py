@@ -42,6 +42,8 @@ def data_dict_parser(data_dict):
         return df
 
 class Database:
+    '''Process princeton benchmark and construct feature csv'''
+    
     def __init__(self):
         
         cla_path = 'data/benchmark/classification/v1/base/train.cla'

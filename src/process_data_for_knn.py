@@ -11,6 +11,7 @@ from sklearn import preprocessing
 
 
 def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distributions):
+    '''Normalize feature value ranges and divide histogram bins'''
     df= df.drop(exclude,axis=1)
     x = df.select_dtypes(include=np.number)
     if scaler == 'minmax':
@@ -20,7 +21,8 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
         scaler = preprocessing.StandardScaler()
         scaler.fit(x)
     else:
-        print(f'Using provided scaler {scaler}')
+        pass
+        #print(f'Using provided scaler {scaler}')
     
     x_scaled=scaler.transform(x)
     
@@ -36,6 +38,7 @@ def sample_normalizer(df,exclude,scaler,array_columns,array_lengths,divide_distr
 
 
 def process_dataset_for_knn(data_path,divide_distributions,scaler = 'minmax'):
+    '''Process data so that it is in form ready to be passed to knn interface'''
     data_path = Path(data_path)
     df = pd.read_csv(data_path,index_col=0)
 
@@ -97,7 +100,5 @@ if __name__ == '__main__':
 
 
 
-# numeric_df =  df.select_dtypes(include=np.number)
-# sample_numeric = sample[numeric_df.columns]
-# dist = np.linalg.norm((numeric_df.values-sample_numeric.values).astype(np.float32),axis=1,ord=2)
+
 

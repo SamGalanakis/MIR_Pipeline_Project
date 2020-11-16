@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import torch.nn.functional as F
 import wandb
 
-
+#Attempt to learn different weights for metric but results did not improve.
 
 wandb.init(project="metriclearner")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

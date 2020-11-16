@@ -55,6 +55,7 @@ def convert_ply_to_off(path):
     return off_file
 
 def read_model(path,verbose=False):
+    '''Read model file, off or ply '''
     if not type(path)==list:
         if type(path)==str:
             path = Path(path)

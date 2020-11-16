@@ -5,14 +5,9 @@ import random
 import numpy as np
 
 
-"""
-    #Make new environmen with Python 3.7
-    #Install CUDA 10.0 
-    #RUN on new environment: conda install faiss-gpu cudatoolkit=10.0 -c pytorch 
-"""
-     
-
 class FaissKNeighbors:
+    '''Interface for knn queries via faiss library'''
+
     def __init__(self, dataset,  metric = "L2"):
      
         self.metric = metric
@@ -62,4 +57,4 @@ if __name__ == '__main__':
 
     knn = FaissKNeighbors(data_path)
     knn.train()
-    #knn.query("asd",3)
+  
