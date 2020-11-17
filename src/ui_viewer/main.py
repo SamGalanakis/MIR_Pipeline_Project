@@ -185,7 +185,7 @@ def path_callback(attr, old, new):
         print('Invalid file type!')
         return
 
-    _, _ , df_slice = query_interface.query(input_path,n_samples_query=10e+6,n_results=initial_n_neighbours)
+    _, _ , df_slice = query_interface.query(input_path,n_samples_query=1e+6,n_results=initial_n_neighbours)
     
     
    
