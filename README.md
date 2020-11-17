@@ -15,12 +15,19 @@ Only tested with Linux due to limited compatibility of the Faiss library with wi
 ### With Anaconda (easy): ### 
 
 Create an environment via the environment.yml file by calling the following:
+
 ```
-conda env create --name envname -file environment.yml
+conda env create --name envname --file=environments.yml
 ```
+
+Activate environment:
+```
+conda activate envname
+```
+
 ### Without Anaconda: ####
 
-Install dependencies from via requirements.txt by calling the following:
+Install dependencies via requirements.txt by calling the following:
 
 ```
 pip install -r requirements.txt
