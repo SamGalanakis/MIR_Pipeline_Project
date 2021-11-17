@@ -34,7 +34,7 @@ pip install -r requirements.txt
 ```
 
 Since Faiss is not installable via pip it has to be compiled from source. This can be done
-as detailed in the [official documentation]("https://github.com/facebookresearch/faiss/blob/master/INSTALL.md")
+as detailed in the [official documentation](https://github.com/facebookresearch/faiss/blob/master/INSTALL.md)
 Both the gpu and cpu versions of Faiss will work.
 
 
